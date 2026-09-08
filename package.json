@@ -1,0 +1,25 @@
+{
+  "name": "regalo-flores-consola",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Flores amarillas en ASCII, en cualquier terminal. Estilo curl parrot.live.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "regalo-flores": "bin/regalo.js"
+  },
+  "scripts": {
+    "start": "node bin/regalo.js",
+    "servidor": "node server.js",
+    "flores": "node scripts/dibujar-flores.mjs",
+    "arte": "node scripts/generar-arte.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "server.js",
+    "README.md"
+  ]
+}

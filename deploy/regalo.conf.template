@@ -1,0 +1,77 @@
+# ============================================================
+# El regalo: flores.duckdns.org
+# ============================================================
+#
+# Para el nginx en contenedor de UCB-DEPORTES-BACKEND. Va en
+# nginx/templates/regalo.conf.template, junto a default.conf.template.
+#
+#   cp regalo.conf.template ../UCB-DEPORTES-BACKEND/nginx/templates/
+#   docker compose restart nginx
+#
+# Las plantillas se procesan con envsubst SÓLO al arrancar el contenedor: un
+# `nginx -s reload` no las vuelve a mirar. Y por eso el dominio va escrito a
+# mano y no como ${VARIABLE}: si la variable no existiera en el entorno del
+# contenedor, envsubst la dejaría literal, nginx no arrancaría y se llevaría por
+# delante el frontend y la API. Cambia las dos líneas `server_name` y ya.
+#
+# NO lleva bloque 443 a propósito: para `curl dominio` sólo hace falta el 80, y
+# un `ssl_certificate` apuntando a un fichero que no existe impide arrancar a
+# nginx entero. Si quieres HTTPS además, mira el final del fichero.
+
+server {
+  listen 80;
+  server_name flores.duckdns.org;
+
+  # nada de `return 301 https://...` aquí: curl no sigue redirecciones si no le
+  # pasan -L, así que redirigir es servir una línea de texto en vez del regalo.
+  # Como nginx elige por server_name antes que por default_server, este bloque
+  # gana al comodín sin tocar los del frontend ni los de la API.
+
+  # por si algún día quieres emitir certificado para este dominio
+  location /.well-known/acme-challenge/ {
+    root /var/www/certbot;
+  }
+
+  # el contenedor del regalo no publica puertos: se le llega por la red interna.
+  # El resolver de Docker + la variable hacen que el nombre se resuelva en cada
+  # petición, así que redesplegar el regalo no deja a nginx con una IP vieja.
+  resolver 127.0.0.11 valid=30s ipv6=off;
+
+  location / {
+    set $regalo_host regalo;
+    proxy_pass http://$regalo_host:3000$request_uri;
+
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;                 # la página HTML enseña el
+    proxy_set_header X-Real-IP $remote_addr;     # comando curl con este nombre
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # la animación es un streaming: si nginx la acumula, llega toda de golpe al
+    # final. El servidor ya manda X-Accel-Buffering: no, esto es por si acaso.
+    proxy_buffering off;
+    proxy_cache off;
+    gzip off;
+
+    # el bucle final del rótulo no termina nunca: lo corta el usuario con
+    # Ctrl-C. Con los 60s de por defecto, el regalo se cortaría solo al minuto.
+    proxy_read_timeout 1h;
+    proxy_send_timeout 1h;
+  }
+}
+
+# ------------------------------------------------------------------
+# ¿HTTPS también? En este orden, y sin saltarse el primer paso:
+#
+#   1. añade  ensure_cert "${REGALO_DOMAIN}"  a nginx/init-certs.sh y
+#      REGALO_DOMAIN: flores.duckdns.org  al environment del servicio nginx,
+#      para que el self-signed temporal exista antes de que nginx lo busque;
+#   2. reinicia nginx y emite el certificado de verdad:
+#      docker compose run --rm certbot certonly --webroot -w /var/www/certbot \
+#        -d flores.duckdns.org
+#   3. y entonces sí, copia aquí el bloque 443 de default.conf.template con
+#      este server_name y el mismo `location /` de arriba.
+#
+# El bloque 80 se queda como está: sin redirección, que es lo que hace que
+# `curl flores.duckdns.org` siga funcionando.
+# ------------------------------------------------------------------

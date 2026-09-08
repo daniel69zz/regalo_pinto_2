@@ -1,0 +1,37 @@
+# Dependencias: el proyecto no tiene ninguna, pero si algún día se instala algo
+node_modules/
+.npm/
+
+# Logs y basura de npm
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Variables de entorno (PORT y HOST se pasan al arrancar, no en un fichero,
+# pero si alguna vez hay un .env que no acabe en el repo)
+.env
+.env.*
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# --------------------------------------------------------------------------
+# Lo que NO se ignora, aunque lo parezca:
+#
+#   src/arte.js    lo genera `npm run arte`, pero es lo que se ejecuta: el
+#                  contenedor copia src/ y nunca corre el generador, así que
+#                  si no está en el repo no hay regalo que servir.
+#   pinto.png      el original del retrato.
+#   girasol.png    las flores las dibuja `npm run flores`, y son la fuente
+#   guirnalda.png  de la que `npm run arte` saca el ASCII. Sin ellas no se
+#                  puede regenerar el arte (ni retocar las flores).
+# --------------------------------------------------------------------------

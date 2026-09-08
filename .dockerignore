@@ -1,0 +1,12 @@
+# fuera de la imagen todo lo que no se ejecuta
+.git
+.gitignore
+.dockerignore
+Dockerfile
+node_modules
+README.md
+scripts
+*.png
+*.log
+.DS_Store
+.nvmrc
