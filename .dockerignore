@@ -3,6 +3,8 @@
 .gitignore
 .dockerignore
 Dockerfile
+docker-compose.yml
+deploy
 node_modules
 README.md
 scripts

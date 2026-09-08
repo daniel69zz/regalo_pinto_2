@@ -1,8 +1,12 @@
 # El regalo por HTTP, en un contenedor.
 #
+#   docker compose up -d --build          # en el VPS: queda en el 2999
+#   curl "localhost:2999?cols=$(tput cols)&filas=$(tput lines)"
+#
+# o a mano, sin compose:
+#
 #   docker build -t regalo-flores .
-#   docker run --rm -p 3000:3000 regalo-flores
-#   curl "localhost:3000?cols=$(tput cols)&filas=$(tput lines)"
+#   docker run -d --name regalo-flores -p 2999:2999 --restart unless-stopped regalo-flores
 #
 # No hay `npm install` ni fase de build: el proyecto no tiene dependencias y el
 # arte ASCII ya viene generado en src/arte.js. Copiar los cuatro ficheros que
@@ -10,8 +14,10 @@
 
 FROM node:22-alpine
 
+# El 2999 es el puerto del contenedor y el que se publica en el VPS (2999:2999).
+# `server.js` lee PORT, así que cambiarlo aquí es cambiarlo en todas partes.
 ENV NODE_ENV=production \
-    PORT=3000 \
+    PORT=2999 \
     HOST=0.0.0.0
 
 WORKDIR /app
@@ -26,7 +32,7 @@ COPY bin ./bin
 # el usuario `node` viene en la imagen oficial; nada de correr como root
 USER node
 
-EXPOSE 3000
+EXPOSE 2999
 
 # Ojo con el agente: si dijera "curl" el servidor le devolvería la animación,
 # que no termina nunca, y el healthcheck se quedaría colgado hasta el timeout.

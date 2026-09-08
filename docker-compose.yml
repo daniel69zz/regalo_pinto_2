@@ -1,0 +1,45 @@
+# El regalo en el VPS.
+#
+#   docker compose up -d --build
+#   curl "localhost:2999?cols=$(tput cols)&filas=$(tput lines)"
+#   docker compose logs -f     ·     docker compose down
+#
+# Se publica en el 2999 del host, que es donde lo va a buscar nginx.
+
+services:
+  regalo:
+    build: .
+    image: regalo-flores
+    container_name: regalo-flores
+    restart: unless-stopped
+
+    ports:
+      # Docker publica puertos POR DELANTE de ufw: tal cual está, el 2999 queda
+      # abierto a Internet (que es lo que hace falta si quieres entrar por
+      # `curl IP:2999` sin dominio). Si delante va un nginx del host, cambia
+      # esta línea por "127.0.0.1:2999:2999" y deja de asomar.
+      - "2999:2999"
+
+    environment:
+      PORT: 2999
+      HOST: 0.0.0.0
+
+    # El bucle final no termina nunca: lo corta el usuario con Ctrl-C. `server.js`
+    # atiende SIGTERM y corta las escenas en marcha, pero si alguna se resiste,
+    # que no se eternice el `docker compose down`.
+    stop_grace_period: 15s
+
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+# Si el nginx que va a servir el dominio corre en un contenedor, descomenta esto
+# y el `networks:` del servicio: se hablan por el nombre del contenedor
+# (regalo-flores) y no hace falta ni publicar el puerto.
+#
+#     networks: [ default, proxy ]
+#
+# networks:
+#   proxy:
+#     external: true
+#     name: ucb-network
