@@ -1,8 +1,18 @@
 # 🎁 regalo-flores · versión consola
 
-Pinto entre flores amarillas en **ASCII de 24 bits** —su retrato, un girasol al
-lado y una guirnalda de flores debajo— y el rótulo de felicitación en arcoíris,
-en una terminal de verdad. Node y nada más: cero dependencias.
+Pinto entre flores amarillas en **ASCII de 24 bits** —su retrato con un girasol
+grande al lado y una guirnalda de flores debajo— y un rótulo en arcoíris por el
+21 de septiembre, el día de regalar flores amarillas. En una terminal de
+verdad. Al final, mientras el rótulo hace el arcoíris, el girasol grande y los
+de la guirnalda **giran**, que para eso son girasoles. Node y nada más: cero
+dependencias.
+
+El girasol va de pie junto a Pinto, apoyado sobre la guirnalda, y más o menos
+de su tamaño (entre 0.7 y 1.2 veces su ancho): primero se elige la flor más
+grande que quepa y el retrato se encoge a su medida. Para girar tiene que seguir en
+pantalla cuando empieza el bucle final, de su cabeza al rótulo, así que el
+tamaño de los dos se elige también por el alto de la consola: con 40 filas o
+más gira; con menos, o por curl sin decir `filas`, se queda quieto a su lado.
 
 ## En local
 
@@ -15,9 +25,11 @@ node bin/regalo.js --ayuda  # todas las opciones
 
 `Ctrl-C` para salir.
 
-Las flores no son fotos: se dibujan en píxeles y de ahí se convierten a ASCII.
-Si quieres tocarlas, están en `scripts/dibujar-flores.mjs`, y
-`npm run flores && npm run arte` rehace los PNG y `src/arte.js`.
+Las flores no son fotos: se dibujan en píxeles y de ahí se convierten a ASCII
+—los ocho fotogramas del giro incluidos—. Si quieres tocarlas, están en
+`scripts/dibujar-flores.mjs`: `npm run arte` rehace `src/arte.js` y
+`npm run flores` escribe además los PNG, que sirven para mirarlas con ojos en
+vez de con caracteres.
 
 ### Opciones
 
@@ -25,7 +37,7 @@ Si quieres tocarlas, están en `scripts/dibujar-flores.mjs`, y
 |---|---|---|---|
 | `--ancho N` / `--cols N` | `?cols=` | columnas a usar | las de la terminal / 96 |
 | `--filas N` | `?filas=` | filas de la terminal; decide cuánto puede ocupar el rótulo | las de la terminal / 24 |
-| `--mensaje TEXTO` | `?mensaje=` | un renglón del rótulo; repetible | el mensaje de cumpleaños |
+| `--mensaje TEXTO` | `?mensaje=` | un renglón del rótulo; repetible | el del 21 de septiembre |
 | `--sin-flores` | `?flores=no` | sólo el retrato, sin flores | con flores |
 | `--sin-color` | `?color=no` | texto pelado, sin ANSI | con color |
 | `--rapido` / `--lento` / `--velocidad N` | `?velocidad=` | multiplicador de tiempos | `1` |

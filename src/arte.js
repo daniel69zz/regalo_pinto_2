@@ -23,6 +23,15 @@ const parte = (s) => s.replace(/^\n/, '').replace(/\n$/, '').split('\n');
 const filas = (a) => a.map((v) => ({ ...v, filas: parte(v.color), mono: parte(v.plano) }));
 
 /**
+ * Igual, pero para lo que gira: cada tamaño trae sus fotogramas, y las claves
+ * filas y mono apuntan al primero, que es el que se pinta si no hay animación.
+ */
+const conMarcos = (a) => a.map((v) => {
+  const marcos = v.marcos.map((m) => ({ filas: parte(m.color), mono: parte(m.plano) }));
+  return { ...v, marcos, filas: marcos[0].filas, mono: marcos[0].mono };
+});
+
+/**
  * Retrato de Pinto, de mayor a menor.
  *
  * El brillo se sube un poco al pintar, no en los datos: un carácter ASCII sólo
@@ -1120,404 +1129,3207 @@ export const RETRATO = filas([
 export const RETRATO_BRILLO = 1.2;
 
 /**
- * El girasol que acompaña al retrato, de mayor a menor.
+ * El girasol grande, de mayor a menor. Va de pie junto al retrato, girando si
+ * cabe en pantalla.
  *
  * Un poco de brillo porque un carácter ASCII sólo entinta parte de su celda y
  * el amarillo se apaga; poco, que los pétalos ya rozan el 255 en la punta y lo
  * siguiente es que se vayan a blanco y se pierda el filo.
+ *
+ * Como la guirnalda, cada tamaño trae 8 fotogramas del giro de la cabeza.
  */
-export const GIRASOL = filas([
+export const GIRASOL = conMarcos([
   {
-    cols: 55, alto: 34,
-    color: `
-000000                               |fcd262*|fce062@
-000000                |fcd270#|fce062@|fcd262#|000000     |fce062@@|e0c454+|d2b654%|eec454@|d2b654%|eec454%|fce054@@|eec454%|000000    |fcd254%|fce062@|fcd270#
-000000                |eec454#|fce054@@|fcd246@|eec446#|d2b654=|000000 |eec454%|fce046@@|fcc446@|e0b646@|eec446@|eeb638@|fcd238@|fce046@|fcd246@|eec446@|000000 |d2b646*|eec446%|fcd246@|fce054@@|eec454#
-000000                 |fcc438@|fce038@@|fcd238@|eeb62a@|d2a838@|e0b638@|fcd238@|fce038@|fcd238@|eeb62a@@@|fcd22a@|fce02a@|fcd22a@|eeb62a@|e0b638@|eeb62a@|fcd238@|fce038@@|fcc438@|000000   |eec454+|fcd254%|fce062@@
-000000           |fcd262@|fce054@|fcd254@|fcc446%|eeb646+|000000 |eeb638#|fcc42a@|fcd22a@@|fcc41c@|eeb61c@|eea82a@|fcc41c@|fcd21c@@|fcb61c@|eeb61c@|fcb60e@|fcd21c@@|fcc41c@|eea81c@|eeb61c@|fcc41c@|fcd22a@@|fcc42a@|eeb646#|000000 |eeb638#|fcc438@|fce046@@|fce054@|eec454%
-000000            |fcc446@|fce046@|fce038@|fcd238@|fcc42a@|e0a82a@|e0a81c@|fcc40e@|fcd20e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcd20e@|fcc40e@|e0a81c@|e0a82a@|fcb61c@|fcd22a@@|fcd238@|fcc438@|eec446%
-000000      |fce070+|fce062*|fcd254*|eec454+|000000   |eec438@|fcc42a@|fcd22a@|fcd21c@|fcc41c@|eea80e@|e09a0e@|fcb60e@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fcc40e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fcc40e@|fcb60e@|e09a0e@|eea80e@|fcc40e@|fcd20e@|fcd21c@|fcc41c@|fcb62a@|eeb646=|000000  |eec454=|fcd262+|fce062*
-000000       |fcd254@|fce054@|fce046@|fcd246@|fcc438@@|eeb638*|e0a82a%|fcb61c@|fcc40e@@@|fca80e@|e08c0e%|fca81c@|fcb60e@|fca80e@|ee9a0e@%|fcb60e@|fca80e@|ee9a0e@|fc9a0e@|fca80e@|e09a0e%|ee9a0e@|fca80e@|fcb60e@|eea81c@|e08c0e%|fca80e@|fcb60e@|fcc40e@|fcb60e@@|eeb62a%|eeb638*|fcc438@@|fcd246@|fce046@|fce054@|fcd262@
-000000        |e0b646@|fcc438@|fcd238@|fcd22a@@|fcc41c@|fcb60e@|eeb61c@|e0a82a@|eea80e@|fcb60e@@|fca80e@|d28c1c#|fcb62a%|fcb61c@|fcb62a@|e0a82a@|d28c1c%|d29a2a%|d29a1c%|d29a2a%|e0a82a@|eea82a@|eea81c@|fcb61c@|fcb638#|d28c1c%|fca80e@|fcb60e@|fca80e@|eea80e@|e0a81c@|eeb61c@|fcb60e@|fcd21c@|fcd22a@@|fcd238@|fcc438@|e0b646@
-000000  |fce070=|fce062*|fcd254#|fcc446##|eec446*|eeb638#|e0a82a@@|eeb61c@|fcb61c@|fcc40e@@@|fcb60e@|fca81c@|e09a2a+|eea81c*|fcb61c@|fcb62a@|c48c1c%|a8700e%|9a620e%%|a8620e%|9a620e%%|a8620e%%|a8700e%%|b67e1c%|d29a1c%|fcb62a@|fcb61c@|eea81c*|e09a2a+|fca81c@|fcb60e@|fcc40e@@@|fcb61c@|eeb61c@|e0a82a@|d2a838@|eeb646+|eec446++|fcd254+|fcd262=
-000000  |fcd270=|fcd262@|fce054@|fce046@@|fce038@|fcd22a@@|fcc41c@|fcb60e@|fca80e@|eea80e@|ee9a0e@@|fca80e@@@|fcc438@|c47e1c%|9a620e%%%%%%%%%%%|a8620e%|9a620e%%|a8700e%|c48c1c%|eeb638@|fcb60e@|fca80e@@|ee9a0e@@|eea80e@|fcb60e@|fcb61c@|fcc41c@|fcd22a@|fcd238@|fce046@@|fce054@|fce062@|fce070=
-000000    |e0c462+|eec446@|fcc438@@|fcc42a@|fcc41c@@|fcc40e@@@|fcb60e@|fca80e@@|eea82a@|fcb62a@|a8620e%%%|9a620e%%%%%%%%%%%%|a8620e%|9a620e%|a8620e%|b67e1c%|fcb62a@|eea82a@|fca80e@@|fcb60e@|fcc40e@@@|fcc41c@|fcc42a@@|fcc438@|eec446@@|e0c462@
-000000     |e0b654@|e0b638@|eeb638@|eeb62a@|eeb61c@|eea80e@@@@|fca80e@|fc9a0e@|fc9a00@|fcc42a@|c48c1c%|a8700e%|a8620e%|9a620e%%%%%%%%%%%%%|a8620e%|9a620e%|a8700e%|9a620e%|a8701c%|fcc42a@|fc9a00@|fc9a0e@|fca80e@|eea80e@@@@|eeb61c@|eeb62a@|eeb638@@|e0b646@|e0b654=
-000000 |fce070*|fce062@|fce054@@|fce046@|fcd238@|fcd22a@@|fcd21c@|fcc40e@@@|fcb60e@@|fca80e@|fc9a0e@|fcc438@|a8700e%|a8620e%%|9a620e%%%%%|8c540e%|8c620e%|8c540e%|8c620e%|9a620e%%|8c620e%|9a620e%%%%%|a8701c%|fcc438@|fc9a00@|fca80e@|fcb60e@@|fcc40e@@@|fcd21c@|fcd22a@|fcd238@|fce038@|fce046@|fce054@@|fce062@
-000000  |eed254+|fcd254#|fcc446@|fcc438@@|fcc42a@|fcc41c@|fcb61c@|fcb60e@@|fca80e@@|fc9a0e@|ee9a0e@|ee8c00%|fcc438@|a8701c%|a8620e%|9a620e%%%%%%|8c540e%|8c620e%%%|8c540e%|8c620e%|9a620e%%%|a8620e%%|a8700e%|c48c1c%|fcc42a@|ee8c00%|ee9a0e@|fc9a0e@|fca80e@@|fcb60e@@|fcb61c@|fcc42a@@|fcc438@|eec446@|eec454%|eed254+
-000000    |e0c462=|e0c454@|eeb646@|eeb638@|fcb62a@|fcb61c@|fcb60e@@@@@|fca80e@@|fcb62a@|e0a82a@|a8700e%|a8620e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%%|e0a82a@|fcb62a@|fca80e@@|fcb60e@@@@@|fcb61c@|fcb62a@|eeb62a@|eeb638@|eec446@|e0c454@|e0c462*
-000000   |eec454+|fcd254@|fcd246@|fcd238@@|fcd22a@|fcd21c@@|fcc40e@@|fcb60e@|fca80e@|ee9a0e@|e09a0e%|ee9a0e@|fcb62a@|e0a82a@|b67e1c%|9a620e%%%%%%%%%%%%%|a8620e%|a8700e%|b67e1c%|e0a82a@|fcb62a@|ee9a0e@|e09a0e%|ee9a0e@|fca80e@|fcb60e@|fcc40e@@|fcd21c@@|fcd22a@|fcd238@@|fcd246@|fcc446@|eec462%
-000000  |fce062@@|fce054@|fcd246@@|fcc438@@|eeb62a@|eeb61c@|eea81c@|eea80e@|fca80e@@|fcb60e@@|fca80e@|fca81c#|fcd246+|eeb62a@|c48c1c%|a8620e%%|9a620e%%%|a8620e%%|a8700e%|9a620e%%|a8620e%|9a620e%%|c48c1c%|fcb638@|fcc446+|fca81c%|fcb60e@@@@|fca80e@|eea80e@|eea81c@|eeb61c@|eeb62a@|fcc42a@|fcc438@|fcd246@|fce046@|fce054@|fce062@@
-000000        |d2a838%|eeb62a@|fcb61c@|fcc41c@|fcc40e@@@|fcb60e@|fca81c@|e0a82a#|fca80e#@@|eea81c@|eeb638%|e0a82a@|d29a2a%|b67e1c%|a8701c%|a8700e%|a8701c%|9a620e%|a87e1c%|a8701c%|d28c1c%|eea82a@|fcc438%|eea81c@|fca80e@@|eea80e#|e09a1c#|fca81c@|fcb60e@|fcc40e@|fcd20e@|fcd21c@|fcc41c@|fcc42a@|e0b62a@|d2a846@|d2b654+
-000000      |eec454+|fcc446@|fcd238@@|fcd22a@@|fcc41c@|fcb61c@|eea82a@|e0a81c@|fca80e@|fcb60e@|fcc40e@|fcb60e@|e09a0e%|e09a2a#|fca80e@@|ee9a0e@|ee9a1c@|fcb61c@|fca81c@|fcb61c@|fca81c@|fcb61c@|e09a1c@|ee9a0e@|fca80e@@|e09a2a%|e09a0e%|fcb60e@|fcc40e@|fcb60e@|fca80e@|e0a81c@|eea82a@|fcb61c@|fcc42a@|fcd22a@|fce038@|fce046@|fcd246@|eec446@|d2b662-
-000000     |fcd262@|fce054@@|fce046@|fcd238@|fcc438@|eeb638#|e0b638+|e0a838%|fcb61c@|fcc41c@|fcd21c@|fcc40e@|fcb60e@|e09a0e@|ee9a0e@|fcb60e@@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|fc9a0e@@|fcb60e@|fc9a0e@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|eea80e@|e09a0e@|fcb60e@|fcc40e@|fcd21c@|fcc41c@|fcb61c@|e0b638#|eeb646=|eec446*|fcc446@|fcd246@|fce054@@|fce062@
-000000     |fce070#|fcd262*|eec454+-|000000   |eec446@|fcd238@|fce038@|fcd22a@|fcc42a@|eeb61c@|e09a0e@|fcb60e@|fcc40e@@|fcb60e@|eea80e@@|fcb60e@|fcc40e@|fca80e@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@@|fcc40e@|fcd20e@|fcc40e@|fcb60e@|e0a81c@|fcb61c@|fcc42a@|fcd22a@|fcd238@@|eec446@
-000000           |eec454%|fce054@|fce046@|fcd246@|eec438@|e0a838@|d2a838@|fcb62a@|fcd22a@|fcd21c@|fcc41c@|fcb61c@|eea81c@|fcb60e@|fcd20e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|fcb60e@|eea81c@|fcb61c@|fcd21c@|fcd22a@@|eeb62a@|d2a838#|e0a838@|eec438@|fcd246@|fce046@|fce054@|eec454@
-000000           |fce062@@|eec454#|d2b646+|000000  |eec446@|fcd238@|fce038@|fcd238@|fcb62a@|e0b638@|eeb62a@|fcc42a@|fcd22a@@|fcb61c@|eeb62a@|fcb61c@|fcd21c@@|fcc41c@|eeb61c@|e0b638@|fcc42a@|fcd238@|fce038@|fcd238@|eec446%|000000   |fcd254*|fce062@@|eed270=
-000000                 |fcd246@|fce054@|fcd246@|eec446@|e0b646%|d2a846=|eec446@|fcd238@|fce038@|fcd238@|eeb638@|eec438@|eeb62a@|fcd22a@|fce038@|fcd238@|fcb62a@|d2b654#|e0b654@|eec446@|fcd246@|fce054@|fcd254@
-000000                 |fce062@@|eec454+|000000   |eec454%|fce054@@|eec446@|e0b646@|eec454@|e0b646@|fcd238@|fce046@@|fcc446@|000000    |fce062#|fce070%
-000000                        |fce062@@|000000  |c4c454%|8cc438@|c4b646@|fce054@@|eec454@
-000000                    |70b638=+|62a82a**|7eb638*|62a838=|000000  |7ec446*|70c438@|62a82a%|fcd262*|fcee70@
-000000                 |70b638+@|70c438@|70b62a@|70c438@|70b62a@|70c438@|62b62a%|70b62a@|62b62a%%%|70c438@|54a82a%|000000   |70b638+#%|70b62a%|7ec438%#+
-000000               |7ec446+|7ec438@@|7ed238@|70c438@|7ec438@@|7ed238@|7ec438@@@|70c438@@|70b638@%|62a838%=|62b62a%%|70b62a@|70c438@@|7ec438@|7ed238@@|8cd246@@|8cd254#
-000000              |9ad254=|8cd246@@@@|7ed238@@|70c438@@|70c42a@|70c438@|62b62a%%|62a82a%|62b62a%@|54a82a%|62b62a%|70b638@|7ec438@@@|7ed238@@|7ec438@@@%
-000000               |8cd246=|7ec438#@|70c438@|7ec438@|70c438@@|70b62a@@%|62b638%|62a838+|7ec454=|7ec438@|62b62a%|70b638@@@|62b62a@@|70c438@|70b62a@|70b638@@%|7ec446-
-000000                     |7eb646=|000000     |7ec446#|70c438@|54a82a%|62a838=|000000  |62a838=|70b638++=
-000000                           |7ec438@|70b62a@|54a82a%
+    cols: 56, alto: 35,
+    marcos: [
+      {
+        color: `
+000000                        |fce070+|000000      |fce070**
+000000                       |fcd254@|fcee62@|fcd254@|000000 |e0c462==|000000 |fcd254@|fcee54@|fce054@|000000      |fce070=
+000000                |fcd270=|fce062@|eec454%@|e0b654@|d2a854+|e0b654+|fcd246@|fce046@@|eec446@@@|eeb638@|fcd246@|fce046@|fcd246@|eec446*|000000  |e0c454=|fcd254@|fce062@|fce054@
+000000                |eec454*|fce054@@|fcd246@|eec446@|e0b638@|e0a838@|fcc438@|fce038@|fcd238@|fcc42a@|eeb638@@|fcc42a@|fcd238@|fce038@|fcc438@|e0b638@|d2b646@|eeb638@|fcd238@|fce046@@|eec446@|000000     |fce062=
+000000           |fce070*|fcd262+|e0b654=|000000   |fcc438@|fce038@@|fcc438@|eeb62a@|e0a82a@|fcb61c@|fcd22a@|fcd21c@|fcc41c@|eeb61c@@|fcc41c@|fcd21c@@|fcc41c@|e0a82a@|eeb62a@|fcc42a@|fcd238@|fce038@|fcc438@|eeb646*|000000  |eec446#|fcd254@|fce054@|fce062@|eed270+
+000000           |fcd254@|fce054@@|fcc446@|e0b638@|d2a838#|e0b638@|fcc42a@|fcd22a@|fcd21c@|fcc41c@|eea81c@|eea80e@|fcc40e@|fcd20e@|fcc40e@|fca80e@|eea80e@|fcc40e@|fcd20e@|fcc40e@|fca80e@|eea81c@|fcc41c@|fcd21c@@|fcc41c@|eeb62a@|d2a838*|eeb638@|fcc438@|fce038@|fce046@|fcd246@|eec454%
+000000            |eec446@|fcd238@|fce038@|fcd22a@|fcc42a@|e0a81c@@|fcb60e@|fcc40e@@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcb60e@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fcb60e@|eea80e@|e0a81c@|fcb61c@|fcd21c@|fcd22a@@|fcc438@|eec446#|000000   |eec454+|fcd254*|fce062#|fce070#
+000000      |fce062@|fce054@|fcd254@|fcd246@|eec446#|eeb646+|e0b654=|e0b62a@|fcc42a@|fcd21c@@|fcc40e@|fca80e@|e09a0e@|fca80e@|fcc40e@|fcb60e@|ee9a0e@%|fca80e@|fcb60e@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@@|fca80e@|e09a0e@|eea80e@|fcb60e@|fcc40e@|fcd20e@|fcc41c@|eeb62a@|eeb646+|eeb638*|fcc438@@|fcd246@|fce046@|fce054@@|eed262*
+000000      |e0c462=|eec446@|fcd246@|fce046@|fce038@|fcd22a@|fcc41c@|fcb62a@|e0a81c@|eea81c@|fcb60e@|fcc40e@@|fca80e@|d28c1c%|fca81c%|fcb60e@|fca80e@|ee9a0e@|fcb62a@|fcb61c@@|fca81c@|fcb61c@|fcb62a@|ee9a0e@|fc9a0e@|fcb60e@|fca81c%|d29a1c%|fc9a0e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|e0a81c@|fcb61c@|fcc41c@|fcd21c@|fcd22a@|fcd238@@@|eec446@
+000000       |d2a854+|e0b638@|eeb62a@|fcc42a@|fcd21c@@|fcd20e@|fcc40e@|fcb61c@|eea82a%|eea81c#|fca80e@|fcb60e@|fca80e@|fcb638%|eea82a@|e0a82a@|c48c1c%|b67e1c%|a8620e%|a8701c%|9a620e%|b6701c%|c47e1c%|c48c1c%|d29a1c%|fcb62a@|fcc438%|fca80e@@@|ee9a1c#|e09a2a%|fca81c@|fcb60e@|fcc40e@@|fcc41c@@|fcb62a@|e0b62a@|d2a846*
+000000  |fce062@@|fcd254@|fcd246@@|fcc438@|eeb62a@@|eea81c@@|eea80e@|fcb60e@@@@|fca80e@|fcb638=|fcc438@|e0a82a@|b67e1c%|9a620e%%%%%%%|a8620e%%|a8700e%%%|b67e1c%|eeb62a@|fcc438@|eeb638=|fca81c%|fcb60e@@@|fca80e@@|eea80e@|eea81c@|eeb61c@|eeb62a@|fcc438@@|fcd246@@|fce054@|fce062@@
+000000   |fcd254*@|fcd246@|fcd238@@|fcd22a@|fcd21c@@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|e09a0e%|ee9a0e@|fca81c@|fcb62a@|c48c1c%|9a620e%%%%%%%%%%%%%%%%|b67e1c%|fcb62a@|fca81c@|ee9a0e@|e09a0e%|ee9a0e@|fca80e@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@@|fcd238@@|fcd246@|fcd254@|eed254+
+000000    |e0c454@|eec446@|eeb638@|eeb62a@|fcb62a@|fcb61c@|fcb60e@@@@@|fca80e@@|fcc438@|b67e1c%|a8620e%%%|9a620e%%%%%%%%%%%%%%|a8700e%|a8701c%|fcb638@|fca81c@|fca80e@|fcb60e@@@@@|fcb61c@@|eeb62a@|eeb638@|e0b646@|e0c462=
+000000  |eec454=|fcd254#|fcc446%|eec438@|fcc438@|fcc42a@|fcb61c@@|fcb60e@|fca80e@@@|ee9a0e@|ee9a00@|fca81c@|e0a82a@|9a620e%|a8700e%|9a620e%|8c620e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|c48c1c%|fcb61c@|ee9a00@|ee9a0e@|fca80e@@|fcb60e@@|fcb61c@@|fcc42a@|fcc438@|eec446@|fcc446#|eed254*|eed262=
+000000 |fce062@|fce054@@|fce046@@|fcd238@|fcd22a@|fcd21c@@|fcc40e@@|fcb60e@@@|fca80e@|fcb61c@|e0a82a@|9a620e%%%%%%%|8c620e%%|8c540e%%|9a620e%|8c620e%|9a620e%|8c620e%|9a620e%%%%|a8620e%|c48c1c%|fcb62a@|fca80e@@|fcb60e@@|fcc40e@@|fcd21c@@|fcd22a@|fcd238@|fce046@@|fce054@|fce062@@
+000000   |eec454=*|e0b646@|eeb638@|eeb62a@|fcb62a@|eeb61c@|eea80e@@@|ee9a0e@@|ee9a00@|fca81c@|eea82a@|a8700e%|a8620e%|9a620e%|a8620e%|9a620e%%%|8c620e%%%|8c540e%|8c620e%%|9a620e%%%%|a8620e%|a8700e%|a8620e%|e0a82a@|fcb61c@|ee9a00@|ee9a0e@|eea80e@@@@|eeb61c@|eeb62a@@|eeb638@|e0b646@|eec454+
+000000    |e0c462%|eec446@|eec438@|fcc42a@@|fcc41c@|fcc40e@@@|fcb60e@@|fca80e@|fca81c@|fcc438@|c48c1c%|a8620e%|9a620e%%%%%%%%%%%%|8c540e%|9a620e%|a8620e%|a8700e%|9a620e%|c48c1c%|fcb638@|fca81c@|fca80e@|fcb60e@|fcc40e@@@|fcc41c@@|fcc42a@|fcc438@|eec446@@|e0c462*
+000000  |fcd262=|fcd254@|fce054@|fce046@|fce038@|fcd238@|fcd22a@|fcd21c@|fcc41c@|fcb60e@|fca80e@|eea80e@|ee9a0e@@|fc9a0e@|fca80e@|fcc42a@|e0a82a@|a8700e%|9a620e%%%%%%%%%%%%%|a8620e%%|e0a82a@|fcb62a@|fca80e@|fc9a0e@|ee9a0e@@|eea80e@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fce038@|fce046@|fce054@@|fce062*
+000000  |fce070*|fce062#|fcd254%|fcd246%|fcc446%|fcc438#|eeb638%|e0a82a@|e0a81c@|eea81c@|fcb60e@@|fcc40e@|fcb60e@@|fca81c#|e09a38-|fcb62a@@|d29a2a%|a8700e%%|9a620e%%|a8620e%%%%|9a620e%%|a8620e%|b67e1c%%|fcb62a@@|e0a838-|fca81c*|fcb60e@@|fcc40e@@|fcb60e@|eeb61c@|e0a81c@|e0a82a@|e0a838@|eeb646#|fcc454*|fcd254*|fcd262*|fce070=
+000000       |eeb646=|eeb638@|fcc42a@|fcd22a@|fcd21c@|fcd20e@|fcc40e@|fcb60e@|eea81c@|e09a1c%|eea80e@|fca80e@|fcb60e@|ee9a00@|e0a838*|fcb62a@|eea82a@|e0a82a@|c48c1c%%%%%|d29a2a%|c48c1c%|eea82a@|fcb62a@|eeb638+|ee9a0e@|fcb60e@@|fca80e@|e0a82a%|eea81c@|fcb60e@|fcc40e@|fcd21c@|fcd22a@@|fcc438@|eeb638@|d2b646@|d2b654=
+000000      |fcc454@|fcd246@|fce046@|fce038@|fcd22a@|fcc42a@|fcb61c@|eeb62a%|e0a82a@|fca80e@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@|d29a1c%|fca80e@|fcb60e@|fc9a00@|e08c00%|fca81c@|fcb60e@|fca80e@|eea80e@|fcb60e@|fca81c@|e08c00%|fc9a0e@|fcb60e@|fca80e@|e09a1c@|ee9a0e@|fcb60e@|fcc40e@@|fcb60e@|e0a81c@|e0a82a@|fcb62a@|fcc42a@|fcd238@|fce046@@|fcd254@|eec454@
+000000     |fce062@|fce054@@|fcd246@|fcc446@|eec446*|eeb646-*|fcb61c@|fcc41c@|fcd20e@|fcc40e@|fcb60e@|ee9a0e@|e09a0e@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@|fcc40e@|fcb60e@|eea80e@|e09a0e@|fcb60e@|fcc40e@|fcd21c@|fcc41c@|fcb62a@|e0b638#|000000 |eec446=*|fcd254%|fce062@@|fce070=
+000000           |eec438@|fcd238@|fcd22a@@|fcc41c@|fcb61c@|e0a81c@|eea80e@|fcc40e@@@|fca80e@|eea80e@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcd20e@|fcc40e@|eea81c@|e09a1c@|fcb61c@|fcd22a@|fcd238@|fce038@|fcd238@|eec446%
+000000          |fcc446@|fce046@@|fcd238@|fcc438@|eeb638%|e0a846+|eeb62a@|fcc41c@|fcd21c@@|fcb61c@|eea81c@|eeb60e@|fcc41c@|fcd20e@|fcc40e@|eea80e@@|fcc41c@|fcd21c@|fcc41c@|fcb61c@|eea81c@|fcb61c@|fcd22a@@@|eeb638@|d2a838*|e0a838@|eec438@|fcd246@|fce054@@|eec462*
+000000         |fcd262@|fce062@|fce054@|fcd246@|eec446*|000000  |eec446%|fcd238@|fce038@|fcd238@|fcc42a@|eeb62a@|e0a82a@|fcc42a@|fcd22a@@|fcc42a@|eeb62a@@|fcc42a@|fcd22a@@|fcc42a@|e0a82a@|eeb638@|fcc438@|fcd238@|fce046@|fcd246@|eec454*|000000   |eed254+|fce062%|fce070%
+000000         |fce070+|fcd262=|000000     |fcc446@|fce046@@|fcd238@|eeb638@|d2b646@|e0b646@|fcc438@|fce038@@|fcc438@|eeb638@|eec438@@|fce046@@|fcd246@|e0b646#|d2b646@|e0c446@|eec446@|fce054@@|eed262%
+000000               |e0c470=|fce054@@|fcd254@|e0c454+|000000   |fcd246@|fce054@|fcd246@|e0b646@|e0c454@@|b6b638@|fcd254@|fcee54@|fcd254@|000000   |e0c462=|000000 |fce062#|fce070+
+000000                |fce070*|000000      |fcd262%|fcee62@|eed262*|000000  |7ec438@|62b62a@|7ea838%|fce070%|fcd270=
+000000                   |70b638=*#|62b62a#|70b638#|7eb646#|62a838+|000000  |70c438@|62b62a@|54a82a*
+000000                |70b638=|70c438@|70b62a@|70c438@|70c42a@|70c438@|70b62a@@@|62b62a%%%|70c438@|70b638@|54a82a*|000000  |70b638+#%@|70c438@|7ec438@#+
+000000               |7ec438@@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|70c438@|7ec438@|70c438@@|62b62a%|62a82a%|62a846#|62a82a#|62b62a%|70b62a@|70c42a@|70c438@@|7ed238@|8cd246@@@@
+000000              |8cd246@@@|7ed238@|8cd246@|7ed238@@|70c438@@@|70b62a@@|62b62a%%|70c438@|62a82a%%|70b62a@|7ec438@@|7ed238@@@@|70c438@|7ec438@@|7ec446=
+000000               |7ec446+|7ec438%@@|70c438@@|70b62a@|70b638@|62b62a%|70b638%|62a838#|000000 |7ec446%|70c438@|62b62a%|70c438@|70b638@|62b62a%|70b62a@@@|70c438@|70b62a@|70b638@*
+000000                    |7eb646--|000000     |7ec438@|62b62a%|54a82a%|000000   |70a838=|62a838+|70b638+=
+000000                          |7ec446=|70c438@|62a82a%|62a838#
 `,
-    plano: `
-                               *@
-                *@#     @@=*%*#@@*    #@*
-                *@@%*: *@@%###%@@# =*%@@*
-                 %@@%#*#%@%###%@%#*#%@@%   =%@@
-           @@@#- +%@@%**#@%#*#%%#**%@@%+ *%@@@#
-            %@@%#**#%%#**%%#**%%**#%%#**#%@@%*
-      +*+=   #%@@%*+*%#*+#%***#*+*#%*+*#%%%#-  =+*
-       %@@@%#+**%%%*+*#*++#*+*#++*#*+*#%#**+#%@@@%
-        #%%@@%#***##*=*##*++++***#+=*#****#%@@%%#
-  =****++***##%%#*-=##=-:::::::-:-+##=-*#%%##***====-
-  =@@@@@@%%#**++**##=:::::::::::::::=##**++**#%%@@@@@=
-    =###%%%%%##***#::::::::::::::::::-#***#%%%%%%%###
-     ####*******+#=:::::::::::::::::-:-#********####-
- *@@@@@@@%%%###**%::::::::::::::::::::-%**###%%%@@@@@@@
-  +*%%######***++%-:::::::::::::::::::=%++***########+
-    =###########*#*:::::::::::::::::::*#*############+
-   =%%@@@@%%##*+++#*-:::::::::::::::-*#+++*##%%@@@@%%*
-  @@@@%%##*****###++#=:::::::::::::=#=+###*****##%%@@@@
-        **#%%%%#*=+*#***+----:--+*#*#*++*#%%%%#**-
-      =%%@@@%#***#%#++*#**#*#*#+*#*++#%#***#%@@@%#:
-     %@@@%%*=*#%%%#++##*+*#*+*#*+*%#*+#%%%#+-+#%@@@
-     #*=-   #%@@%*+*%%#**#%***%#**#%%*+#%@@%#
-           #@@@#**#%@%**#%%#*#%%#*#%@%#=*#@@@%
-           @%*=  #@@@#**%@%###%@%**#@@%*   *@@-
-                 %@@#*-#@@%###%@@#+##@@%
-                 @@=   #@@%#%#%@@%    #%
-                        @%  ***@@%
-                    :---=:  =*=+@
-                 -++++++++++++=   -=++++=
-               -************++=:+++****###+
-              =####****++++=++=++********+
-               -+***+++++=--*+++++++++++:
-                     :     =*=:  :--:
-                           *+=
+        plano: `
+                        +      **
+                       %@% -- %@@      =
+                =@###-=%@@####@@@+  -%@@
+                +@@%##*%@@%###@@%**#%@@%     -
+           *+-   %@@%#*#%@%**#@%#**%@@%+  +%@@=
+           %@@%*+*%@@#**%%%**#%%**#%@%*=#%@@@*
+            #@@@#**#%%*+*%#**#%***%%#**#%@@%+   =+##
+      @@@%*--*#%%%*+*##++##++##++##*+*#%%##==#%@@@@+
+      -%@@@%##**#%#*++#*+##**##+*#++*###**##%@@@%#
+       -*#%%%%##++*#****=-:-:-==+#**#*++*#%%%##*=
+  @@@%%%#****####*-#*-:::::::::-::-*#-*###*****##%%@@@@
+   *%@@@@%%%#*+++*#=::::::::::::::::-#*+++*##%%@@@@%%+
+    ############*%=::::::::::::::::::-#**##########-
+  =*#######***++**::::::::::::::::::::=*++***######*+-
+ @@@@@@@%%%%###*#*::::::::::::::::::::=#*###%%%@@@@@@@@
+   -+####*****++**-:::::::::::::::::::*#++*****####=
+    ######%%%##**%=::::::::::::::::::=#**##%%%%####+
+  =%@@@@@%%#**+++*#*::::::::::::::::*#*+++**#%%@@@@@*
+  *####*****#####+:*#+:::::::::::-=##:=##%##*****+++=
+       -##%%%%#*+**#+=#**=====+=*#=+##*+*#%%@%%#*-
+      %@@@@%#***#%#++*#++*#**#*=+#*++#%%#**#%@@@@#
+     @@@%#+-+#%%%#++#%#++##++##++#%#++#%%%#+ -+#%@-
+           #%@@%#+*#%%**#%#**#%#**%%%*+#%@@%*
+          %@@@%*-#%@%#**%%%**%@%#*#%@%#=*#@@@+
+         %@@%+  *%@@%**#@@%##%@@#*##@@%=   =#%
+         +=     %@@%#**%@@####@@%+*#%@@#
+               -@@%=   %@@###*%@%   - #+
+                *      #@+  *+=%=
+                   :-====:  *+-
+                :+++++++++++++-  -=+++*+=
+               ************++===+++***####
+              #####****++++++==+*********-
+               =*****++++= ++++++++++++=
+                    ::     *+=   ::-:
+                          -*==
 `
+      },
+      {
+        color: `
+000000                        |fce070=*|000000      |fce070+=
+000000                        |fcd254@|fcee62@|fcd254@|000000  |e0c462=|000000 |fcd254@|fcee62@|fcd254@
+000000                 |fcd262%|fce062@|eed254@|eec454@|e0b646@|d2a846*|e0b646%|fcd246@|fce046@|fcd246@|e0b646@|eec446@@|eec438@|fce046@@|fcd246@|e0c454=|000000   |fcd254%|fce062@@
+000000                 |eec454@|fce054@|fce046@|fcd246@|eeb638@|e0b638@|e0b62a@|fcd238@|fce038@|fcd238@|fcc42a@|eeb638@@|fcc42a@|fce038@@|fcc438@|d2b646##|e0b646@|fcd246@|fce046@|fce054@|eec454@
+000000           |fce070=|fce062@|eed254@|e0b654%|d2a846*|000000 |eec454*|fcc438@|fce038@|fcd238@|fcc42a@|eeb62a@|eea81c@|fcc41c@|fcd21c@@|fcc41c@|eeb61c@@|fcc41c@|fcd21c@|fcd22a@|fcb61c@|e0a82a@|eeb62a@|fcc42a@|fce038@@|fcc438@|e0c454=|000000  |eec446+|fcd254%|fce062@@
+000000            |fcd254@|fce054@|fce046@|fcd238@|eeb638@|d2a838@|eea82a@|fcc42a@|fcd21c@@|fcb61c@|eea80e@|fcb60e@|fcc40e@|fcd20e@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcd20e@|fcc40e@|eea81c@@|fcc41c@|fcd21c@|fcd22a@|fcc42a@|eeb646%|e0a838=|eec438%|fcc438@|fce046@@|fcd254@|eec454%
+000000       |fce070=|eed262=|000000    |fcc438@|fcd238@|fce038@|fcd22a@|fcb61c@|e0a81c@|eea80e@|fcc40e@@@|eea80e@@|fcb60e@|fcc40e@|fca80e@|eea80e@|fca80e@|fcc40e@|fcb60e@|fca80e@|eea80e@|fcb60e@|fcc40e@@|fcb60e@|e0a81c@@|fcc41c@|fcd22a@@|fcd238@|fcc438@|eec446*
+000000      |eed270=|fce054@@|fce046@|fcd246@|fcc438@|eeb638*|e0b646+|eeb62a@|fcc41c@|fcd21c@|fcd20e@|fcb60e@|eea80e@|e09a0e@|fcb60e@|fcc40e@|fca80e@|ee9a0e@|fc9a0e@|fcb60e@|fca80e@|fc9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@@|fca80e@|e09a0e@|fca80e@|fcc40e@|fcd20e@|fcd21c@|fcc41c@|eeb62a@|eeb654=|eeb638=|eec438#|fcc446@|fcd246@|fce054@@|fce062@|fce070*
+000000       |d2b654*|eec446@|fcd238@@|fcd22a@@|fcc41c@|fcb61c@|eea81c@|eea80e@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@|e09a2a%|fca80e@@|ee9a0e@|eea82a@|fcb61c@@|fca81c@|fcb61c@@|eea82a@|ee9a0e@|fca80e@@|eea82a#|e09a0e%|fca80e@|fcc40e@@|fcb60e@|eea80e@|e0a82a@|eeb62a@|fcc41c@|fcd22a@@|fce038@|fce046@|fcd246@|fcd254@
+000000    |eed262=|eec454=|eec446=|000000 |d2a846#|d2a838@|eeb62a@|fcc41c@@|fcc40e@@|fcb60e@|fca80e@|eea82a*|fca81c*|fca80e@@|fcb62a@|eeb638@|e0a82a@|c48c1c%|b67e1c%|a8620e%|a8701c%|9a620e%|b67e1c%%|c48c1c%|d28c1c%|fcb62a@|fcc446#|ee9a1c@|fca80e@|fcb60e@|fca80e@|e09a1c%|e0a81c@|fca80e@|fcc40e@@|fcd21c@@|fcc42a@@|eeb638@|e0b646+
+000000  |fce070*|fce062@|fce054@@|fce046@|fcd238@|fcd22a@|fcc42a@|fcb61c@|eea80e@@@|fca80e@|fcb60e@@|fca80e@|fca81c#|fcc446#|eea82a@|b67e1c%|9a620e%%%%%%%|a8620e%%|a8700e%%%|b67e1c%|eea82a@|fcc42a@|e0a838+|eea82a+|fca80e@|fcb60e@@@@@|eea81c@|e0a81c@|e0a82a@|e0b638@|eec438#|fcc446%|fcd254%%|fcd262#|fce062+
+000000    |eec454@|fcc446@|fcc438@|fcd238@|fcd22a@|fcd21c@@|fcc40e@@|fcb60e@|fca80e@|ee9a0e@|e09a1c@|eea81c@|eeb62a@|c48c1c%|9a620e%%%%%%%%%%%%%%%%|b67e1c%|fcb62a@|fca80e@|fc9a00@|ee9a0e@@@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd21c@|fcd22a@|fcd238@|fce046@@|fce054@@|fce062#
+000000    |d2b654+|e0b646@|eeb638@|eeb62a@@|eeb61c@|fcb60e@@|fca80e@@@@@|fcc438@|b67e1c%|a8620e%%%|9a620e%%%%%%%%%%%%%%|a8700e%|a8701c%|fcb62a@|fca82a@|fca80e@|fcb60e@@|fcc40e@@@@|fcc41c@|fcc42a@@|eec438@|eec454@
+000000 |fce062#@|fcd254@|fcd246@|fcd238@@|fcd22a@|fcc41c@@|fcc40e@|fcb60e@@|fca80e@@|ee9a00@|fca81c@|e0a82a@|9a620e%|a8700e%|9a620e%|8c620e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|c48c1c%|fcb61c@|ee9a00@|ee9a0e@|eea80e@@@@|eeb61c@|eeb62a@@|eeb638@|e0b646@|e0c454=
+000000 |fcd262+|fcd254%@|fcd246@|fcd238@@|fcd22a@|fcc41c@@|fcc40e@|fcb60e@@|fca80e@@|fca800@|fcb61c@|e0a82a@|9a620e%%%%%%%|8c620e%%|8c540e%%|9a620e%|8c620e%|9a620e%|8c620e%|9a620e%%%%|a8620e%|c48c1c%|fcb62a@|fca80e@|fcb60e@@@|fcc40e@@|fcd21c@@|fcd22a@|fcd238@|fce046@@|fce054@|fce062@|fce070*
+000000    |e0c462#|e0b646@|eeb638@|eeb62a@@|eeb61c@|fca80e@@@@@@|fcb61c@|eeb62a@|a8700e%|a8620e%|9a620e%|a8620e%|9a620e%%%|8c620e%%%|8c540e%|8c620e%%|9a620e%%%%|a8620e%|a8700e%|a8620e%|e0a82a@|fca81c@|ee9a00%|ee9a0e@|fca80e@@|fcb60e@@|fcb61c@|fcc41c@|fcc42a@|fcc438@|fcc446@|fcd246@|fcd254%|fcd262*
+000000   |eec462=|eec454@|fcc446@|fcc438@|fcd22a@@|fcd21c@|fcd20e@|fcc40e@@|fcb60e@|fca80e@|fc9a0e@|ee9a1c@|fcc42a@|c48c1c%|a8620e%|9a620e%%%%%%%%%%%%|8c540e%|9a620e%|a8620e%|a8700e%|9a620e%|c48c1c%|fcc438@|fca80e@|fcb60e@@@@@|fcb61c@@|eeb62a@|eeb638@|e0b646@|e0b654@
+000000  |fce062@|fce054@@|fce046@|fcd238@@|fcc42a@|fcc41c@|fcb61c@|fca80e@|eea80e@@@|fca80e@@@|fcc438@|e0a82a@|a8700e%|9a620e%%%%%%%%%%%%%|a8620e%|a8700e%|e0a82a@|fcb62a@|fca80e@|ee9a1c@|e09a0e%|ee9a0e@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@@|fcd246@@|eec454#
+000000     |eec454=|000000 |e0b654=|d2a838@|e0a82a@|fcb61c@|fcb60e@|fcc40e@@@|fcb60e@|fca80e@|e09a1c+|e09a0e+|fca81c@|fcb62a@|d29a1c%|a8700e%%|9a620e%%|a8620e%%%%|9a620e%%|a8620e%|b67e1c%%|fcb62a@|fcc446#|eea82a=|fca80e@|fcb60e@@@@|eea80e@|eea81c@@|eeb62a@|fcc438@|fcd246@@|fce054@|fce062@|fce070%
+000000      |eec446+@|fcd238@|fcd22a@@|fcd21c@|fcc40e@|fcb60e@|eea81c@|e09a1c@|ee9a0e@|fca80e@|fcb60e@|fca80e@|e08c0e%|fcb646*|fcb61c@|eea82a@|e0a82a@|c48c1c%%|d28c1c%|c48c1c%%|d29a1c%|d29a2a%|eea82a@|fcc438@|e09a1c%|fca80e@|fcb60e@|fca80e@|eea81c*%|fcb60e@|fcc40e@|fcd20e@|fcd21c@|fcc41c@|fcc42a@|eeb62a@|d2a838@|c4a854=
+000000     |fcd254@|fce054@|fce046@@|fcd238@|fcc42a@|fcb62a@|eeb62a#|e0a82a@|fcb60e@|fcc40e@@|fcb60e@|fca80e@|e09a0e%|eea81c%|fcb60e@|fca80e@|ee9a00%|e09a1c%|fcb60e@|fca80e@@@|fcb60e@|ee9a1c@|ee9a0e@|fca80e@|fcb60e@|eea82a@|e08c0e%|fca80e@|fcc40e@@|fcb60e@|eea81c@|eea82a%|fcb61c@|fcc42a@|fcd22a@|fce038@|fce046@|fcd246@|e0b646@|d2b662+
+000000    |fce070#|fce062@|fcd254%#|eec446+|eeb646-|000000 |eeb638*|fcb62a@|fcc41c@|fcd21c@|fcd20e@|fcc40e@|eea80e@|e09a0e@|fca80e@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|fca80e@|e09a0e@|fcb60e@|fcc40e@|fcd21c@|fcc41c@|fcb61c@|eeb638#|eeb654-|eec446*|fcc446@|fcd246@|fce054@|fce062@|fcd262@
+000000          |eec446@|fcd238@@|fcd22a@@|fcb61c@|e0a82a@|e0a81c@|fcb60e@|fcc40e@@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcd20e@|fcc40e@|fcb60e@|e0a81c@|eeb61c@|fcc42a@|fcd22a@|fcd238@@|eec446@
+000000         |fcd254@|fce054@|fce046@|fcd246@|fcc438@|eeb638#|000000 |eeb638%|fcc42a@|fcd22a@|fcd21c@|fcc41c@|eea81c@@|fcc41c@|fcd21c@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcd21c@@|fcb61c@|eea81c@|fcb61c@|fcc41c@|fcd22a@@|fcb62a@|d2a838@|e0a82a@|fcc438@|fcd246@|fce046@|fce054@|eec454%
+000000        |fce070#|fce062@@|fcd254#|eec454=|000000  |eeb646#|fcd238@|fce038@@|fcc42a@|eeb62a@|e0a82a@|eeb62a@|fcd22a@@@|eeb61c@|eeb62a@|fcc42a@|fcd22a@@|fcc42a@|eeb62a@@|fcc42a@|fcd238@|fce038@|fcd238@|eec446%|000000  |e0b646*|fcd254%|fce062@@
+000000               |fcc446@|fce046@@|fcd246@|e0b638@|d2b646@|d2b654*|fcc438@|fce038@@|fcc438@|eeb638@|eec446@|eeb638@|fcd238@|fce046@|fcd246@|e0b646@|d2b646@|eec446@@|fce054@@|eed254@
+000000               |fce062@|fce054@|fcd254%|e0c454-|000000   |fcd246@|fce054@|fce046@|eec446@|e0c454@@|b6b638@|fcd246@|fcee54@|fcd254@|e0c462=|000000 |d2b654=|e0c462+|eec462+|fce062@|fce070@
+000000               |fce070=|000000      |fcd262#|fcee62@|eed262#|000000   |70c438@|7ec438@|e0d254@|fcd270*
+000000                   |70b638=*#|70b62a#|7eb638%|62a838*+|000000  |70c438@|62b62a@|54a82a*
+000000                |70b638=|70c438@|70b62a@|70c438@|70c42a@|70c438@|70b62a@@@|62b62a%%%|70c438@|70b638@|54a82a*|000000  |70b638+#%@|70c438@|7ec438@#+
+000000               |7ec438@@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|70c438@|7ec438@|70c438@@|62b62a%|62a82a%|62a846#|62a82a#|62b62a%|70b62a@|70c42a@|70c438@@|7ed238@|8cd246@@@@
+000000              |8cd246@@@|7ed238@|8cd246@|7ed238@@|70c438@@@|70b62a@@|62b62a%%|70c438@|62a82a%%|70b62a@|7ec438@@|7ed238@@@@|70c438@|7ec438@@|7ec446=
+000000               |7ec446+|7ec438%@@|70c438@@|70b62a@|70b638@|62b62a%|70b638%|62a838#|000000 |7ec446%|70c438@|62b62a%|70c438@|70b638@|62b62a%|70b62a@@@|70c438@|70b62a@|70b638@*
+000000                    |7eb646--|000000     |7ec438@|62b62a%|54a82a%|000000   |70a838=|62a838+|70b638+=
+000000                          |7ec446=|70c438@|62a82a%|62a838#
+`,
+        plano: `
+                        =*      +-
+                        @@%  - %@@
+                 %@%##=*@@@####@@%-   #@@
+                 %@@%##*%@@###%@@%++#%@@#
+           =@%*= =%@@%**#@%#**%@%#*#%@@%-  =#@@
+            %@@%***%@%#**%%#**%%#**%@%#*-*%@@@*
+       =-    #@@%#**#%#**#%***%#**#%%#+*#%@@%+
+      =@@@%#+-*#%%#++##*++#*+*#*+*##*+*%%%%#--+%%@@@+
+       =#%@@%##**#%#++*#***#*##*+**++*#%#***#%@@@@%
+    ==- +**#%%%#*==*#***=-:-:-===#*+*#*+**#%%%%##=
+  *@@@@@%##****###+**-:::::::::-::-*#--*####*******##*+
+    #%%%%%%%%#*++*#=::::::::::::::::-#*++++*##%%@@@@@@*
+    =##**********%=::::::::::::::::::-#**###%%%%####
+ #@@@@%%%%##***+**::::::::::::::::::::=#++*****####-
+ =#%%%%%%%%##***#*::::::::::::::::::::=#*###%%%%@@@@@@*
+    *###********#*-:::::::::::::::::::**++***####%%%#+
+   -#%%%%%%%%#**+#=::::::::::::::::::=#*###########
+  @@@@@%%##*******#*::::::::::::::::*#*+++*#%%@@@%%*
+     - -**###%%#*--*#+:::::::::::-=#*-*###*****#%%@@%
+      =#%%@%%#*++*#*==#**==+==++*#+*#*=+#%%%%#**-
+     %@@@%%#+**#%#*+*#*++#***#++*#*+*%%#**#%@@@%#-
+    #@#*=- =#%%%#*+*##*+*#*+*#*+*##*+*%%%#+-+%%@@@
+          #%@@%#**#%%#**%%**#%#**#%%#+*%@@%#
+         %@@@%+ *%@@#**#%%#*#%%#*#%@%#+*#@@@#
+        #@@*-  +%@@%#*#%@%###@@%*##@@%#  =#@@
+               %@@%#*=#@@%###@@%#*#%@@%
+               @@#-   %@@###*%@@- -+=@%
+               =      *@*   **%+
+                   :-==+-:  *+-
+                :+++++++++++++-  -=+++*+=
+               ************++===+++***####
+              #####****++++++==+*********-
+               =*****++++= ++++++++++++=
+                    ::     *+=   ::-:
+                          -*==
+`
+      },
+      {
+        color: `
+000000                         |fce062+#|000000      |fce070=
+000000                     |e0c462=|000000  |e0c462=|fce054@|fcee54@|eed254@|000000    |fcd254@|fcee62@|fcd254@
+000000                  |fcd262@|fce062@|eed254@|eec454@|e0c446@|d2a846#|eec446@|fcd246@|fce046@|fcd246@|e0b646@|e0c454@|eec446@@|fce046@@|fcc446@|000000    |fcd254*|fce062@|fce070#
+000000                  |eec446@|fce046@@|fcc438@|eeb638@|e0b638@|eeb62a@|fcd238@|fce038@|fcd238@|eeb62a@|eec438@|eeb62a@|fcd238@|fce038@|fcd238@|fcc438@|d2b662=|d2b646+|e0b646%|fcd246@|fce054@@|eec454#
+000000            |fcd262%|fce062@|fcd254@|e0b646@|d2a846%|c4a838+|eeb646@|fcd238@|fce038@|fcd22a@|fcc42a@|eeb62a@|eeb61c@|fcc41c@|fcd21c@@|fcb61c@|eeb62a@|fcb61c@|fcd21c@|fcd22a@|fcc42a@|eeb62a@|e0a838@|eeb62a@|fcd238@|fce038@@|fcc446@|000000    |eed254+|fce062%%
+000000             |fcd246@|fce046@@|fcc438@|eeb62a@|d2a82a@|eeb61c@|fcc41c@|fcd21c@|fcc41c@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcd20e@|fcc40e@|fcb60e@|e0a81c@|fcb61c@|fcc41c@|fcd22a@@|fcc42a@|eeb646+|000000 |eec438#|fcc446@|fcd246@|fce054@@|eed262#
+000000       |fce070%|fce062%|fcd254#|eec454+|000000  |eec454=|fcc438@|fcd22a@@|fcc41c@|fcb61c@|e0a80e@|fca80e@|fcc40e@@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@@|fcb60e@|fcc40e@|fcb60e@|eea80e@@|fcc40e@|fcd20e@|fcc40e@|fcb61c@|e0a82a@|eeb61c@|fcc42a@|fcd22a@|fce038@|fcd238@|fcc438@|eec454*
+000000       |eec462+|fcd254@|fce054@|fce046@|fcd238@|fcc438@|eeb638#|eeb646*|eeb62a@|fcc41c@|fcd20e@|fcc40e@|fcb60e@|e09a0e@|eea80e@|fcb60e@@|ee9a0e@@|fca80e@|fcb60e@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@|fcc40e@|fcb60e@|eea80e@|e09a0e@|fcb60e@|fcc40e@|fcd21c@@|fcc42a@|eeb62a@|000000  |eeb646=|eec446*|fcc454#|fcd254@|fce062@@
+000000        |d2b654#|eeb638@|fcc438@|fcd22a@@|fcd21c@|fcc40e@|fcb61c@|eea82a%|fcb60e@@@|fca80e@|e08c0e%|eea82a#|fcb60e@|fca80e@|eea81c@@|fcc41c@|eea81c@|fcb61c@@|fcb62a@|e08c0e%|fc9a0e@|fcb60e@|fca80e@|e09a2a%|ee9a0e@|fcb60e@|fcc40e@@|fcb60e@|eea80e@|e0a82a@|eeb62a%|fcc42a@@|fcd238@|fce046@@|fce054@|fcd254@|eed262=
+000000   |fce062%@|fcd254@|fcd246@|fcc446%|eec438*|e0a838@|e0a82a@|eea81c@|fcb61c@|fcc40e@@@|fcb60e@|fca81c#|eea838=|fca81c#|fcb60e@|fcb61c@|eeb638@|e0a82a@|c48c1c%|b67e1c%|a8620e%|a8701c%|9a620e%|b67e1c%%|c48c1c%%|fcb62a@@|eea838+|fc9a0e@|fcb60e@@|fca80e@|e09a1c@|e09a0e@|fca80e@|fcc40e@|fcd21c@@|fcd22a@@|fcc438@|eec438@|eec446+
+000000   |eed262+|fcd254@|fce046@@|fce038@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@|eea80e@|ee9a0e@|fca80e@@|fcb60e@|fca80e@|fcc446#|eeb638@|b67e1c%|9a620e%%%%%%%|a8620e%%|a8700e%%%|b67e1c%|eea82a@|fcc42a@|eea81c#|e09a2a+|eea81c%|fcb60e@@|fcc40e@@@|fcb61c@|eeb61c@|e0b62a@|d2a838@|d2b654+
+000000    |e0c462*|e0c446@|eec438@|fcc438@|fcc42a@|fcc41c@@|fcc40e@@@|fcb60e@|fca80e@|ee9a1c@|eea82a%|eeb62a@|c48c1c%|9a620e%%%%%%%%%%%%%%%%|b67e1c%|fcc438@|fca81c@|fca80e@@@|eea80e@@@|fcb60e@|fcb61c@|fcc41c@|fcc42a@|fcd238@@|fce046@|fce054@@|fce062@|fce070=
+000000   |eec454+|eec446*|eeb646@|eeb638@|eeb62a@@|eeb61c@|eea80e@@@|fca80e@@@@|fcc438@|b67e1c%|a8620e%%%|9a620e%%%%%%%%%%%%%%|a8700e%|a8701c%|fcb62a@|eea82a@|fc9a0e@|fca80e@|fcb60e@|fcc40e@@@|fcd21c@@|fcd22a@|fcd238@@|fcd246@|fcc446%|eec454+
+000000 |fce062@|fce054@@|fce046@@|fcd238@|fcd22a@|fcd21c@@|fcc40e@@|fcb60e@@|fca80e@|fc9a00@|fcb61c@|e0a82a@|9a620e%|a8700e%|9a620e%|8c620e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|c48c1c%|fcb61c@|fc9a00@|fca80e@@@@|fcb60e@|eeb61c@@|eeb62a@|eeb638@|e0c446@|e0c462+
+000000   |eec454+|eec446@|eec438@|fcc438@|fcc42a@|fcb61c@@|fcb60e@@|fca80e@@@|fc9a00@|fcb61c@|e0a82a@|9a620e%%%%%%%|8c620e%%|8c540e%%|9a620e%|8c620e%|9a620e%|8c620e%|9a620e%%%%|a8620e%|c48c1c%|fcb62a@|fca80e@@|fcb60e@@@|fcc40e@|fcc41c@@|fcc42a@|fcc438@|fcc446@|fcd246@|fcd254#|eed262=
+000000    |e0c454@|eec446@|eec438@|eeb62a@|fcb62a@|fcb61c@|fcb60e@@@|fca80e@@@|fcb61c@|eeb62a@|a8700e%|a8620e%|9a620e%|a8620e%|9a620e%%%|8c620e%%%|8c540e%|8c620e%%|9a620e%%%%|a8620e%|a8700e%|a8620e%|e0a82a@|fcb61c@|ee9a00@|fca80e@@|fcb60e@@|fcc40e@|fcc41c@|fcd22a@@|fcd238@|fce046@@|fce054@|fce062@|fce070#
+000000  |fcd262+|fcd254@|fcd246@@|fcd238@|fcd22a@@|fcd21c@|fcd20e@|fcc40e@|fcb60e@@|fca80e@|ee9a0e@|e09a1c@|fcc42a@|c48c1c%|a8620e%|9a620e%%%%%%%%%%%%|8c540e%|9a620e%|a8620e%|a8700e%|9a620e%|c48c1c%|fcc42a@|fca80e@@@@|fcb60e@@|eea81c@|eeb61c@|eeb62a@|eeb638@|e0b638@|e0b646%
+000000 |fce070+|fce062%|fce054@|fcd254@|fcd246@|fcc446@|fcc438@|eeb62a@|eeb61c@|eea81c@|eea80e@@|fca80e@@@@@|fcc438@|e0a82a@|a8700e%|9a620e%%%%%%%%%%%%%|a8620e%|a8700e%|e0a82a@|fcc42a@|eea81c@|e09a1c%|ee9a0e@|fca80e@|fcb60e@|fcc40e@|fcd20e@|fcd21c@|fcd22a@@|fcc438@|fcc446@|eec454@|e0c462+
+000000       |d2b646@|eeb62a@|fcb62a@|fcc41c@|fcc40e@@@|fcb60e@|fca80e@|e09a1c%#|ee9a0e@|fcb61c@|eeb62a@|d29a1c%|a8700e%%|9a620e%%|a8620e%%%%|9a620e%%|a8620e%|b67e1c%|c48c1c%|eeb62a@|fcd254+|fca81c%|fcb60e@@@|fca80e@|eea80e@@|eeb61c@|fcb61c@|fcc42a@|fcd238@|fce046@@|fce054@|fce062@|fce070=
+000000     |eec446+|fcd246@@|fce038@|fcd22a@@|fcc41c@|fcb61c@|eea80e@|e09a0e@|ee9a0e@|fca80e@|fcb60e@@|ee9a0e@|d29a46=|fcb62a%|fcb61c@|eea82a@|e0a82a@|c48c1c%%|d29a2a%|c48c1c%%|d28c1c%|d29a2a%|eea82a@|fcc446%|ee9a0e@|fca80e@@|fca81c*|eea82a+|fca80e@|fcc40e@@@|fcc41c@|fcb61c@|e0a82a@|d2a838@|d2a846*|000000 |eec446=|eec454=
+000000    |fce062@|fce054@@|fcd246@|fcd238@|fcc438@|eeb638#*|e0a82a@|fcb60e@|fcc40e@@@|fcb60e@|e09a0e@|e0a82a@|fca80e@|fcb60e@|fc9a0e@|e08c00%|fca81c@|fcb60e@|fc9a0e@|eea80e@|fcb60e@|fca80e@|ee9a0e%|fc9a0e@|fcb60e@|fca80e@|d28c1c%|ee9a0e@|fcb60e@|fcc40e@|fcb60e@|eea81c%|eea82a%|fcb61c@|fcc41c@|fcd22a@@|fcd238@|fcc438@|e0b638@|d2b654*
+000000          |eeb646*|fcc42a@|fcd22a@|fcd21c@@|fcc40e@|fca80e@|e09a0e@|fca80e@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@|fcc40e@|fca80e@|e09a0e@|eea80e@|fcc40e@|fcd20e@|fcc40e@|fcb61c@|eeb638#+|eec438%|fcc438@|fcd246@|fce046@|fce054@|fcd254@
+000000         |eec446@|fcd246@|fce038@@|fcd22a@|fcc42a@|eeb62a#|e0b638@|fcb61c@|fcc40e@|fcd20e@|fcc40e@|eea80e@@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|fcb60e@|e0a80e@|eea81c@|fcc41c@|fcd22a@@@|eec438@|000000   |eec454+|fcd262*|fce062#|fce070=
+000000        |fcd254@|fce054@@|fcd246@|fcc446@|eec446+|000000 |eeb638#|fcc42a@|fcd22a@|fcd21c@|fcc41c@|fcb61c@|e0a81c@|fcb61c@|fcd21c@|fcd20e@|fcb60e@|eea80e@|fcb60e@|fcc41c@|fcd21c@|fcc41c@|eea81c@@|fcc41c@|fcd21c@|fcd22a@|fcc42a@|d2a82a@|e0a82a@|fcc42a@|fcd238@|fce046@@|eec446@
+000000        |fce062%|fcd262*|eec454=|000000   |e0c454*|fcc438@|fce038@@|fcd22a@|eeb62a@|e0a838@|eeb62a@|fcc42a@|fcd22a@@|fcb61c@|eeb62a@@|fcd22a@@@|eeb62a@@@|fcd238@|fce038@|fcd238@|eec446@|000000 |d2a846*|e0b646@|eec454@|fce054@|fce062@|eed262+
+000000              |eec454@|fce054@|fce046@|fcd246@|e0b646@|d2b646*|000000 |eec438@|fcd238@|fce038@|fcd238@|eeb638@|eec446@|eeb638@|fcd238@|fce046@|fcd246@|eeb638@|d2b646@|eec446@@|fce046@|fce054@|fcd246@
+000000              |fce062@@|fcd254#|000000    |eec454@|fce054@@|eec446@|e0c454@@|d2b654#|eec446@|fce054@@|eec454*|000000 |d2b654+|e0c462#|eec454*|fce062@@
+000000                     |eed262*|fcee62@|eed262#|000000    |8cc438@|e0e054@|e0d254%
+000000                   |70b638=*#|7eb638%|62a82a#|62a838*+|000000  |70c438@|62b62a@|54a82a*
+000000                |70b638=|70c438@|70b62a@|70c438@|70c42a@|70c438@|70b62a@@@|62b62a%%%|70c438@|70b638@|54a82a*|000000  |70b638+#%@|70c438@|7ec438@#+
+000000               |7ec438@@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|70c438@|7ec438@|70c438@@|62b62a%|62a82a%|62a846#|62a82a#|62b62a%|70b62a@|70c42a@|70c438@@|7ed238@|8cd246@@@@
+000000              |8cd246@@@|7ed238@|8cd246@|7ed238@@|70c438@@@|70b62a@@|62b62a%%|70c438@|62a82a%%|70b62a@|7ec438@@|7ed238@@@@|70c438@|7ec438@@|7ec446=
+000000               |7ec446+|7ec438%@@|70c438@@|70b62a@|70b638@|62b62a%|70b638%|62a838#|000000 |7ec446%|70c438@|62b62a%|70c438@|70b638@|62b62a%|70b62a@@@|70c438@|70b62a@|70b638@*
+000000                    |7eb646--|000000     |7ec438@|62b62a%|54a82a%|000000   |70a838=|62a838+|70b638+=
+000000                          |7ec446=|70c438@|62a82a%|62a838#
+`,
+        plano: `
+                         +#      =
+                     -  =@@%    %@%
+                  @@%##+#@@%####@@%    +@#
+                  %@@%###%@%###%@@#-=*%@@*
+            #@%#*-#%@@#**%@%###%@%**#%@@%    +#%
+             %@@%*+#%@%**#%%**#%%#*#%@%#= +%@@@*
+       %%*=  -#%@%#+*%%#**##**#%#**#%%#**#@@@%+
+       =@@@%%+=#%%%#+*##++*#++##++#%#*+#%@%%#  -+*%@@
+        +#%@@%##+*##*=+#***#*###+*#*++#%%#***#%@@@@%=
+   %@%#*+***#%%%#+-+##**=-:-:-===##-+##*++*#%@@%%#=
+   =%@@@@%%#**+**#***-:::::::::-::=*%+-+##%%###**=
+    +####%%%%##*++*=::::::::::::::::-#*******###%%@@@@@=
+   =+####********%=::::::::::::::::::-#*+*##%%%%%%%%#=
+ @@@@@@@@%%%##****::::::::::::::::::::=#*******####=
+   =########***+#*::::::::::::::::::::=#**####%%%%%%*-
+    #########***#*-:::::::::::::::::::**+**##%%%%@@@@@#
+  =%@@@@@%%%#**++#=::::::::::::::::::=#*********#**
+ +%@@%%%##********#*::::::::::::::::+#*++*#%%%%%%%#=
+       *##%%%%#*+=+##+:::::::::::-=#++###****#%%@@@@=
+     =%@@@@%#*++*##+:*#**==+==++*#+#*==*#%%%#**= --
+    @@@@%%*=*##%%#++*#*=*#**##++#*++#%#**#%@@@%#=
+          =#%@%%*+*#%#++##*+##++#%*+*#%%#+-*%@@@%
+         #%@@%#+*#%%#**#%#**%%#**%%#**%@@%#   =*#=
+        %@@%%= +%@@%**#%%#**%@%**%@%#**#@@@%
+        %*=   =%@@%#**%@%###%@%###%@@# =*%@@=
+              %@@%#= #@@%###%@@#*##@@%
+              @@*    %@@###+%@@= =*+@@
+                     *@*    *%#
+                   :-=+=-:  *+-
+                :+++++++++++++-  -=+++*+=
+               ************++===+++***####
+              #####****++++++==+*********-
+               =*****++++= +*++++++++++=
+                    ::     *+=   ::-:
+                          -*==
+`
+      },
+      {
+        color: `
+000000                          |fce062*|fce070#
+000000                   |fce070*|fcd262=|000000 |e0c462+|000000  |eec454*|fce054@@|eec454@|000000    |fcd254@|fcee62@|fcd262@
+000000                   |fce054@@|fcd254@|eec446@@|d2a846@|eec446@|fce046@@|fcd246@|e0b646%|e0c454@|eec454@|fcc446@|fce046@|fce054@|eec446@|000000    |eed262=|fce070%=
+000000             |fce070+|eed262*|e0b654*|d2a854-|000000  |fcc446@|fce046@@|fcc438@|eeb638@|e0b638@|fcc42a@|fcd238@|fce038@|fcc42a@|eeb62a@|eec438@|eeb62a@|fcd238@|fce038@|fcd238@|eec438@|000000  |eec446*|fcd246@|fce054@@|eec462*
+000000             |fcd254@|fce054@|fcd254@|eec446@|d2a838@#|eeb62a@|fcd238@|fce02a@|fcd22a@|fcb62a@|eeb62a@|fcb61c@|fcd21c@@|fcc41c@|eeb61c@|eeb62a@|fcc41c@|fcd22a@@|fcc42a@|e0a82a@|d2a838@|eeb62a@|fcd238@|fce046@@|eec446@|000000     |fcd262=|fce070=
+000000             |eec454+|fcd246@|fce046@|fcd238@|fcc42a@|eeb62a@|e0a81c@|fcb61c@|fcd21c@@|fcc40e@|eea80e@@|fcc40e@|fcd20e@|fcc40e@|eea80e@@|fcc40e@|fcd20e@|fcc40e@|eea80e@|e0a81c@|fcb61c@|fcd21c@|fcd22a@@|fcc438@|000000  |eec446+|fcc446@|fcd246@|fce054@|fce062@|eed262#
+000000        |fce062@|fce054@|fcd254@|fcc446#|eec446=|000000 |eeb646*|fcc42a@|fcd22a@|fcd21c@|fcc41c@|fcb60e@|e0a80e@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcd20e@|fcc41c@|fcb62a@|e0a838#|eeb62a%|fcc42a@|fcd238@|fce038@|fce046@|fcd246@|eec454#
+000000        |e0c454*|fcd246@|fce046@|fce038@|fcd238@|fcc42a@|eeb62a%|e0a838#|fcb61c@|fcc40e@@@|fca80e@|e09a0e%|fca80e@|fcb60e@|fca80e@|ee9a0e@|fc9a0e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|e09a0e@|fca80e@|fcb60e@|fcc40e@|fcb60e@|eea81c@|e0a81c@|fcb60e@|fcc41c@|fcd21c@|fcd22a@|fcc42a@|eec438@|eec454=|000000   |eec454-=|fcd262=
+000000         |d2a846#|eeb638@|fcc42a@|fcd22a@|fcd21c@@|fcb60e@|eea80e@|eea81c#|fcb60e@@@|ee9a0e@|e09a1c%|fca80e@|fcb60e@|fca81c@|eea81c@|fcc41c@|eea81c@|fcb61c@@@|e09a2a@|ee9a00%|fcb60e@@|fca81c%|e09a1c@|fca80e@|fcb60e@|fcc40e@@|fcb60e@|eea81c@|e0a82a@|eeb638*|fcc438%@|fcd238@|fcd246@|fce054@@|fce062@|fcd270=
+000000   |fce062@@|fce054@|fce046@|fcd246@|fcc438@@|eeb62a@|e0a81c@|eea81c@|fcb60e@@|fcc40e@@|fca80e@|eea82a*=|fca81c@|fcb61c@|eea82a@|e0a82a@|c48c1c%|b67e1c%|a8620e%|a8701c%|9a620e%|b67e1c%%|c48c1c%%|fcb62a@|fcb61c@|fcb638=|e09a1c#|fca80e@|fcb60e@@|fca80e@|e09a0e@@|fca80e@|fcc40e@|fcd21c@|fcd22a@@|fcd238@@|fcd246@|eec454*
+000000    |e0c462#|fcc446@|fcd246@|fcd238@@|fcd22a@|fcd21c@|fcc41c@|fcb60e@|fca80e@|ee9a0e@|e09a0e@|ee9a0e@|fca80e@@|fcb638@|eeb62a@|b67e1c%|9a620e%%%%%%%|a8620e%%|a8700e%%%|b67e1c%|eeb62a@|fcc42a@|fca80e@|e09a0e#|e09a1c%|eea81c@|fcb60e@|fcc40e@@@|fcc41c@@|fcb62a@|eeb638@|e0b646@
+000000     |d2b654%|e0b646@|eeb638@|eeb62a@|fcb61c@@|fcc40e@@@|fcb60e@@|fca81c@|eeb638#|eeb62a@|c48c1c%|9a620e%%%%%%%%%%%%%%%%|b67e1c%|fcc438@|fcb61c@|fca80e@@@@@|eea80e@@|eeb61c@|eeb62a@@|fcc438@|fcc446@|fcd246@|fcd254@%|fce062*
+000000 |fce062*@|fcd254@|fcd246@|fcd238@|fcc438@|fcc42a@|fcc41c@|fcb61c@|fcb60e@|fca80e@|eea80e@|ee9a0e@@@|fc9a0e@|fcc438@|b67e1c%|a8620e%%%|9a620e%%%%%%%%%%%%%%|a8700e%|a8701c%|fcb62a@|ee9a1c@|ee9a0e%|fc9a0e@|fca80e@|fcb60e@|fcc40e@@|fcd21c@@|fcd22a@|fcd238@|fce038@|fce046@|fce054@|fcd254@|fcd262#
+000000 |fcd262+@|fcd254@|fcd246@|fcd238@@|fcd22a@|fcd21c@@|fcc40e@@@|fcb60e@@|fca80e@|fcb61c@|e0a82a@|9a620e%|a8700e%|9a620e%|8c620e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|c48c2a%|fcb61c@|fca80e@@@|fcb60e@@@@|fcb61c@|fcb62a@|fcc438@|eec446@|eec454%
+000000    |e0c454@|eec446@|eec438@|eeb62a@|eeb61c@|fcb61c@|fca80e@@@@|ee9a0e@|ee9a00@|fcb61c@|e0a82a@|9a620e%%%%%%%|8c620e%%|8c540e%%|9a620e%|8c620e%|9a620e%|8c620e%|9a620e%%%%|a8620e%|c48c1c%|fcb62a@|fc9a00@|fca80e@@@|fcb60e@@|fcb61c@|fcb62a@|fcc42a@|eec438@|eec446@|e0c454*
+000000   |e0c454=|eec446@|eec438@|fcc438@|fcc42a@|fcc41c@@|fcc40e@@|fcb60e@@@|fca80e@|fcb61c@|eea82a@|a8700e%|a8620e%|9a620e%|a8620e%|9a620e%%%|8c620e%%%|8c540e%|8c620e%%|9a620e%%%%|a8620e%|a8700e%|a8620e%|e0a82a@|fcb62a@|fc9a00@|fca80e@|fcb60e@@|fcc40e@@|fcd21c@|fcd22a@@|fce038@|fce046@|fce054@@|fce062@|fce070=
+000000 |fce070*|fce062@|fce054@@|fce046@|fce038@|fcd22a@@|fcc41c@|fcc40e@|fcb60e@@|fca80e@|ee9a0e@|e09a0e%|ee9a0e%|fcc42a@|c47e1c%|a8620e%|9a620e%%%%%%%%%%%%|8c540e%|9a620e%|a8620e%|a8700e%|9a620e%|c48c1c%|fcc42a@|fca80e@@@@|eea80e@@@|eeb61c@|eeb62a@@|eeb638@|fcc446%|fcd254#+
+000000   |eed254+|eec454+|eec446**|e0b638@|e0b62a@|eea81c@@|fcb60e@@@@@|fca80e@|fca81c#|fcc438@|e0a82a@|a8700e%|9a620e%%%%%%%%%%%%%|a8620e%|a8700e%|e09a2a@|fcb62a@|e0a82a#|ee9a1c%|fca80e@|fcb60e@|fcc40e@@@|fcc41c@|fcc42a@@|eeb638@|e0b646@|e0b654@
+000000      |e0b646%|eec438@|fcc42a@|fcd22a@|fcd21c@@|fcc40e@@|fca80e@|e09a0e@|e09a1c@|ee9a0e@|fca800@|fcb61c@|eeb638@|d29a2a%|a8700e%%|9a620e%%|a8620e%%%%|9a620e%%|a8620e%|b67e1c%|c48c1c%|eeb638@|fcc446*|fca80e@|fcb60e@|fca80e@|eea80e@|ee9a0e@|eea80e@|fcb60e@|fcc41c@|fcd22a@@|fce038@|fce046@@|fcd254@|eed262+
+000000    |eed262*|fcd254@|fce046@@|fce038@|fcd22a@|fcc42a@|fcb61c@|eea81c@|e0a80e@|eea80e@|fcb60e@@@|fca80e@|e09a1c#|eea82a=|fcb61c@@|eea82a@|e0a82a@|c48c1c%%|d28c1c%|c48c1c%%|d29a1c%|d29a2a%|eea82a@|fcb62a@|fca80e@@|fca81c#|eea838=|eea80e@|fcb60e@|fcc40e@@@|fcb61c@|e0a81c@|e0a82a@|e0b638%|fcc446#%|fcd254@|fce062@%
+000000   |fce070*|fce062@|fce054@|fcd254@|fcc446%|eec446#|eeb646+|e0b646=|eeb638%|fcb61c@|fcc40e@@@|fcb60e@|eea80e@|e09a2a@|fca81c@|fcb60e@@|ee9a00%|e09a1c%|fca80e@@|ee9a0e@|fca80e@|fcb60e@|eea80e@|ee9a0e@|fca80e@@|e09a1c@|e08c0e%|fca80e@|fcb60e@@|fca81c%|e0a81c%|fcb60e@|fcc40e@|fcd21c@|fcd22a@@|fcc438@|e0b638@|d2a846*
+000000         |eec446*|fcc438@|fcd22a@@|fcd21c@|fcc41c@|fcb60e@|e0a82a@|eea81c@|fcb60e@|fcc40e@|fcb60e@|eea80e@|e09a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|ee9a0e@@|fcb60e@|fcc40e@@|fcb60e@|eeb62a%|e0b638#|fcb62a@|fcc42a@|fcd238@|fce046@@|eec446@|d2b662+
+000000        |eec454@|fcd246@|fce046@|fce038@|fcd238@|fcc42a@|eeb638**|fcb61c@|fcc41c@|fcd20e@|fcc40e@|fca80e@|eea80e@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@@|fcc40e@@@|eea80e@@|fcc41c@|fcd21c@|fcd22a@|fcc42a@|eeb638@|000000  |eec446+|fcd254%@|fce062@@
+000000       |fcd262@|fce062@|fce054@|fcd254@|eec446#=|000000 |eeb646*|fcc42a@|fcd22a@@|fcc41c@|fcb61c@|e0a81c@|eeb61c@|fcc41c@|fcd21c@|fcc40e@|eea80e@@|fcc40e@|fcd21c@|fcc41c@|fcb60e@|eea81c@|fcb61c@|fcd21c@@|fcc42a@|e0a82a@@|fcb62a@|fcd238@|fce038@|fcd246@|fcc446@
+000000             |e0c454+|fcc446@|fce046@|fce038@|fcd238@|eeb62a@|d2a838@|e0a838@|fcc42a@|fcd22a@@|fcc42a@|eeb62a@@|fcc42a@|fcd22a@@|fcb62a@|eeb62a@@|fcd22a@|fce038@|fcd238@|fcc438@|d2a854+|d2a838#|e0b646@|fcd246@|fce054@@|eed262%
+000000             |eed254@|fce054@@|fcd246@|eeb646#|d2a846=|000000 |eec446@|fcd238@|fce046@|fcd238@|eeb638@|eec446@|e0b638@|fcc438@|fce046@@|eec438@|e0b638@|eec446@@|fcd246@|fce054@|fcd246@|e0c462=|000000   |eec454=|fce062*|fce070*
+000000             |fce062@@|eed254*|000000    |eec454@|fce054@@|eec446@|eec454@|e0c454@|d2a846*|eec454@|fce054@@|eec454%|000000 |e0b654*|e0c454%|eec454*|fce062@@
+000000                    |eed262*|fcee62@|fcd262#|000000     |eee054@|e0d254@|70a838*
+000000                   |70b638=*|7eb646#|62b62a#|62a82a#|62a838*+|000000  |70c438@|62b62a%|54a82a*
+000000                |70b638=|70c438@|70b62a@|70c438@|70c42a@|70c438@|70b62a@@@|62b62a%%%|70c438@|70b638@|54a82a*|000000  |70b638+#%@|70c438@|7ec438@#+
+000000               |7ec438@@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|70c438@|7ec438@|70c438@@|62b62a%|62a82a%|62a846#|62a82a#|62b62a%|70b62a@|70c42a@|70c438@@|7ed238@|8cd246@@@@
+000000              |8cd246@@@|7ed238@|8cd246@|7ed238@@|70c438@@@|70b62a@@|62b62a%%|70c438@|62a82a%%|70b62a@|7ec438@@|7ed238@@@@|70c438@|7ec438@@|7ec446=
+000000               |7ec446+|7ec438%@@|70c438@@|70b62a@|70b638@|62b62a%|70b638%|62a838#|000000 |7ec446%|70c438@|62b62a%|70c438@|70b638@|62b62a%|70b62a@@@|70c438@|70b62a@|70b638@*
+000000                    |7eb646--|000000     |7ec438@|62b62a%|54a82a%|000000   |70a838=|62a838+|70b638+=
+000000                          |7ec446=|70c438@|62a82a%|62a838#
+`,
+        plano: `
+                          *#
+                   *= =  +@@#    %@%
+                   @@%##*#@@%*###@@%    =%=
+             ++=:  %@@%#*#@@%*##%@@#  +%@@+
+             %@@#*+#%@%#*#%@%**#%@%**#%@@%     ==
+             =%@@%**#%%#**#%#**#%%**#%@%#  =%@@@*
+        @@%*- =#%@%*+#%%**#%#**#%*+*%%%#+*#%@@%*
+        +%@@%#*+#%%#*+*#*++#*+*#*+*#%#**#%@%%#-   ---
+         +*%%@%#*+*##++*#**#*#*#++##++*#%%#**+*#%@@@@=
+   %@@@%%#****#%#*=-*#**=-:-:-===##-=*##*++*#%@@@@%+
+    +%%@@@%%#*+++*##*-:::::::::-::-*#*=+*##%%%###*
+     **#########*+*=::::::::::::::::-##********###%%%#*
+ *%%%%%####**+++*%-::::::::::::::::::-#++**##%%%@@@@@@*
+ +%@@@@@%%%%###*#+::::::::::::::::::::=#***#########
+    #####*****++#*::::::::::::::::::::=#****#######=
+   -###########*#*-:::::::::::::::::::****##%%%@@@@@@@=
+ *@@@@@@%%%#**+++#=::::::::::::::::::=#********####*+
+   =+++*****####*+#*::::::::::::::::+#++*#%%%%#####
+      *#%%%%%#*+++*##+:::::::::::-=#+*#**+**#%@@@@%+
+    +%@@@%%#*+**##*=-##**==+==++*#**+-*#%%#*****#%%%
+   +@@%#+=-*#%%%#++*##++****#*+*#++*##*+*%%@%#*=
+         +#%@@%#**#%#*+*#*+*#*+*##++#%%#*+#%@@@%-
+        #@@@%#+=#%%%***%%**#%#**#%#**#%@%#  =#@@@
+       %@@%*- +#%@%#**%%%**#%%**#%@#**#%@@%
+             =%@@%#**%@@#**%@%#*#%@@#-+#%@@#
+             %@@%+: #@@%##*%@@#*##@@%-   -**
+             @@+    %@@###=%@@# +#+@@
+                    +@*     %%-
+                   :-+=--:  *+-
+                :+++++++++++++-  -=+++*+=
+               ***********+++===+++***####
+              #####****++++++==+*********-
+               =***++++++= ++++++++++++=
+                    ::     *+=   ::-:
+                          -*==
+`
+      },
+      {
+        color: `
+000000                           |fce062##
+000000                    |fce062@|fcd262*|000000 |e0c462*|d2b662=|000000 |eec454#|fce054@@|eec454%|000000    |fcd262%|fcee62@|eed262#
+000000                   |eec462*|fce054@@|fcc446@|eec446@@|d2b646@|fcc438@|fce046@@|fcc438@|d2b654#|e0c454@|eec454@|fcc446@|fce054@@|eec446@|000000     |fce070+
+000000              |fce070@|eed262@|e0b654@|d2b646*|000000 |e0c454*|fcd246@|fce046@|fcd238@|fcc438@|eeb638@@|fcc42a@|fcd238@@|fcc42a@|e0b638@|eec438@|eec42a@|fcd238@|fce038@|fcd238@|eec446@|000000  |eec446+|fcd254@|fce054@|fce062@|eec470=
+000000              |fcd254@|fce054@|fcd246@|eec438@|e0a838@|d2a838@|fcb62a@|fcd22a@@|fcc42a@|eeb61c@@|fcb61c@|fcd21c@@|fcc41c@|eeb61c@@|fcc41c@|fcd22a@@|fcc42a@|d2a838%@|eeb638@|fcd238@|fce046@@|eec446@
+000000         |fcd262=|000000    |eec454%|fcd238@|fce038@|fcd238@|fcc42a@|eea81c@|e0a81c@|fcc41c@|fcd21c@|fcd20e@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcd20e@|fcc41c@|eea81c@|e0a81c@|fcc41c@|fcd22a@@|fcd238@|fcc438@|000000  |eec446=#|fcd254@|fce054@|fce062@|fce070*
+000000        |eed262+|fce054@@|fcd246@|fcc446@|eeb638*|000000 |eeb638#|fcc42a@|fcd21c@@|fcc40e@|eea80e@@|fcb60e@|fcc40e@|fcb60e@|eea80e@@|fcb60e@@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@@|fcb60e@|fcd20e@|fcd21c@|fcc41c@|eeb62a@|e0b646=|eeb62a#|fcc438@|fcd238@|fce046@@|fcd246@|eec454#
+000000         |e0b654%|fcc446@|fce038@@|fcd22a@|fcc41c@|eeb61c@|e0a82a@|fcb61c@|fcc40e@@|fcb60e@|ee9a0e@@|fcb60e@@|ee9a0e@@|fca80e@|fcb60e@|ee9a0e@@|fcb60e@@|ee9a0e@|e09a0e@|fcb60e@|fcc40e@@|fcb60e@|e0a81c@|eea81c@|fcb61c@|fcd21c@|fcd22a@@|fcd238@|fcc438@|eec454=
+000000    |fce062*|fcd262#|fcd254*|eec454+|eec446=|000000 |d2a846%|eeb62a@|fcc42a@|fcd21c@@|fcc40e@|fcb60e@|e0a81c@|eea82a%|fcb60e@@|fca80e@|e08c0e%|eea82a%|fcb60e@|fca81c@|eea81c@|fcb61c@@|eea81c@|fca81c@|fcb60e@|fca82a%|e08c0e%|fca80e@|fcb60e@|fca80e@|eea81c#|e09a1c@|fca80e@|fcc40e@@@|fcc41c@|eeb61c@|e0a838@|e0b646=|eeb638+|eec438#|fcc446@|fcd254@@|fce062@|fce070@
+000000    |fcd262%|fce054@@|fce046@|fcd238@|fcd22a@|fcc42a@|eeb61c@|e0a81c@|eea80e@|fca80e@|fcb60e@|fcc40e@|fcb60e@|fca80e@|e09a2a-|fcb62a#|fcb61c@|eeb62a@|e09a2a@|d29a2a%|b67e1c%|a8620e%|a8701c%|9a620e%|b67e1c%|c47e1c%|c48c1c%|d28c1c%|fcb62a@|fcb61c@|fcb62a#|000000 |ee9a0e@|fcb60e@@@|fca80e@|eea80e@|e0a80e@|eea81c@|fcc41c@|fcc42a@|fcd22a@|fce038@|fce046@@|fcd254@%
+000000     |e0b654@|eec446@|fcc438@|fcd22a@@|fcd21c@@|fcc40e@|fcb60e@|fca80e@|e09a0e@|e09a1c@|ee9a0e@|fca80e@|fcb62a@|e0a82a@|b67e1c%|9a620e%%%%%%%|a8620e%%|a8700e%%%|b67e1c%|eeb62a@|fcb62a@|fca80e@|ee9a0e@|e09a1c%@|eea80e@|fcb60e@|fcc40e@@|fcd21c@@|fcc42a@@|eec438@|e0b646%
+000000    |eec454=|e0b646*|e0b638@@|eeb62a@|eeb61c@@|fcb60e@@@@@|fca80e@|fcb62a#|eeb638@|c48c1c%|9a620e%%%%%%%%%%%%%%%%|b67e1c%|fcc438@|fcb62a#|fca80e@|fcb60e@@@@@@|eea81c@|eeb62a@|e0b638@@|eec446+=|eec454=
+000000 |fce062@@|fce054@|fce046@@|fcd238@|fcd22a@@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|ee9a0e@|ee9a00%|ee9a0e@|fcc438@|b67e1c%|a8620e%%%|9a620e%%%%%%%%%%%%%%|a8700e%|a8701c%|fcb62a@|ee9a1c@|ee9a00%|ee9a0e@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd21c@|fcd22a@|fcd238@|fce038@|fce046@|fce054@@|fce062@|fce070+
+000000   |eec454*|eec446@|fcc438@@|fcc42a@|fcc41c@@|fcc40e@@|fcb60e@@@|fca80e@|fcb61c@|e09a2a@|9a620e%|a8700e%|9a620e%|8c620e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|c48c2a%|fcb62a@|fca80e@|fcb60e@@@|fcc40e@@@|fcc41c@|fcc42a@@|fcc438@|fcc446@|eec454#=
+000000   |e0c462=|e0c454@|eec446@|eeb638@|eeb62a@|eeb61c@@|fca80e@@@|eea80e@|ee9a0e@|ee9a00@|fcb61c@|e0a82a@|9a620e%%%%%%%|8c620e%%|8c540e%%|9a620e%|8c620e%|9a620e%|8c620e%|9a620e%%%%|a8620e%|c48c1c%|fcb62a@|ee9a00@|ee9a0e@|fca80e@@@|eea80e@|eeb61c@|eeb62a@@|eec438@|e0c454@|e0c462*
+000000  |fcd262+|fcd254%|fcd246@|fcd238@@|fcd22a@|fcd21c@@|fcc40e@@@|fcb60e@@|fca80e@|fcb61c@|eea82a@|a8700e%|a8620e%|9a620e%|a8620e%|9a620e%%%|8c620e%%%|8c540e%|8c620e%%|9a620e%%%%|a8620e%|a8700e%|a8620e%|e0a82a@|fcb62a@|fca80e@|fcb60e@@|fcc40e@@@|fcd21c@|fcd22a@@|fcd238@|fcd246@|fcd254@#
+000000 |fce062%@|fce054@|fcd246@@|fcd238@|fcc42a@@|fcb61c@|fcb60e@@|eea80e@|ee9a0e@@@|fc9a0e@|fcc42a@|c47e1c%|a8620e%|9a620e%%%%%%%%%%%%|8c540e%|9a620e%|a8620e%|a8700e%|9a620e%|c48c1c%|fcc42a@|fc9a0e@|ee9a0e@@@|eea80e@|fcb60e@@|fcb61c@|fcc42a@@|fcd238@|fcd246@|fcd254@|fce062@%
+000000      |d2b646%|e0b638@|eeb62a@|eeb61c@|fcb61c@|fcb60e@@|fcc40e@|fcb60e@@|fca81c@|ee9a2a*|fcb638@|e0a82a@|a8700e%|9a620e%%%%%%%%%%%%%|a8620e%|a8700e%|e09a2a@|fcb638@|eea82a*|fca81c@|fcb60e@@|fcc40e@@|fcb60e@|fcb61c@|eeb62a@@|e0b638@|d2b646@|d2b662+
+000000     |eec446#|fcc438@|fcd238@@|fcd22a@|fcd21c@|fcc41c@|fcc40e@|fcb60e@|ee9a0e@|e09a0e@|ee9a0e@|fca80e@@|fcb61c@|eeb638@|d29a2a@|a8700e%%|9a620e%%|a8620e%%%%|9a620e%%|a8620e%|b67e1c%|c48c1c%|eeb638@|fcb62a@|fca80e@@|ee9a0e@|e09a0e@|ee9a0e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@@|fcd238@|fcd246@|fcc446@|eec454@
+000000   |fcd262*|fce062@|fce054@|fce046@|fcd246@|fcd238@|fcc42a@|fcb62a@|e0a82a@|e0a81c@|eea80e@|fcb60e@@@|fca80e@|e09a0e@|e0a838=|fca81c#|fcb60e@|fca81c@|eeb638@|e0a82a@|c48c1c%%%%%|d29a2a%|d28c1c%|eeb638@|eea81c@|fcb60e@|fca81c%|eea82a=|ee9a1c#|fca80e@|fcc40e@@|fcb60e@|fca80e@|e0a81c@@|eeb62a@|fcc438@|fcd238@|fcd246@|fce054@|fce062@%
+000000   |fce070=|fcd262+|eed254+|eec454=|000000   |eeb638#|fcb61c@|fcc41c@|fcd21c@|fcd20e@|fcc40e@|fca80e@|e09a2a@|fca81c@|fcb60e@@|fca80e@|e08c0e%|fca81c@|fcb60e@|fc9a0e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fc9a0e@|fcb60e@|fca80e@|e08c0e%|fc9a0e@|fcb60e@@|fcb61c@|e0a82a@|eea80e@|fcc40e@|fcd21c@@|fcd22a@|fcc42a@|e0a82a@|d2a846*
+000000        |eec446*|fcc438@|fcd238@@|fcd22a@|fcc41c@|fcb61c@|eeb62a%@|fcb60e@|fcc40e@@|fca80e@|e09a0e@|eea80e@|fcb60e@@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@|fcc40e@|fca80e@|e09a0e@|fca80e@|fcc40e@@@|eeb62a@|e0a82a%|fcb61c@|fcc42a@|fcd238@|fce038@|fcd246@|eec446@|d2b654*
+000000       |eed254@|fce054@|fce046@@|fcd238@|fcc438@|eeb638+|eeb646+|fcb62a@|fcc41c@|fcd21c@|fcc40e@|fcb60e@|eea80e@@|fcc40e@@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc41c@|fcd21c@|fcd22a@|fcb62a@|e0b646=|e0b638=|eec446#|fcd246@|fce054@@@
+000000      |fce070+|fce062@@|fcd254#|eec454+|000000  |eeb646+|fcc438@|fcd22a@@@|fcb61c@|e0a81c@|eea81c@|fcc41c@|fcd21c@|fcc40e@|fcb60e@|eea81c@|fcb60e@|fcd21c@@|fcb60e@|eea81c@|fcb61c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|e0a82a@|fcb62a@|fcd22a@|fce038@|fcd238@|fcc438@|000000     |fce070=
+000000            |e0c462=|fcc446@|fce046@@|fcd238@|eeb638@|d2a838@|e0a838%|fcc42a@|fcd22a@@|fcc42a@|eeb62a@@|fcc42a@|fcd22a@@|fcc42a@|eeb62a@@|fcc42a@|fcd238@@|fcc438@|d2a846%|d2a838@|e0b638@|fcd246@|fce054@@|eed254@
+000000            |eed262@|fce054@@|fcd246@|eec446*|000000  |eec446%|fcd246@|fce046@|fcd238@|eec438@@|e0b638@|fcc438@|fce038@|fce046@|fcc438@|e0b638@|eec446@|eec438@|fcd246@|fce046@|fcd246@|e0b646+|000000  |d2b654+|eec454*|fce062@@
+000000            |fce070%|fce062#|eec462-|000000    |eec454@|fce054@@|fcc446@|eec454@|e0c454@|d2b654+|eec454%|fce054@@|e0c446@|8ca838#|e0b654%|eec462@|eec454#|fce054@|fce062@|eec462-
+000000                   |eed270+|fcee62@|fcd262#|000000     |fce062@|eee054@|7eb638@|62a838*
+000000                   |70b638=|7eb638*|70b638#|62b62a#|62a82a#|62a838*+|000000  |70c438@|62b62a@|54a82a*
+000000                |70b638=|70c438@|70b62a@|70c438@|70c42a@|70c438@|70b62a@@@|62b62a%%%|70c438@|70b638@|54a82a*|000000  |70b638+#%@|70c438@|7ec438@#+
+000000               |7ec438@@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|70c438@|7ec438@|70c438@@|62b62a%|62a82a%|62a846#|62a82a#|62b62a%|70b62a@|70c42a@|70c438@@|7ed238@|8cd246@@@@
+000000              |8cd246@@@|7ed238@|8cd246@|7ed238@@|70c438@@@|70b62a@@|62b62a%%|70c438@|62a82a%%|70b62a@|7ec438@@|7ed238@@@@|70c438@|7ec438@@|7ec446=
+000000               |7ec446+|7ec438%@@|70c438@@|70b62a@|70b638@|62b62a%|70b638%|62a838#|000000 |7ec446%|70c438@|62b62a%|70c438@|70b638@|62b62a%|70b62a@@@|70c438@|70b62a@|70b638@*
+000000                    |7eb646--|000000     |7ec438@|62b62a@|54a82a%|000000   |70a838=|62a838+|70b638+=
+000000                          |7ec446=|70c438@|62a82a%|62a838#
+`,
+        plano: `
+                           ##
+                    @* +- *@@#    %@*
+                   +@@%##*#@@%+##%@@%     +
+              @%#= +%@@####@@%*##@@%#  =%@@-
+              @@@#**#@@%**#%@#**%@@#**#@@@%
+         -    *%@@#**#%%#**%%#**%%#**#%@%#  -*%@@+
+        +@@@%= *%@%#**#%#**##**#%#**#%%%#-*#@@@@*
+         *%@@@#**#%%#++##++##++##++#%%#**#%@@%#-
+    **+=- +*#%%%#*+##*=*#**##**#*=*##++*%%%#**-=*%%@@@
+    #@@@@%#****###*:+#*++-:-:-==+##+ +###****#%@@@@@#
+     ##%%%@%%#*+++*#*=:::::::::-::-##*+++*#%%%%%%#*
+    -=*****#####*+#=::::::::::::::::-#+*####******==-
+ @@@@@@@%%##**+++%-::::::::::::::::::-#+++**##%%%@@@@@@+
+   +#%%%%%%####*#+::::::::::::::::::::+#*####%%%%%%%*-
+   -#####*****++#*::::::::::::::::::::=#++*****####+
+  +%%%%%%%%%%##*#*-:::::::::::::::::::*#*##%%%%%@@%%*
+ %@@@@%%%##***+++%=::::::::::::::::::=#*++***##%%%@@@%
+      ***#######*=#*::::::::::::::::+#=*##%#####**-
+     *%%@@@%#*+++***#+:::::::::::-=##**+++*#%@@@%%#
+   +@@@@%%#***####+:+#***=====++#*#*:+*%%#***#%%@@@%
+   ===-   +#%%%#*+*##*=*#*+*#+*#*+*##***%%@%#*=
+        +%@@@%#**#%%*+*##*+##+*##*+*%%#**#%@@@%=
+       %@@@%#==#%%%#**#%#**%%**#%%**#%@%#--*%@@@
+      +@%*=  =#@@%#**%%%#*#%%#*#%@%**#%@@%     =
+            -%@@%#**#@@%**#@@#*#%@@%+*#%@@%
+            %@@%=  #%@@##*#@@%*##@@@=  -+@@
+            %*-    %@@%##=#@@#=*%*@@-
+                   =@*     @@+-
+                   :====-:  *+-
+                :+++++++++++++-  -=+++*+=
+               *************+===+++***####
+              #####****++++++==+*********-
+               =*****++++= +*++++++++++=
+                    ::     *+=   ::-:
+                          -*==
+`
+      },
+      {
+        color: `
+000000                            |fce062%|fce070#
+000000                    |eed270=|fce062@|fcd262#|000000 |e0c462*|e0b654+|000000 |eec454%|fce054@@|eec454%|000000    |fcd262#|fcee62@|eed270=
+000000                    |eec454%|fce054@@|eec446@@@|e0b646@|fcc438@|fce046@@|fcc438@|d2b654=|e0b654#|eec454@|fcd246@|fce054@@|eec454%
+000000              |fcd262#|fce062@|fcd254@|e0b646@|d2b646@|c4a846+|eeb646%|fcd238@|fce046@|fcd238@|eeb638@|eec438@|eeb62a@|fcc42a@|fce038@|fcd238@|fcc42a@|e0b638@|eeb638@|fcc438@|fce038@|fce046@|fcd238@|eec454#|000000  |eec454=|fcd254%|fce062@@
+000000              |eec454+|fcd254@|fce046@|fcd246@|eec438@|e0b638@|e0a82a@|fcc42a@|fcd22a@@|fcc41c@|eeb61c@@|fcc41c@|fcd21c@@|fcb61c@|eeb62a@|eeb61c@|fcd22a@@@|fcb62a@|d2b654*|d2a838#|eec438@|fcd246@|fce046@|fce054@|eec454@
+000000         |fce070%|fce062#|eed254+|000000   |eec446@|fcd238@|fce038@|fcd22a@|fcc42a@|eea81c@@|fcc41c@|fcd20e@|fcc40e@|fca80e@|eea80e@|fcb60e@|fcd20e@|fcc40e@|fca80e@|eea80e@|fcb60e@|fcd20e@|fcd21c@|fcb61c@|e0a81c@@|fcc42a@|fcd22a@|fce038@|fcd238@|eec438@|000000   |eec454=|fcd254*|fce062%%
+000000         |eed262#|fce054@@|fcd246@|fcc438@|eeb638%|d2a838*|eeb62a@|fcc41c@|fcd21c@@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fca80e@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@@|fcb60e@|fcc40e@|fcb60e@|eea80e@@|fcc40e@|fcd21c@@|fcc41c@|eeb638%|000000 |eeb638*|fcc438@|fcd238@|fce046@|fce054@@|eed262#
+000000          |e0b646@|fcc438@|fcd238@|fcd22a@@|fcc41c@|eea81c@|e0a81c@|fcb60e@|fcc40e@@|fca80e@|e09a0e%|fca80e@|fcb60e@|fca80e@|ee9a0e@|fc9a0e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|e09a0e@|eea80e@|fcb60e@|fcc40e@@|fcb61c@|e0a82a%|eeb62a%|fcc41c@|fcd22a@@|fce038@|fcd238@|fcc446@|eec454+
+000000    |fce070@|fce062@|fce054@|fcd246@|fcc446@|eec438#|eeb638+|d2a838@|eea81c@|fcc41c@@|fcd20e@|fcc40e@|fca80e@|e09a2a@|fca81c%|fcb60e@@|ee9a00@|e09a2a@|fcb61c@@|fca81c@@|fcb61c@|eea81c@|fca81c@|fca80e@@|e09a1c%|ee9a0e@|fcb60e@@|fca80e@|eea82a#|eea81c@|fcb60e@|fcc40e@|fcd20e@|fcd21c@|fcc41c@|eeb62a@|e0b638%|000000  |eec446=|eec454++|fcd254+|fce070+
+000000     |eec454@|fcd246@|fce046@|fce038@|fcd238@|fcd22a@|fcc41c@|fcb60e@|eea80e@|e09a0e@|fca80e@|fcb60e@@@|ee9a1c%|eeb646=|fcb62a@@|e09a2a@|d29a2a%|b67e1c%|a8620e%|a8700e%|9a620e%|b67e1c%|c47e1c%|c48c1c%|d29a2a%|eeb62a@|fcb61c@|fca81c@|eea82a=|e09a2a+|fca80e@|fcb60e@|fcc40e@|fcb60e@@|eea80e@|e0a81c@|eea82a@|fcc42a@@|fcd238@@|fce046@|fce054@@|fce062@
+000000      |d2b646@|e0b638@|fcb62a@|fcc42a@|fcc41c@|fcd21c@|fcc40e@@|fcb60e@|fca80e@|e09a1c%|e09a0e#|fca80e@|fcc41c@|e0a82a@|b67e1c%|9a620e%%%%%%%|a8620e%%|a8700e%%%|b67e1c%|eeb62a@|fcc438@|fca80e@@|ee9a0e@|e09a0e@@|eea80e@|fcb60e@|fcc40e@|fcd21c@@|fcd22a@@|fcd238@|fcc438@|eec446%
+000000 |fce070+|fce062#|fcd254%@|fcc446@|fcc438@|eeb62a@@|eeb61c@|eea81c@|eea80e@|fca80e@@@@@|fca81c@|eeb638@|c48c1c%|9a620e%%%%%%%%%%%%%%%%|b67e1c%|fcb62a@|eeb638%|fca81c%|fca80e@|fcb60e@@@@@|fcb61c@|eeb62a@@|e0b638@|d2b654+
+000000 |fcd262=@|fce054@|fce046@@|fce038@|fcd22a@@|fcd21c@|fcc40e@@|fcb60e@|fca80e@@|ee9a0e@|e09a1c@|fcc438@|b67e1c%|a8620e%%%|9a620e%%%%%%%%%%%%%%|a8700e%|a8701c%|fcb62a@|fca80e@|ee9a0e@@@|eea80e@|fca80e@|fcb60e@|fcb61c@|fcc41c@|fcc42a@|fcc438@|fcd238@|fcd246@|fcd254@|fce054@|fce062#
+000000   |e0c462=|e0c454@|eec446@|eec438@|fcb62a@|fcb61c@@|fcb60e@@@|fca80e@@@|fcb61c@|e09a2a@|9a620e%|a8700e%|9a620e%|8c620e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|c48c2a%|fcb62a@|fca80e@@|fcb60e@|fcc40e@@@|fcd21c@@|fcd22a@|fcd238@@|fcd246@|fcd254@@|fcd262*
+000000   |e0c462=|e0b646@|eec438@@|fcb62a@|fcb61c@@|fcb60e@@|fca80e@@@|fc9a00@|fcb61c@|e0a82a@|9a620e%%%%%%%|8c620e%%|8c540e%%|9a620e%|8c620e%|9a620e%|8c620e%|9a620e%%%%|a8620e%|c48c1c%|fcb62a@|ee9a00@|ee9a0e@|fca80e@@@@|fcb61c@|eeb62a@@|eec438@|eec446@|e0c462#
+000000 |fce062#@|fce054@|fce046@@|fce038@|fcd22a@|fcd21c@@|fcc40e@@|fcb60e@@|fca80e@|fc9a0e@|fca81c@|e0a82a@|a8700e%|a8620e%|9a620e%|a8620e%|9a620e%%%|8c620e%%%|8c540e%|8c620e%%|9a620e%%%%|a8620e%|a8700e%|a8620e%|e0a82a@|fcb61c@|fca80e@|fcb60e@@@|fcc40e@@|fcc41c@|fcc42a@@|fcc438@|eec446@|eec454#
+000000  |fcd262+|fcd254#|fcc446%@|eec438@|eeb62a@@|eeb61c@|eea80e@@@|fca80e@@@@|fcc42a@|c47e1c%|a8620e%|9a620e%%%%%%%%%%%%|8c540e%|9a620e%|a8620e%|a8700e%|9a620e%|c48c1c%|fcb62a@|ee9a1c@|e09a0e%|ee9a0e@|fca80e@|fcb60e@@|fcc40e@|fcc41c@|fcd22a@|fcd238@|fce046@@|fce054@|fce062@@
+000000     |e0b662+|e0b646@|eeb638@|fcc42a@|fcc41c@@|fcc40e@@@|fcb60e@|fca80e@|ee9a1c@|e09a2a#|fcb62a@|e0a82a@|a8700e%|9a620e%%%%%%%%%%%%%|a8620e%%|e0a82a@|fcc438@|fca81c#|fca80e@|fcb60e@@@@@|eea81c@@|e0b62a@|e0b638@|e0b646@|eec454+=
+000000    |fcd254%|fcd246@|fce046@|fce038@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|eea80e@|e09a0e@|ee9a0e@|fca80e@@@|fcc438#|eeb638@|d29a2a@|a8700e%%|9a620e%%|a8620e%%%%|9a620e%%|a8620e%|b67e1c%|c48c1c%|fcb638@|fcb61c@|fca80e@|ee9a0e@|e09a1c%@|fca80e@|fcc40e@@|fcd21c@|fcd22a@@|fcc438@|eec438@|e0b646@|d2b654#
+000000   |fce062@|fce054@|fcd254@|fcd246@|fcc446@|fcc438%|eeb638#|e0a838@|e0a81c@|fcb60e@@|fcc40e@@|fcb60e@|eea80e@|e09a38+|fca81c*|fca80e@@|eeb62a@|eea82a@|e0a82a@|c48c1c%%%%|c47e1c%|d29a2a@|c48c2a%|eeb62a@|fcb61c@@|fca82a+|e09a2a+|fca80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|e0a80e@|eea81c@|fcb62a@|fcc42a@|fcd238@|fce046@@|fce054@|fcd254@
+000000         |eeb638%|fcc42a@|fcd22a@|fcd21c@@|fcc40e@|fcb60e@|e0a81c%|eea81c%|fcb60e@@|fca80e@|ee9a0e%|e09a1c@|fca80e@@|ee9a0e@@|fcb60e@|fca80e@@@@|e09a1c@|e09a00%|fcb60e@@@|e0a82a%|eea80e@|fcb60e@|fcc40e@|fcd21c@|fcc41c@|fcb61c@|e0a82a@|d2a846*|000000 |eec446+|eec454*|fcd262#|fce062*|fce07e=
+000000       |eec454*|fcd246@|fce046@|fce038@|fcd238@|fcc42a@|fcb62a@|eeb638#|eeb62a%|fcb60e@|fcc40e@@|fcb60e@|ee9a0e@|e09a0e@|fcb60e@@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@@|ee9a0e@|eea80e@|fcb60e@|fcc40e@@|eea80e@|e0a81c@|fcb61c@|fcc41c@|fcd22a@|fce038@|fcd238@|eec438@|d2b646#
+000000      |fcd262%|fce054@@|fcd246@|fcc446@|eec438%|eeb646=|eeb654=|fcb62a@|fcc41c@|fcd21c@@|fcb60e@|eea80e@@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcd21c@@|fcb62a@|e0b646#|e0a82a*|eeb638@|fcd238@|fce046@|fce054@|fcd254@|eec462=
+000000      |fce070+|fcd262+|eec454=|000000   |eeb646+|fcc438@|fcd238@|fce038@|fcd22a@|fcc41c@|e0a81c@@|fcc41c@|fcd21c@@|fcb60e@|eea80e@@|fcc40e@|fcd20e@|fcc40e@|eea80e@|eea81c@|fcc41c@|fcd21c@@|fcb61c@|e0a81c@|eeb62a@|fcc42a@|fce038@|fcd238@|fcc438@|e0c454=|000000  |eec454=|fcd254*|fce062%|fce070%
+000000            |fcd246@|fce046@@|fcd238@|eec438@|d2a838*|d2b654+|fcc42a@|fcd22a@|fce02a@|fcd22a@|eeb61c@|eeb62a@|fcb62a@|fcd22a@@|fcc42a@|eeb62a@@|fcc42a@|fcd22a@|fce038@|fcc438@|e0a838@|d2a838@|eeb638@|fcc438@|fce046@|fce054@|eec454@
+000000           |eed262#|fce062@|fce054@|fcd254@|eec446=|000000  |eec446#|fcd246@|fce046@|fce038@|fcc438@|eeb638@|e0b638@|eeb638@|fcd238@|fce046@|fcd238@|e0b638@|eec446@|eeb638@|fcd246@|fce046@|fcd246@|eec454%|000000 |d2a846=|e0b654#|eec454@|fce062@@
+000000            |fce070=|000000     |eec454%|fce054@@|fcd246@|eec454@|e0b654@|d2a854=|eec454#|fce054@@|eec446@|9ab638@|d2b654@|eec454@|e0c454#|fce054@|fce062@|eec462+
+000000                  |eed270=|fcee62@|fcd262*|000000     |fcd262@|fce062@|8cc438@|62b62a@|62a838*|000000   |fce070+
+000000                   |70b638=*#|62b62a#|62a82a#|62a838*+|000000  |70c438@|62b62a@|54a82a*
+000000                |70b638=|70c438@|70b62a@|70c438@|70c42a@|70c438@|70b62a@@@|62b62a%%%|70c438@|70b638@|54a82a*|000000  |70b638+#%@|70c438@|7ec438@#+
+000000               |7ec438@@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|70c438@|7ec438@|70c438@@|62b62a%|62a82a%|62a846#|62a82a#|62b62a%|70b62a@|70c42a@|70c438@@|7ed238@|8cd246@@@@
+000000              |8cd246@@@|7ed238@|8cd246@|7ed238@@|70c438@@@|70b62a@@|62b62a%%|70c438@|62a82a%%|70b62a@|7ec438@@|7ed238@@@@|70c438@|7ec438@@|7ec446=
+000000               |7ec446+|7ec438%@@|70c438@@|70b62a@|70b638@|62b62a%|70b638%|62a838#|000000 |7ec446%|70c438@|62b62a%|70c438@|70b638@|62b62a%|70b62a@@@|70c438@|70b62a@|70b638@*
+000000                    |7eb646--|000000     |7ec438@|62b62a%|54a82a%|000000   |70a838=|62a838+|70b638+=
+000000                          |7ec446=|70c438@|62a82a%|62a838#
+`,
+        plano: `
+                            ##
+                    -@# += #@@*    *@=
+                    *@@%##*%@@#-*#%@@#
+              *@%#*-*%@@##*%@@#*##@@%+  -#@@
+              =@@@#**#@@#**%@%#*#%@%#=+#@@@%
+         #*=   #%@%#**%%%**#%%**#%%#**#@@%#   =*#%
+         *@@@%*=#%%%#**%%***%#**#%#**#%%#* +#%@@@*
+          *%@@%#**#%%*+*#*+*#*+*#*+*#%%#+*#%@@%%=
+    @@@%#+=**#%%%*+*##++##**#***#=+##*+*#%%%%#*  -==++
+     %%@@@%%#*+*###+-##++-:-:-==+###--*###****#%%@@@@@
+      *###%%%%#*+=*#*=:::::::::-::-##**+++*#%%@@@%%*
+ +*#%%###******#*##=::::::::::::::::-#**########**=
+ =%@@@@@@%%%#**++%-::::::::::::::::::-#*+++**####%%%%%#
+   -#########***#+::::::::::::::::::::+#*###%%%%@@@@@@+
+   -########****#*::::::::::::::::::::=#++*****####*
+ #@@@@@@@%%%##****-:::::::::::::::::::*#*####%%%%##+
+  +*######*******%=::::::::::::::::::=#+++**#%%%@@@@@%
+     =####%%%%#*+=#*::::::::::::::::+#+*####******=-
+    #%@@@@%#**++*#*+#+:::::::::::-=##**++*#%%%%%##*
+   @@@%%#+***#%%#*-=*****=====+=*##=-*###*+*#%@@@@%
+         *#%@%%#**###++**++#***#++##*+*#%%%#*= =+**=
+       +%@@@%#+*#%%#++##*+*#*+*##+*#%#***%@@%#+
+      #@@@%*--#%%%#**#%#**#%#**%%#**%@%#+=#%@@@=
+      +=-   =%@@%#**#%%#**%%#**%@%#*#%@@%-  -*%%
+            %@@%#==#%@%###%@%*##@@%**#%@@%
+           *@@%-  +%@@##*#@@%*##%@@* -+#@@
+            =     #@@%##-*@@%+##+@@+
+                  =@*     %@*+-   +
+                   :-===-:  *+-
+                :+++++++++++++-  -=+++*+=
+               ************++===+++***####
+              #####****++++++==+*********-
+               =*****++++= +*++++++++++=
+                    ::     *+=   ::-:
+                          -*==
+`
+      },
+      {
+        color: `
+000000                             |fce062##
+000000                     |eed262*|fcee62@|fcd254%|000000 |e0c462*|e0c454+|000000 |eec454@|fce054@@|eec454*|000000    |fcd262+|fce070@
+000000                 |e0c462*|d2b654=|000000  |eec454@|fce054@|fce046@|eec446@@@|e0b638@|fcd246@|fce046@@|eec446@|000000 |e0b654+|eec454#|fcd246@|fce054@@|eec462*
+000000               |fcd262@|fce062@|fcd254@|eec446@|e0b646@|d2a846#|eeb638@|fcd238@|fce038@|fcd238@|eeb62a@|eec438@|eeb62a@|fcd22a@|fce038@|fcd238@|eeb62a@|e0b638@|eeb638@|fcc438@|fce046@@|fcd246@|e0c454+|000000   |fcd254*|fce062@|fce070@
+000000               |eec454%|fce046@@|fcd238@|eeb638@|e0b62a@|e0a82a@|fcc42a@|fcd22a@@|fcb61c@|eeb61c@|fcb61c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|eeb62a@|fcb61c@|fcd22a@|fce02a@|fcd22a@|eeb638@|000000 |e0b646+|fcc446@|fcd246@|fce054@@|eec454#
+000000          |fce062@@|fcd254#|e0b646+|000000  |fcc438@|fcd238@|fcd22a@@|fcb61c@|eea81c@|fcb60e@|fcc40e@|fcd20e@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcd20e@|fcb60e@|eea80e@@|fcc40e@|fcd21c@|fcc41c@|fcb61c@|d2a82a@|eea82a@|fcc42a@|fcd238@|fce038@|fcd238@|eec446@|000000     |fcd262=|fce070=
+000000          |eec454%|fce046@@|fcd238@|fcc438@|e0b62a@|e0a838@|fcb61c@|fcc41c@|fcd21c@|fcc40e@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@@|fcb60e@|fcc40e@|fca80e@|eea80e@|fca80e@|fcc40e@@|fcb60e@|e0a80e@|fcb60e@|fcc41c@|fcd21c@@|fcc42a@|eeb638%|000000 |eeb638+|fcc446%|fcd246@|fce046@|fce054@|fce062@|fcd262#
+000000      |eed262=|000000    |e0b638@|fcc438@|fcd22a@@|fcd21c@|fcb61c@|e09a0e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@@|fca80e@|e09a0e@|fca80e@|fcc40e@@@|fcb61c@|eeb638#|eeb62a%|fcc42a@|fcd22a@|fcd238@|fce038@|fcd246@@|eec454+
+000000     |fce062@|fce054@@|fcd246@|fcc438@@|eeb638#|e0a82a@|eea81c@|fcb61c@|fcc40e@@|fcb60e@|eea80e@|e09a2a%|fca80e@|fcb60e@|fca80e@|e08c0e%|fca82a@|fcb61c@|fca81c@@|fcb61c@@|eea81c@|fca80e@|fcb60e@|fca81c%|d28c0e%|fca80e@|fcb60e@@|fca80e@|e0a82a%|eea81c@|fcb60e@|fcc40e@|fcd21c@@|fcc42a@@|e0b638%
+000000      |e0c446@|fcc446@|fcd238@@|fcd22a@|fcd21c@|fcc41c@|fcb60e@|eea80e@|e09a0e@|fca80e@|fcb60e@@|fca80e@|e0a838+|fcb638@|fcb62a@|e09a2a@|c48c1c%|b67e1c%|a8620e%|a8700e%|9a620e%|b6701c%|c48c1c%%|d29a2a%|eeb638@|fcb61c@|fca80e@#|ee9a2a=|ee9a1c#|fca80e@|fcc40e@@@|fcb60e@|eea81c@|e0a81c@|e0a82a@|eeb638#|fcc438@|fcc446@|fcd246@|fcd254@|fce054@|fce062@|fce070%
+000000      |d2b654+|d2a846@|e0b638@|eeb62a@|fcb61c@|fcc41c@|fcc40e@@@|fcb60e@|fca81c@|e09a2a*|eea81c#|fcc42a@|e0a82a@|b67e1c%|9a620e%%%%%%%|a8620e%%|a8700e%%%|b67e1c%|eeb62a@|fcc446%|fca81c@|fca80e@@@|ee9a0e@@|eea80e@|fcb60e@|fcc41c@|fcd21c@|fcd22a@|fcd238@|fce038@|fce046@|fcd246@|fcd254@|eed262+
+000000 |fce070#|fce062@|fce054@@|fcd246@|fcd238@|fcc42a@@|fcb61c@@|eea80e@@@|fca80e@@@@|eeb638@|c48c1c%|9a620e%%%%%%%%%%%%%%%%|b67e1c%|fcb62a@|eea82a@|ee9a1c%|fca80e@|fcb60e@@|fcc40e@@@|fcc41c@@|fcc42a@|eec438@|e0b646@
+000000   |eed254#|fcc446@|fcd238@@|fcd22a@@|fcd21c@|fcd20e@|fcc40e@@|fcb60e@|fca80e@|fc9a0e@|ee9a1c@|fcc438@|b67e1c%|a8620e%%%|9a620e%%%%%%%%%%%%%%|a8700e%|a8701c%|eeb62a@|fca80e@@@@|eea80e@@@|eeb61c@|eeb62a@@|eeb638@|eec446%*|eec454+
+000000   |e0c462=|e0c454@|eec446@|eeb638@|eeb62a@|eeb61c@@|fcb60e@|fca80e@@@@|fc9a0e@|fcb61c@|e0a82a@|9a620e%|a8700e%|9a620e%|8c620e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|c48c1c%|fcb62a@|fc9a00@|fca80e@|fcb60e@@|fcc40e@@|fcd21c@@|fcd22a@|fcd238@|fce046@@|fce054@@|fce062@
+000000  |eed262+|fcd254%|fcc446@|fcc438@@|fcc42a@|fcc41c@@|fcc40e@|fcb60e@@|fca80e@@@|fcb61c@|e0a82a@|9a620e%%%%%%%|8c620e%%|8c540e%%|9a620e%|8c620e%|9a620e%|8c620e%|9a620e%%%%|a8620e%|c48c1c%|fcb62a@|fc9a00@|fca80e@@@|fcb60e@@|fcb61c@@|fcc42a@|fcc438@|eec438@|eec446#|eec454+
+000000 |fce062@@|fce054@|fce046@@|fcd238@|fcd22a@|fcd21c@|fcc41c@|fcc40e@|fcb60e@@|fca80e@@|ee9a00@|fca81c@|e0a82a@|a8700e%|a8620e%|9a620e%|a8620e%|9a620e%%%|8c620e%%%|8c540e%|8c620e%%|9a620e%%%%|a8620e%|a8700e%|a8620e%|e0a82a@|fcb61c@|fca80e@@|fcb60e@@@@|fcb61c@|fcb62a@|eec438@@|eec446@|e0c462*
+000000     |e0b646#|e0b638@|eeb638@|eeb62a@|eeb61c@|eea80e@|fca80e@@@@@@|fcc438@|c47e1c%|a8620e%|9a620e%%%%%%%%%%%%|8c540e%|9a620e%|a8620e%|a8700e%|9a620e%|c48c1c%|fcb62a@|e09a1c@|ee9a0e@|fca80e@|fcb60e@@|fcc40e@|fcd21c@@|fcd22a@|fcd238@|fce046@|fcd246@|fcd254@|fcd262#
+000000     |eec446@|fcc438@|fcc42a@|fcd22a@|fcd21c@@|fcc40e@@|fcb60e@|fca80e@|ee9a0e@|e09a1c@|ee9a1c%|fcc42a@|e0a82a@|a8700e%|9a620e%%%%%%%%%%%%%|a8620e%%|e0a82a@|fcc438@|fca81c@|fca80e@|fcb60e@|fca80e@@|eea80e@@|eea81c@|eeb62a@@|eec438@|fcc446@|fcd254@%|fce062#|fce070+
+000000   |fcd262@|fce054@@|fce046@|fcd238@@|fcc42a@|fcb61c@|eeb61c@|eea80e@@@|fca80e@|fcb60e@|fca80e@%|fcd254+|eeb638@|d29a2a@|a8700e%%|9a620e%%|a8620e%%%%|9a620e%%|a8620e%|b67e1c%|b68c1c%|fcb62a@|fcb61c@|fca80e@|e09a1c*%|fca81c@|fcb60e@|fcc40e@|fcd20e@|fcc41c@|fcc42a@@|eeb638@|e0b638@|d2b646%
+000000   |fce062*|fcd262#|fcd254#|eec446*+|eeb638=|e0b646*|e0a82a@|fcb61c@|fcc40e@@@@|fca80e@|e09a1c*|ee9a1c+|fca80e@@|ee9a0e@|fcc438%|eea82a@|eeb62a@|c48c1c%%%%|c47e1c%|d29a2a@|c48c2a%|eea82a@|fcb61c@|fcb62a@|e0a846-|ee9a0e@|fcb60e@@@|eea80e@|e09a0e@|eea80e@|fcb61c@|fcc42a@|fcd22a@|fce038@|fce046@|fcd246@|eec446@|e0c462%
+000000        |eec446%|fcc438@|fcd22a@@|fcd21c@|fcc41c@|fcb60e@|eea81c#%|fca80e@|fcb60e@@|fc9a0e@|d28c0e%|fca81c@|fcb60e@|fc9a0e@|ee9a0e@|fca81c@|fcb60e@|eea80e@|ee9a0e@|fcb60e@|fca81c@|e08c0e%|fc9a0e@|fcb60e@@|eea82a%|e09a0e@|fcb60e@|fcc40e@@@|fcb61c@|e0a82a@|e0a838%|eeb638*|fcc446%|fcd246@|fcd254@|fce054@|fce062@
+000000      |eec454*|fcd246@|fce046@@|fcd238@|fcc42a@|fcb62a@|eeb638*#|fcb61c@|fcc40e@@@|fca80e@|e09a0e@|fca80e@|fcb60e@@|ee9a0e@@|fcb60e@@|ee9a0e@@|fcb60e@@|fca80e@|ee9a0e@|fcb60e@|fcc40e@@|fca80e@|e09a0e@|eea80e@|fcc41c@|fcd22a@@@|fcc438@|d2b646*
+000000     |fce070*|fce062@|fce054@|fcd254@|fcc446%|eec446+|000000  |eeb62a@|fcc42a@|fcd21c@@|fcc40e@|eea80e@|e0a80e@|fcb60e@|fcc40e@@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@@|eea80e@@|fcc40e@|fcd21c@@|fcc41c@|e0a838@|e0a82a%|eeb62a@|fcd238@|fce046@@|fcd246@|eec462*
+000000           |e0c454=|fcc438@|fcd238@|fce038@|fcd22a@|fcc42a@|e0a82a@@|fcb61c@|fcd21c@@|fcc40e@|eea80e@|eea81c@|fcc40e@|fcd20e@|fcc40e@|fcb60e@|eea81c@|fcb61c@|fcd21c@@|fcb61c@|e0a81c@|eeb61c@|fcc42a@|fcd22a@|fcd238@|fcc438@|eeb646*|000000 |e0b646=|eec446*|fcd254@|fce062@@
+000000           |fcd254@|fce054@|fce046@|fcd246@|eec446@|e0b646=|000000 |eeb638@|fcd238@|fce02a@|fcd22a@|fcb62a@|eeb62a@@|fcc42a@|fcd22a@@|eeb61c@|eeb62a@@|fcd22a@|fce038@|fcd238@|e0b62a@|d2a838@|eeb638@|fcc438@|fce046@@|fcc446@
+000000          |eed270+|fce062@@|eec454#|000000   |e0c454*|fcd246@|fce046@@|fcc438@|eeb638@|e0b638@|eeb638@|fcd238@|fce038@|fcd238@|eeb638@|eec446@|eec438@|fcc438@|fce046@@|eec446@|000000 |d2a846*|e0b654@|eec454@|fce054@|fce062@|eec462=
+000000                 |eec454#|fce054@@|fcd246@|eec454@|e0b654#|000000 |eec454*|fcd254@|fce054@|fcd246@|a8b638@|d2c454@|eec454@|e0b654#|fcd254@|fce062@|eec462#|000000     |fce070=
+000000                 |eed270=|fcee70@|fcd262*|000000     |fcd262@|fce062@|eed270=|70c438@|70b62a@|70a838*|000000  |fce070*
+000000                   |70b638=*#|62b62a#|62a82a#|62a838*|70a838+|7eb646=|000000 |70c438@|62b62a@|54a82a*
+000000                |70b638=|70c438@|70b62a@|70c438@|70c42a@|70c438@|70b62a@@@|62b62a%%%|70c438@|70b638@|54a82a*|000000  |70b638+#%@|70c438@|7ec438@#+
+000000               |7ec438@@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|70c438@|7ec438@|70c438@@|62b62a%|62a82a%|62a846#|62a82a#|62b62a%|70b62a@|70c42a@|70c438@@|7ed238@|8cd246@@@@
+000000              |8cd246@@@|7ed238@|8cd246@|7ed238@@|70c438@@@|70b62a@@|62b62a%%|70c438@|62a82a%%|70b62a@|7ec438@@|7ed238@@@@|70c438@|7ec438@@|7ec446=
+000000               |7ec446+|7ec438%@@|70c438@@|70b62a@|70b638@|62b62a%|70b638%|62a838#|000000 |7ec446%|70c438@|62b62a%|70c438@|70b638@|62b62a%|70b62a@@@|70c438@|70b62a@|70b638@*
+000000                    |7eb646--|000000     |7ec438@|62b62a%|54a82a%|000000   |70a838=|62a838+|70b638+=
+000000                          |7ec446=|70c438@|62a82a%|62a838#
+`,
+        plano: `
+                             ##
+                     *@# += %@@+    +@
+                 +-  %@@###*%@@# =*%@@+
+               @@%#*+#@@%###%@%#*#%@@%-   +@@
+               *@@%#**%@%##*%@%**#%@%# =#@@@*
+          @@*=  #%@%#*#%%#**%%#**%%%#**%@@%#     ==
+          #@@@%**#%%%*+#%#**#%***%%*+*%@%#* =#%@@@*
+      -    *%@@%#+*#%#++##++##++##*+*%%##+*#%@@@%=
+     @@@@%#***#%%#*+*#*+*#**#***#+=*##*+*#%%%%#*
+      #%%@@%%#++*##*=##++-:::-==+###+:=*#%##****#%%@@@%
+      -**###%%%#*==#*=:::::::::-::-##****++*#%%@@@@@%=
+ #@@@@%%###*******#=::::::::::::::::-#*+*##%%%%####
+   *%%%%%%%%%#***%-::::::::::::::::::-#********###*+=
+   -####********#+::::::::::::::::::::=#**##%%%%@@@@@@@
+  +#%%%%%%###***#*::::::::::::::::::::=#+***#######*=
+ @@@@@@%%%###**+**-:::::::::::::::::::*#***########+
+     +*#*********%=::::::::::::::::::=#++**#%%@@@@@@*
+     ##%%%%%%#*+++#*::::::::::::::::*#*##******##%%%#+
+   %@@@@%%#*****##+=#+:::::::::::-=##*=+*#%%%%##**
+   +**+=-=*##%%#*=-***#**=====+=*##:+###*+*#%@@@@%*
+        #%%@%%#+**##*=*#++*#**#*=*##*+#%%%#*+=#%@@@
+      +%@@@%#=+#%%#*+*##++##++##*+#%%*+*%@@%#+
+     +@@%#=  #%@%%*+#%%***%#**#%#**#%%#**#%@@%+
+           -%@@@#**#%@%**#%%**#%%#**%@@%= -+%@@
+           %@@%#- #%@%#**%@%###%@%**#%@@%
+          =@@*   =%@@%#*#%@%###%@@# =#%@@-
+                 +@@%#* +@@%*##+@@*     =
+                 -@+     %@=*+-  *
+                   :-==---: *+-
+                :+++++++++++++-  -=+++*+=
+               ************++===+++***####
+              #####****++++++==+*********-
+               =*****++++= ++++++++++++=
+                    ::     *+=   ::-:
+                          -*==
+`
+      },
+      {
+        color: `
+000000                       |fce070=|000000      |fce070#*
+000000                      |fcd262@|fcee62@|fcd254@|000000 |e0c462++|000000 |fcd254@|fce054@@|eec462+|000000    |eed262=|fce070#
+000000                |fce070*|eec462*@|d2b654#|000000  |fcc446@|fce054@|fce046@|eec446@@@|e0b638@|fcd246@|fce046@|fcd246@|eec446@|000000 |d2b654=|eec454*|fcd254@|fce054@@
+000000                |fce054@@|fcd246@|eec446@|e0b638@|d2a838@|fcc438@|fcd238@|fce038@|fcc438@|eeb62a@|eeb638@|fcb62a@|fcd238@|fce038@|fcd238@|eeb638@|e0b646@|eeb638@|fcc438@|fce046@@|fcc446@|000000    |eed262=|fce062#|fce070+
+000000                |eec446@|fce046@@|fcd238@|eeb62a@|e0b62a@|eeb62a@|fcd22a@@|fcd21c@|fcb61c@|eeb61c@|fcb61c@|fcd21c@@|fcc41c@|eeb61c@|eeb62a@|fcc42a@|fcd22a@|fce038@|fcd238@|eeb646@|000000 |e0b646-|eec446%|fcd246@|fce054@@|eed262*
+000000          |fcd262#|fce062@|fce054@|fcc446@|e0b646%|d2a838+|e0b646*|fcc42a@|fcd22a@@|fcc41c@|eeb61c@|eea80e@|fcb60e@|fcd20e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|fcb60e@|eea81c@|fcb60e@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|d2a838@|eeb62a@|fcc42a@|fcd238@|fce046@|fcd246@|eec446@
+000000           |eec446@|fcd246@|fce046@|fcd238@|fcc42a@|e0a81c@@|fcb61c@|fcc40e@|fcd20e@|fcc40e@|eea80e@@|fcb60e@|fcc40e@|fca80e@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@@|fcb60e@|fcc40e@@|eea80e@|e0a80e@|fcb60e@|fcc41c@|fcd22a@@|fcc42a@|eeb638%|000000  |eec446*|fcc446%|fcd254@|fce062@@|fce070+
+000000     |fce070#|fce062%|fcd254#|fcc454*|eec446+|000000  |e0b638@|fcc42a@|fcd22a@|fcd21c@|fcc41c@|fcb60e@|e09a0e@|eea80e@|fcb60e@|fcc40e@|fca80e@|e09a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@@|ee9a0e@|e09a0e@|fcb60e@|fcc40e@@@|fcb61c@|eeb646*|eeb62a#|fcc42a@|fcd238@@|fce046@@|fcd254@|eec454*
+000000      |fcd254@|fce054@|fce046@|fce038@|fcd238@|fcc42a@|eeb62a%|e0a82a@|eea81c@|fcb60e@|fcc40e@@|fcb60e@|e09a0e@|e0a82a#|fca80e@|fcb60e@|ee9a0e@|e09a1c@|fcb61c@@|fca81c@|fcb61c@@|eea81c@|eea80e@|fca80e@@|e09a2a%|e09a0e%|fcb60e@@@|eea80e@|e0a81c%|fcb61c@|fcb60e@|fcc41c@|fcd21c@|fcd22a@@|fcc438@|eec446%
+000000      |d2b654+|e0b646@|fcc438@|fcd238@|fcd22a@|fcd21c@@|fcc40e@|fcb60e@|eea81c@@|fca80e@|fcb60e@@|ee9a0e@|fcc446#|eea82a@|e0a82a@|c48c1c%|b67e1c%|a8620e%|a8700e%|9a620e%|b6701c%|c47e1c%|c48c1c%|d29a2a%|eeb638@|eeb62a@|fca80e@@|eea80e#|e09a2a+|fca81c%|fcb60e@|fcc40e@@@|fcb60e@|eeb61c@|e0a82a@|d2a838%|eeb646=|eec446+*|fcc454#|fcd254#|fcd262*|fce070+
+000000  |fcd262=|fcd254**|eec446#*|e0b646%|e0a82a@@|eea81c@|fcb61c@|fcb60e@|fcc40e@@|fcb60e@@|fca82a*|e0a846+|fcb62a@|e0a82a@|b67e1c%|9a620e%%%%%%%|a8620e%%|a8700e%%%|b67e1c%|eeb62a@|fcc446%|fca82a*|fca80e@|fcb60e@|fca80e@@|eea80e@@@|fcb61c@|fcc41c@|fcc42a@|fcd22a@|fcd238@|fce046@@|fce054@@|fcd262*
+000000  |fce062%|fce054@@|fce046@|fce038@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|eea80e@|ee9a0e@@|fc9a0e@|fca80e@|eeb62a@|c48c1c%|9a620e%%%%%%%%%%%%%%%%|b67e1c%|fcb62a@|eea81c@|e09a1c%|ee9a0e@|fca80e@|fcb60e@|fcc40e@@|fcd20e@|fcd21c@@|fcd22a@|fcc42a@|fcc438@|eec446%|eec454=
+000000   |e0c462=|eec454@|eec446@|fcc438@|fcc42a@|fcc41c@@|fcc40e@@@|fcb60e@@|fca80e@|fca81c@|fcc438@|b67e1c%|a8620e%%%|9a620e%%%%%%%%%%%%%%|a8700e%|a8701c%|eeb62a@|fca80e@@@@@@@|eeb61c@|eeb62a@@|e0b638@|e0b654@
+000000    |e0b654@|e0b646@|eeb638@|eeb62a@|eeb61c@@|eea80e@@@|ee9a0e@@|ee9a00@|fca81c@|e0a82a@|9a620e%|a8700e%|9a620e%|8c620e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|c48c1c%|fcb61c@|ee9a00@|fca80e@@|fcb60e@@|fcc40e@|fcc41c@@|fcd22a@|fcd238@@|fcd246@|fcd254@|fce062@#
+000000 |fce062%|fce054@@|fce046@|fce038@|fcd238@|fcd22a@|fcd21c@@|fcc40e@@|fcb60e@@@|fca80e@|fcb61c@|e0a82a@|9a620e%%%%%%%|8c620e%%|8c540e%%|9a620e%|8c620e%|9a620e%|8c620e%|9a620e%%%%|a8620e%|c48c1c%|fcb62a@|fca800@|fca80e@@|fcb60e@@|fcc40e@|fcc41c@@|fcd22a@|fcd238@@|fcd246@|fcd254@|fcd262%=
+000000 |fcd262=#|fcd254@|fcd246@|fcc446@|fcc438@|fcc42a@|fcc41c@|fcb61c@|fcb60e@@|fca80e@@|ee9a0e@|ee9a00@|eea81c@|e0a82a@|a8700e%|a8620e%|9a620e%|a8620e%|9a620e%%%|8c620e%%%|8c540e%|8c620e%%|9a620e%%%%|a8620e%|a8700e%|a8620e%|e0a82a@|fcb61c@|fca80e@@@@@|eea80e@|eeb61c@|eeb62a@|eeb638@|eeb646@|e0b646@|e0c462+
+000000     |e0b654@|e0b646@|eeb638@|eeb62a@|fcb61c@|fcb60e@@@@@|fca80e@@|fcc438@|c48c1c%|a8620e%|9a620e%%%%%%%%%%%%|8c540e%|9a620e%|a8620e%|a8700e%|9a620e%|c48c1c%|fcb62a@|ee9a1c@|fc9a0e@|fca80e@|fcb60e@|fcc40e@@|fcd21c@@|fcd22a@|fcd238@|fcc438@|fcc446@|eec454#
+000000    |eec454@|fcd246@|fcd238@@|fcd22a@|fcd21c@@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|e09a0e%@|fc9a0e@|fcc42a@|e0a82a@|a8700e%|9a620e%%%%%%%%%%%%%|a8620e%%|e0a82a@|fcc438@|fca80e@@@|eea80e@@@|fca80e@|fcb61c@|fcc42a@@|fcd238@|fcd246@|fce054@@|fce062@|fce07e=
+000000  |fce070%|fce062@|fce054@|fce046@|fcd246@|fcc438@@|eeb62a@|eea81c@@|eea80e@|fca80e@|fcb60e@@@|fca80e@|eea82a=|fcc446*|eeb62a@|d29a2a@|a8700e%%|9a620e%%|a8620e%%%%|9a620e%%|a8620e%|b67e1c%%|fcb62a@|fcb61c@|ee9a1c+|e09a38*|fca81c@|fcb60e@|fcc40e@@@|fcc41c@|fcb61c@|eeb62a@|e0a82a@|d2a838@|d2b646=
+000000        |e0b646=|e0b62a@|fcb61c@|fcc41c@|fcd20e@|fcc40e@@|fcb60e@|eea81c%|e09a1c*|fca80e@@|fca800@|e09a1c@|fcc438%|eea81c@|eeb62a@|c48c1c%%%%%|d29a2a%|c48c1c%|eea82a@|fcb61c@|fcb638#|e08c1c#|fca80e@|fcb60e@@|eea80e@|e0a81c@|eea80e@|fcb60e@|fcc41c@|fcd22a@@|fcd238@@|eec446@|e0b646@
+000000       |eec446@|fcd238@@|fcd22a@@|fcc41c@|fcb61c@|eeb62a%|eea81c%|fca80e@|fcb60e@@|fca80e@|e08c0e%|e09a1c%|fca80e@@|ee9a00@|e09a1c@|fcb60e@|fca80e@@@|fcb60e@|e09a1c@|ee9a00%|fca80e@|fcb60e@|fca81c@|e09a1c%|fca80e@|fcc40e@@@|fcb60e@|e0a82a@|e0a838@|fcc438%@|fcd238@|fce046@|fce054@@|eed262#
+000000     |eed262+|fce054@@|fce046@|fcd246@|fcc438@|eec438%|eeb646+|eeb638#|fcb61c@|fcc40e@|fcd20e@|fcc40e@|fcb60e@|e09a0e@|eea80e@|fcb60e@@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcc40e@@|fcb60e@|e09a0e@|eea80e@|fcc40e@|fcd21c@|fcd22a@@|fcc42a@|e0b638*|000000   |eec454=|fcd270+
+000000     |fce070#|fce062#|fcd254*|eec454+|000000   |eeb638@|fcc42a@|fcd22a@|fcd21c@|fcc41c@|fcb60e@|e0a81c@|fca80e@|fcc40e@@|fcb60e@|eea80e@@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcd21c@|fcc41c@|eea81c@|e0a82a@|fcb62a@|fcd22a@|fce038@|fce046@|fcd246@|eec454*
+000000           |fcc446@|fcd246@|fce038@|fcd238@|fcc42a@|eeb62a@|d2a838%|fcb61c@|fcc41c@|fcd21c@|fcc41c@|fcb60e@|eea81c@|fcb60e@|fcd20e@@|fcb60e@|eea80e@|fcb60e@|fcc41c@|fcd21c@|fcc41c@|eea81c@@|fcc41c@|fcd22a@@|fcc42a@|eeb646%|d2a846-|e0b638#|eec446@|fcd246@|fce054@@|eed262=
+000000          |fcd254@|fce054@@|fcd246@|eec446%|000000  |eeb638@|fcd238@|fce038@|fcd22a@|fcc42a@|eeb62a@@|fcc42a@|fcd22a@@|fcc42a@|eeb62a@@|fcc42a@|fce02a@|fcd22a@|eeb62a@|e0a838@|eeb638@|fcc438@|fce046@@|fcd246@|000000     |fce062=
+000000          |fce062@#|eec454=|000000   |e0c454=|fcd246@|fce046@@|fcc438@|eeb638@|e0b646@|e0b638@|fcd238@|fce038@|fcd238@|eeb638@|eec446@|eec438@|fcc438@|fce046@@|fcc446@|d2b654=|d2b646%|e0b646@|eec446@|fce054@@|eed262*
+000000                |eec462*|fce054@@|fcd246@|e0c454#|e0b654*|000000 |e0c454+|fcd254@|fce054@|fcd246@|e0b654%|e0c454@@|c4b654@|fcd254@|fcee54@|fcd254@|000000     |fce070*
+000000                 |fcee70%|eed262=|000000     |fcd262@|fce062@|eed262+|000000 |7ec438@|70b638@|62a838*|000000 |fce070#
+000000                   |70b638=*#|62b62a#|62a82a#|70b638*|7eb646*|000000  |70c438@|62b62a@|54a82a*
+000000                |70b638=|70c438@|70b62a@|70c438@|70c42a@|70c438@|70b62a@@@|62b62a%%%|70c438@|70b638@|54a82a*|000000  |70b638+#%@|70c438@|7ec438@#+
+000000               |7ec438@@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|7ec438@|7ed238@|70c438@|7ec438@|70c438@@|62b62a%|62a82a%|62a846#|62a82a#|62b62a%|70b62a@|70c42a@|70c438@@|7ed238@|8cd246@@@@
+000000              |8cd246@@@|7ed238@|8cd246@|7ed238@@|70c438@@@|70b62a@@|62b62a%%|70c438@|62a82a%%|70b62a@|7ec438@@|7ed238@@@@|70c438@|7ec438@@|7ec446=
+000000               |7ec446+|7ec438%@@|70c438@@|70b62a@|70b638@|62b62a%|70b638%|62a838#|000000 |7ec446%|70c438@|62b62a%|70c438@|70b638@|62b62a%|70b62a@@@|70c438@|70b62a@|70b638@*
+000000                    |7eb646--|000000     |7ec438@|62b62a%|54a82a%|000000   |70a838=|62a838+|70b638+=
+000000                          |7ec446=|70c438@|62a82a%|62a838#
+`,
+        plano: `
+                       =      #*
+                      %@% == %@@=    =#
+                *+#+  %@@####%@@# -=%@@
+                @@%#**#@@%###@@%#*#%@@%    =*+
+                #@@%#*#%@%#*#%@%**#@@%# -#%@@+
+          *@@%*-=#@@%**#%%#*#%%#*#%@%***%@@@#
+           #@@@%*+#%%#**#%***%#**#%#*+#%@%%*  =#%@@+
+     *##+=  *%%@%#+*#%*+*#*+*#*+*##++#%%##++#%@@@%+
+      %@@@%#***#%%#++*#++##*##****++###*+##%@@%%*
+      -##%%@%%#***##+**+=-:::-==+##**=-*#%%%#***-=+***+
+  =+*++****###%##=-#*=:::::::::-::-*#=*#*****##%%@@@@@+
+  %@@@@@%%##**+++*#=::::::::::::::::-#*++*##%%%%%%%#-
+   -####%%%%%##**%-::::::::::::::::::-#**********#*
+    *####*****++**::::::::::::::::::::=#+***##%%%%@@@@#
+ #@@@@@@%%%%###*#*::::::::::::::::::::=#***##%%%%%%%%#=
+ =*%%%%####***++**-:::::::::::::::::::*#********###=
+     ###########*%=::::::::::::::::::=#***#%%%%%%%%*
+    #%%@@@%%#**++*#*::::::::::::::::*#*******##%%@@@@=
+  %@@@%%##****###*-+#+:::::::::::-=##--*#%%%##***:
+        -*#%%%%#+=*#*+#**=====+=*#+=*##***#%@@@%##
+       #%@@@%#***##*++**++#***#++*#*+*#%%#***%%@@@*
+     +@@@@%*=+#%%%*+*##*+*#***#*+*#%#+*#%@%#+   -=
+     ##+=   #%@@%*+*%%#**#%#**%%**#%%#**#%@@%+
+           %@@@%*+#%@%#*#%%#**%@%**#@@%*:+#%@@=
+          %@@%*  #%@@#**%@@###%@@#*#%@@%     =
+          @#-   -%@@%#**%@@###%@@%-+#%@@+
+                +@@%*= =@@@*##*@@%     *
+                 %=     %@+ *+- #
+                   :-===--  *+-
+                :+++++++++++++-  -=+++*+=
+               ************++===+++***####
+              #####****++++++==+*********-
+               =*****++++= +*++++++++++=
+                    ::     *+=   ::-:
+                          -*==
+`
+      }
+    ]
   },
   {
-    cols: 48, alto: 29,
-    color: `
-000000                           |fce062@|eed262=
-000000              |fce062@@|eec454*|000000   |eed254@|fce054@|fcd254@|e0b646@|eec454@|e0b646@|fcd246@|fce054@|fcd254@|000000   |fcd254#|fce062@|fcd262@
-000000              |eec446@|fce046@@|fcc438@|e0b646%|d2b654+|fcc438@|fce046@|fcd238@|eeb638@|eec438@|eeb638@|fcd238@|fce038@|fcc438@|d2a846#|e0b646@|fcc438@|fce046@@|eec454%|000000    |fce062+
-000000         |fce070+|fce062@|fcd254#|eec446=|000000 |eeb646=|fcc42a@|fcd22a@@|fcb62a@|e0b62a@|fcb62a@|fcd22a@@|fcb61c@|eeb61c@|fcc41c@|fcd21c@@|eeb61c@|eeb62a@|fcc42a@|fcd22a@@|fcc438@|000000  |fcc446%|fcd246@|fce054@@
-000000          |fcd254@|fce046@@|fcc438@|e0b638%|e0a82a@|fcc41c@|fcd21c@|fcc40e@|fca80e@|eea80e@|fcc40e@|fcd20e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcd21c@|fcb61c@|e0a82a@|eeb62a@|fcc42a@|fcd238@|fce038@|fcd238@|eec454=
-000000     |fce070=|fce062*|fcd254+|eec446=|000000  |fcc438@|fcd22a@@|fcc41c@|fcb60e@|e09a0e@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@|fca80e@|fcc40e@|fca80e@|ee9a0e@|fcb60e@@|eea80e@@|fcb60e@|fcc40e@|fca80e@|e09a0e@|fcb60e@|fcc40e@|fcd21c@|fcc41c@|fcb62a@|000000  |eec454=|fcd254+|fce062+
-000000      |fcd254@|fce054@|fce046@|fcd238@|fcc42a@|fcb62a#|e0a82a@|fcb61c@|fcc40e@@|fcb60e@|e09a0e%|eea81c@|fcb60e@|fc9a0e@|e09a0e%|fca80e@@|ee9a0e@|fcb60e@|fca80e@|e08c0e%|fca80e@|fcb60e@|eea81c@|e09a0e%|fcb60e@|fcc40e@|fcb60e@|fca81c@|eeb62a%|fcc42a%|fcc438@|fcd238@|fce046@|fce054@|fcd262%
-000000       |e0b646@|eec438@|fcc42a@|fcd21c@@|fcc40e@|fcb61c@|eea81c@|fca81c%|fca80e@@|eea81c%|fcb62a@|eea81c@|d29a2a%|c48c1c%|b67e1c%%|c48c1c%|d28c1c%|d29a1c%|eea81c@|fcb638%|ee9a1c@|fca80e@@|eea81c%@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcc42a@|eeb638@|d2b646#
-000000  |fce062@|fce054@@|fcd246@|fcc438@@|eeb62a@|eea81c@|eea80e@|fca80e@|fcb60e@@@|fca80e@|fcb638*|eeb62a@|c48c1c%|9a620e%%%%%%%|a8620e%|a8700e%|a8620e%|a8700e%|d29a2a@|fcb638@*|fca80e@|fcb60e@@@|eea80e@|eea81c@|eeb61c@|eeb62a@|fcc438@|fcd246@|fcd254@|fce062@%
-000000   |eec454+|fcc446@|fcd238@@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@|fca80e@|ee9a0e@|e09a1c@|fcb62a@|d29a2a@|a8700e%|9a620e%%%%%%%%%%%%%|a8700e%|eeb62a@|fca81c@|e09a0e@|fc9a0e@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@@|fcd246@|eec454@
-000000    |e0b654%|e0b646@|eeb638@|eeb62a@|eeb61c@|fca80e@@@@@@|eeb62a@|a8700e%|a8620e%|9a620e%%%%%%%%%%%%%|a8700e%|9a620e%|eea82a@|fca80e@@@@@|fcb60e@|eeb61c@|eeb62a@|eeb638@|eeb646@|e0b654@
-000000 |fce070#|fce062@|fce054@|fce046@|fcd238@|fcd22a@@|fcd21c@|fcc40e@@|fcb60e@|fca80e@@|fcb61c@|d29a2a%|9a620e%|a8620e%|9a620e%%%%|8c620e%%|8c540e%|9a620e%%%%%%%|a8700e%|e09a2a@|fca81c@|fca80e@|fcb60e@@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fce038@|fce046@|fce054@|fce062@|fce070=
-000000  |eed254=|fcc446*|eec446@|fcc438@|fcc42a@|fcb61c@@|fcb60e@|fca80e@@|ee9a0e@|ee9a00@|fca81c@|e0a82a@|a8620e%|9a620e%%%%%|8c620e%%%%%|9a620e%%%|a8620e%%%|eeb62a@|ee9a0e@@@|fca80e@@|fcb60e@|fcb61c@|fcb62a@|fcc42a@|eec438@|eec446@|eec454*
-000000    |e0c446@|eec438@|fcc42a@@|fcc41c@|fcc40e@@|fcb60e@@|fca80e@|fca81c@|fcc438@|b67e1c%|a8700e%|9a620e%%%%%%%%%%%%|a8620e%%|c48c1c%|fcb62a@|fca81c@|fca80e@|fcb60e@@|fcc40e@@|fcc41c@|fcc42a@@|eec438@|eec446@|e0c454@
-000000  |fce062#|fce054@|fce046@@|fcd238@|fcd22a@|fcc41c@|fcb60e@@|eea80e@|ee9a0e@@|fca80e@@|fcc438@|d29a2a@|9a620e%%%%%%%%%%%%|a8701c%|e0a82a@|fcb62a@|fca80e@@|ee9a0e@|eea80e@@|fcb60e@|fcc41c@@|fcd22a@|fcd238@|fce046@|fce054@@|fce062#
-000000   |fcd254=|eec454+|eec446=|eeb646+|d2a838@|e0a82a@|fcb61c@|fcc40e@@@|fcb60e@|fca81c%|eea82a*|fca80e*|fcb61c@|fcb62a@|d29a2a@|b67e1c%|a8701c%|9a620e%|a8620e%|9a620e%|a8620e%|9a620e%|a8700e%|c48c1c%|e0a82a@|eea81c@|fcb60e@|fca80e*|ee9a1c*|fcb61c@|fcb60e@|fcc40e@@|fcc41c@|eeb62a@|e0a82a@|d2a838@|e0b646+|eec446+|eed254+|fcd254=
-000000      |eec446@|fcd238@@|fcd22a@|fcd21c@|fcc40e@|eeb61c@|eea81c@|fca80e@|fcb60e@@|ee9a0e@|e09a2a#|fca80e@@|eea81c@|fca81c@|eea81c@|fcb62a@|eea81c@|fcb62a@|eea81c@|fca80e@@|e09a2a%|fca80e@|fcb60e@@|fca80e@|eea81c@|fcb61c@|fcc41c@|fcd22a@|fcd238@@|fcc446@|e0b646@
-000000    |fcd262#|fce054@@|fcd246@|fcd238@|fcc438%|eeb638+|e0b638%|fcb61c@|fcc41c@|fcd20e@|fcc40e@|eea80e@|ee9a0e@|fcb60e@@|ee9a0e@@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|ee9a0e@|eea80e@|fcc40e@|fcd20e@|fcc41c@|fcb62a@|e0b646*|eeb638+|fcc438%|fcd246@|fce054@@|fce062%
-000000    |fce070=|fcd262=|000000    |eec446%|fcd238@|fce038@|fcd22a@|fcb61c@|e0a81c@|fcb60e@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcd20e@|fcc41c@|eea81c@|e0a81c@|fcc42a@|fcd22a@|fce038@|fcd238@|eec446#
-000000         |eed262*|fce054@@|eec446@|e0b638%|d2a846*|eeb62a@|fcd22a@@|fcc41c@|eeb61c@@|fcc41c@|fcd21c@|fcb61c@|eea80e@|fcb60e@|fcd20e@|fcc40e@|eea81c@|eeb62a@|fcc42a@|fcd22a@|fcd238@|eeb638@|d2a838=|e0b638#|fcd246@|fce054@@|eed262+
-000000              |eec454#|fcd246@|fce046@|fcd238@|e0b638@|e0b646@|fcc42a@|fcd238@|fcd22a@|eeb62a@@|fcc41c@|fcd22a@@|fcb62a@|e0b646@|eeb638@|fcd246@|fce046@|fcd246@|000000    |fcd262=
-000000              |fcd254@|fce054@|fcd254@|e0c446=|000000  |fcd246@|fce046@|fcd246@|e0b646@|eec446@|eeb638@|fcd238@|fce046@|fcc438@|000000  |eec454=|fcd254%|fce062@
-000000                    |fcd262#|fce062@|eec462+|000000 |c4c454@|9ab638@|eed246@|fce054@|fcd254@
-000000                 |70b638=*|62b62a*|62a82a*|70b638*|62a838=|000000 |7ec446#|70c438@|7ea838#|fce070%|fcd270=
-000000              |70c438+@@@@|70c42a@|70c438@|70b62a@|62b62a%|70b638@@@|54a82a*|000000 |70b638=#@@|70c438@|7ec438@%|7ed246+
-000000             |7ec438@|7ed238@@@@@|7ec438@@|70c438@@|70b638@|62b62a%%|62a838%|62b62a%%|70c438@|7ec438@|7ed238@@@@@|8cd254=
-000000             |8cd246@|7ed238@@|7ec438@|70c438@@@|70b62a@%|62b638%|70b638#|70c438@|62b62a%|70b638@|70c438@@@@@@@|7ec438@
-000000               |7ec438-+|70b638***=|000000  |7ec446=|70c438@|54a82a%|70b646=|62b638+|62a82a*|62b638#|70b638##+
-000000                       |7ec438%|62b62a@|62a82a%
+    cols: 48, alto: 30,
+    marcos: [
+      {
+        color: `
+000000                    |fce070+|000000     |eed270=|fce070%
+000000                   |eec462=|fce054@@|eec454*|e0c454**|eec454*|fce054@@|eec454#|000000    |fce070*
+000000              |fce062@@|eec454@|e0c446@|d2b646%|e0b646@|fcd246@|fce046@|fcc438@|eec446@@|fcc438@|fce046@|fcd246@|eec446@|000000 |e0b646*|fcc446@|fce054@@|eec462=
+000000              |eec454%|fce046@@|fcc438@|eeb638@|e0b62a@|fcc42a@|fcd22a@@|eeb62a@@|fcc42a@|fcd22a@@|eeb62a@|e0b638@|fcc42a@|fcd238@|fce046@|fcc446@|000000   |fcd254*|fce062@|fce070@
+000000         |fcd262*|fce054@|fcd254@|eec446@|d2a838#|d2a846*|fcc42a@|fcd22a@@|fcb61c@|eea81c@|fcb60e@|fcd20e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fcd20e@|fcb60e@|eea81c@|fcb61c@|fcd21c@|fcd22a@|fcc42a@|e0b646#|e0b638+|fcc438@|fcd246@|fce046@|fcd254@|eec454=
+000000          |eec446@|fcd246@|fce038@|fcd22a@|eeb61c@|e0a81c@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@@|eea80e@@|fcc40e@@|fcb60e@|e0a81c@|eeb61c@|fcc41c@|fcd22a@@|fcc438@|eec446=|000000  |eec454=|fcd254+|fce062*|fce070=
+000000     |fce062@|fce054@|fcd254@|fcd246@|fcc438#|eeb646=|e0b638%|fcc41c@|fcd21c@|fcd20e@|fcb60e@|e09a0e@|fca80e@|fcb60e@@|ee9a0e@|fc9a0e@|fcb60e@|fc9a0e@|ee9a0e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|e09a0e@|fcb60e@|fcc40e@@|fcc41c@|eeb62a%|eeb638*|fcc42a%|fcc438@|fcd238@|fce046@|fce054@|fcd254@
+000000      |eec446@|fcd246@|fcd238@|fcd22a@@|fcc41c@|eea81c@@|fcb60e@|fcc40e@|fcb60e@|e09a0e%|eea81c*|fcb60e@|fca81c@|eeb62a@|eea81c@@|e09a1c@|fcb61c@|eeb62a@|fca81c@|fcb60e@|fca81c#|e08c1c%|fca80e@|fcb60e@@|eea81c@@|fcb61c@|fcc41c@|fcd21c@|fcd22a@|fcd238@|fcc438@|eec446+
+000000   |eed254=|eec446==|e0b646*|e0a838@|eeb62a@|fcb61c@|fcc41c@|fcc40e@@|fcb60e@|fca81c%|ee9a1c+|fca81c%|fcb61c@|eea82a@|c48c1c%|b67e1c%|a8620e%%|9a620e%%|a8620e%|a8700e%%|d28c1c%|e0a82a@|fcb61c@|fca81c@|ee9a1c+|eea81c#|fcb60e@|fcc40e@@@|fcb61c@|eeb61c@|e0a82a@|e0b646#|eec438+|fcc446*|fcd254*|fcd262*|fce062+
+000000  |fce062%|fce054@|fce046@@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@|eea80e@|ee9a0e@|fca80e@@|fcb61c@|eeb638@|b67e1c%|9a620e%%%%%%%%|a8620e%%|9a620e%%|b67e1c%|e0a82a@|fcb61c@|fca80e@@|ee9a0e@|eea80e@|fca80e@|fcb60e@|fcc41c@|fcd21c@|fcd22a@|fce038@|fce046@@|fce054@|fcd262#
+000000   |e0c462%|eec446@|fcc438@|fcc42a@|fcc41c@@|fcc40e@@|fcb60e@@|fca80e@|fca82a@|eea82a@|a8620e%%|9a620e%%%%%%%%%%%|a8620e%|9a620e%|a8700e%|e0a82a@|fcb62a@|fca80e@@|fcb60e@|fcc40e@@@|fcc41c@|fcc42a@|fcc438@|eec446@|eec454=
+000000  |eed254=|eec454#|eec446@|fcc438@|fcc42a@|fcb61c@|fcb60e@|fca80e@@@|ee9a0e@|ee9a00@|fcb62a@|b67e1c%|a8700e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|fcb62a@|ee9a00@|ee9a0e@|fca80e@@|fcb60e@|fcb61c@@|fcc42a@|eec438@|eec446@|fcc446*|eed254=
+000000 |fce062@|fce054@|fce046@@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@@|fca80e@|fc9a00@|fcc42a@|a8701c%|9a620e%%%%%%|8c620e%%|8c540e%|9a620e%|8c620e%|9a620e%%%%%|a8700e%|fcc438@|fc9a00@|fca80e@|fcb60e@@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fce046@@|fce054@|fce062@
+000000    |e0b646@|eeb638@|eeb62a@|eeb61c@@|fca80e@@@@@|fcb62a@|c48c1c%|a8700e%|9a620e%|a8620e%|9a620e%%%%|8c620e%%|9a620e%%%%%|a8620e%%|b6701c%|fcc42a@|fca80e@@@@@|eeb61c@|eeb62a@@|eeb638@|e0b646@
+000000   |eec454#|fcc446@|fcd238@|fcd22a@@|fcd21c@|fcc40e@@|fcb60e@|fca80e@|ee9a0e@|ee9a1c@|fcb62a@|c47e1c%|a8620e%|9a620e%%%%%%%%%%%|a8620e%|a8700e%|b67e1c%|fcc42a@|ee9a1c@|ee9a0e@|fca80e@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fcd246@|fcc454@|eec462+
+000000  |fce062@|fce054@|fce046@|fcd246@|fcc438@|fcc42a@|eeb61c@|eea81c@|eea80e@|fca80e@@|fcb60e@|fca80e@|fca81c%|fcc446%|d29a2a%|a8701c%|a8620e%|9a620e%%%|a8620e%%|9a620e%%%|a8620e%|9a620e%|d29a2a@|fcd246%|fca81c#|fca80e@|fcb60e@@|fca80e@|eea80e@|eea81c@|eeb61c@|fcc42a@|fcd238@|fcd246@|fce054@|fce062@|fce070+
+000000       |e0b638@|fcb62a@|fcc41c@|fcc40e@@|fcb60e@|fca80e@|e09a1c%|fc9a0e%|fca80e@@|eea838%|e0a82a@|d29a2a@|b67e1c%%%|a8701c%%%|d28c1c%|eea82a@|eeb638%|fca80e@@%|eea82a%|fca81c@|fcb60e@|fcc40e@|fcd21c@|fcc42a@@|e0b638@|d2a846%
+000000     |fcc454#|fcd246@|fce038@|fcd238@|fcd22a@|fcc41c@|fcb62a%|eea81c@|fca80e@|fcb60e@@|fca80e@|e09a1c%|fca81c@|fcb60e@|ee9a0e@|ee9a1c@|fcb61c@|fca81c@@|fcb61c@|eea81c@|ee9a0e@|fcb60e@|fca80e@|e09a1c%|fca80e@|fcc40e@@|fcb60e@|eea81c@|eeb62a@|fcc42a@|fcd22a@|fce038@|fce046@|fcd246@|e0c454@
+000000    |fce062@|fce054@|fcd254@|fcd246%|eec446*|eeb646=*|fcc42a@|fcc41c@|fcd20e@|fcc40e@|eea80e@|e09a0e@|fcb60e@|fcc40e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|eea80e@@|fcc40e@|fcd21c@|fcd22a@|fcc42a@|e0b646+|000000 |eec446=|fcd254*|fce062#%
+000000         |eec446@|fcd238@@|fcd22a@|fcc41c@|e0a82a@|eea81c@|fcc40e@|fcd20e@|fcc40e@|eea80e@|fca80e@|fcc40e@@|fca80e@@|fcc40e@@|fcb60e@|eea80e@|fcc40e@|fcd21c@|fcc41c@|eea81c@|e0a82a@|fcc42a@|fcd238@|fce038@|fcd246@|eec454*
+000000        |eed254@|fce054@|fce046@|fcd246@|eec446#|000000 |eeb638%|fcc42a@|fcd22a@|fcd21c@|fcb61c@|eea81c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@@|fcc41c@|fcd21c@|fcc41c@|eea82a@|eeb62a@|fcd22a@|fce038@|fcd238@|eeb646#|d2a846-|e0b646#|fcd246@|fce054@|fce062@
+000000        |fce062@|fcd262#|eec454=|000000  |e0c454=|fcd246@|fce046@|fcd238@|fcc438@|e0b638@@|fcd238@|fce038@|fcd22a@|eeb638@@|fcc438@|fce038@|fcd238@|e0b638@@|eec438@|fcd246@|fce054@|fcd254@
+000000             |eec462#|fce054@@|eec446@|e0b654*|000000 |eec454*|fce046@@|eec446@|e0c446@|eec446@|e0b646@|fce054@@|eec454+|000000 |e0b654+|eec454*|fce062%@
+000000             |fce070=|fce062*|000000     |fce062@@|000000  |8cc438@|62b62a%|e0d254#|fce070%
+000000                |70b638=*#|62b62a#|70b638%*|62a838+|000000 |70c438@|62b62a%
+000000              |70c438%@@|70c42a@|70c438@@|70b62a@|70c438@@|70b638@|70c438@|62a82a%|000000  |70b638*%@|70c438@@|7ec438@|7ed238%|8cd246*
+000000            |8cd246*|7ed238@@|7ed246@|7ed238@@@|7ec438@@|70c438@|62b62a@%%|54a82a%|62b638%|62b62a%|70b62a@|70c438@|7ed238@@@@|8cd238@|7ed238@
+000000            |8cd246*|7ed238@@|7ec438@@@|70c438@@|70b62a@|62b62a%|62b638%|70b638%|70c438@|70b638%|70c438@@|7ec438@|70c438@@@@@|7ec438#
+000000               |70b638=+*++|000000   |7ec438@|62b62a@|62a82a%|000000 |62b638+*#|70b638#*=
+000000                       |70c438@|62a82a%|62a838+
 `,
-    plano: `
-                           @-
-              @@+   %@%#%*%@%   *@@
-              %@@%+-%@@###@@#=*%@@*    +
-         +@*- -%@@#*#@@#*#@%#*#@@#  *%@@
-          %@@%**#%%**#%#*#%#*#%%#*#%@@%=
-     =++-  #%@%#+*%#**%*+##**#%*+#%%%#  -=+
-      %@@%%**#%%#+*#*+#**#*+*#*+#%#***%@@@#
-       *#%%%%#*****#*+=--==+**+**+*#%%%%#+
-  @@@%%%#***###*+*=:::::::::::+#=*##****#%%@@#
-   =%%%%%%%#*++#+-::::::::::::::**+**#%%@@%%%
-    *###*******#:::::::::::::::::********###*
- #@@@@@%%%###*#+:::::::::::::::::+**##%%%%@@@@@=
-  =+#####***++**:::::::::::::::::#++****#####+
-    #####%%##**#-:::::::::::::::=#**##%%######
-  #@@@@%%#**+***#+::::::::::::-*#******#%%@@@@*
-   ==--**##%%#*==##+=-::::::=**#==*#%%##**====
-      #%@@%#***##+=*****#*#*#*+*##**#%%@@%#
-    *@@@%#=*#%%#*+##*+#*+*#+*##+*#%%#==*%@@%
-    ==    #%@%#+*%%#*#%#*#%**#%%**#@@%*
-         *@@#*=#%@%**%%#*#%%**%@%#-*%@@+
-              +@@%#*#@@###@@#*#%@%    =
-              %@%-  %@%###@@%  -#@
-                    #@= #*%@%
-                 :----: ++=%=
-              -+++++++++++- :=+++*+=
-             **********+====++***##*-
-             #*****++++=*++******++
-               :--=-:  -*=:--===-
-                       *+=
+        plano: `
+                    +     -%
+                   -@@++++@@+    *
+              @@%#*#@@%##%@@# =%@@=
+              #@@%#*%@%##%@%**#@@%   *@@
+         +@@#+=#@@#*#%%**%%#*#%@%+=%@@@-
+          #@@%#+#%%**#%**##**%%#**%@@%-  -+*=
+     @@@%+-*#%%#+*##+*#++#*+*#*+#%%#*=*%@@@@
+      #%@@%#**###+=#****+#**#=+*##**#%@@%%=
+   =--=**#%%%#*-*#*=-:::::--+*#*-+##%##**+=+++=
+  %@@@@%%#*****##-::::::::::::-*#**+**##%@@@@@*
+   *####%%%##***:::::::::::::::-***###%%####-
+  =*#####***++#-:::::::::::::::::#++***#####+-
+ @@@@@@%%%##**%-::::::::::::::::-#**##%%%@@@@@%
+    ###*******#=-:::::::::::::::-#******####
+   *%%%%%%%#*++#=:::::::::::::--#++*#%%%@%%%=
+  @@@%%##****##*#+-:::::::::::+#+###***##%@@@+
+       *#%%%#*++****+------+****++*#%%%#**
+     *%@@%#***##*+*#++#**#*+#*+*#%#*##%@@%#
+    @@@#+-+#%%%*+#%*+*#**##+*%#**%@%#= =+##
+         #%@@#**%%#**%%**%%**#@%**#@@%+
+        %@@%* *%@%#*#@%**%@%*#%@%*:+%@@
+        @#-  -%@@#**%@%##%@%**#@@%
+             *@@#+ +@@%###@@= =+#@
+             -*     @@  *+*#
+                :===+-: *+
+              +**+*++++++=  =+++***=
+            +*##******+++=+++****##*
+            +*****++++=+*++***+**+=
+               :----   *+= --==-:
+                       *=:
 `
+      },
+      {
+        color: `
+000000                     |fce070#|000000     |fcd262=|fce070*
+000000               |fce070=|000000 |e0c462+|000000  |eec454%|fce054@|fcd254@|e0b654=|e0c454*+|eec454#|fce054@@|e0c462=|000000    |fce070=
+000000               |fce054@@|eec446@@|d2a838@|eec438@|fce046@@|eec438@|eec446@|eeb638@|fcd238@|fce046@|fcd246@|eeb646*|000000 |e0b654+|fcd254@|fce054@@
+000000          |fce070+|eec462+|d2b654-|000000  |fcc446@|fce046@|fcd238@|fcc438@|eeb62a@@|fcd22a@@|fcc42a@|eeb62a@|fcb61c@|fcd22a@@|fcc42a@|e0a838@|e0b638@|fcc438@|fce046@@|eec446@|000000   |fcd254+|fce062#|fce070=
+000000          |fcd254@|fce054@|fcd246@|eeb638@|d2a838%|e0a838@|fcc42a@|fcd22a@|fcc41c@|eeb61c@|eea80e@|fcc40e@|fcd20e@|fcb60e@|eea80e@|fcb60e@|fcd20e@|fcc40e@|fcb61c@|eea81c@|fcc41c@|fcd22a@@|fcc42a@|000000 |eeb638+|fcc446@|fcd246@|fce054@|fcd254@
+000000      |fce070=|000000    |fcc438@|fcd238@|fcd22a@|fcc42a@|eea81c@|eea80e@|fcc40e@@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|fcb60e@|e0a82a@|fcb61c@|fcd22a@|fcd238@@|fcc446@
+000000      |fce054@@|fcd246@|fcd238@|fcc438%|eeb638*|eeb62a@|fcc41c@|fcd20e@|fcc40e@|fca80e@|e09a0e@|fcb60e@@|fca80e@|ee9a0e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fc9a0e@|fcb60e@@|ee9a0e@|eea80e@|fcb60e@|fcd20e@|fcc41c@@|eeb638%+|eec438*|fcc438@|fcd246@|fce054@@|fce062@
+000000      |d2b654=|eeb638@|fcd238@|fcd22a@@|fcc41c@|fcb61c@|eea81c@|fca80e%|fcb60e@@|fca80e@|e09a2a#|fcb61c@@|eea81c@|e0a82a@|eea81c@|e09a1c@|fcb61c@|fcb62a@|eea81c@|fcb60e@|fca80e@|e09a2a#|ee9a0e@|fcb60e@@|fca80e@|eea81c@@|fcb61c@|fcc41c@|fcd22a@|fcd238@@|fcd246@|eec454*
+000000  |fce062#%|fcd254@|fcd246%|fcc438#|eeb638@|e0a82a@|eea81c@|fcb61c@|fcb60e@|fcc40e@|fcb60e@@|eea82a+|fcb62a*|fcb61c@|eea82a@|c48c1c%|b67e1c%|a8620e%%|9a620e%%|a8620e%|a8700e%%|d29a1c%|e0a82a@|fcb61c@|fca80e@|fc9a0e%|e09a1c#|eea81c@|fcb60e@|fcc40e@@|fcc41c@@|eeb62a@|e0b638@
+000000   |fcd254@|fcd246@@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@@|fc9a0e@|fca80e@|eeb62a@|b67e1c%|9a620e%%%%%%%%|a8620e%%|9a620e%%|b67e1c%|e0a82a@|fcb62a%|fca80e@@@|eea80e@@@|fcb61c@|fcc41c@|fcc42a@|fcd238@|fcd246@|fce046@|fce054@|fce062@
+000000   |e0c462-|e0b654@|eeb638@|eeb62a@|fcb62a@|fcb61c@|fcb60e@@@@|fca80e@|fcb62a@|eeb62a@|a8620e%%|9a620e%%%%%%%%%%%|a8620e%|9a620e%|a8700e%|e0a82a@|eea82a@|ee9a0e@|fca80e@|fcb60e@|fcc40e@@@|fcd21c@|fcd22a@|fcc42a@|fcc438@|fcc454%|eec454=
+000000 |fce062#|fcd254@|fcd246@|fcd238@@|fcc42a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@|fc9a0e@|ee9a00@|fcb62a@|b67e1c%|a8700e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|fcb62a@|fc9a00@|fc9a0e@|fca80e@@@|eeb60e@|eeb61c@|eeb62a@|eeb638@|e0c454@
+000000 |fcd262+|fcd254#|fcd246@@|fcc438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@@|fc9a00@|fcc42a@|a8701c%|9a620e%%%%%%|8c620e%%|8c540e%|9a620e%|8c620e%|9a620e%%%%%|a8700e%|fcc42a@|fca80e@@|fcb60e@|fcc40e@@@|fcd21c@|fcd22a@|fcd238@|fce046@|fce054@@|fce062%
+000000   |e0c462+|e0c446@|eeb638@|eeb62a@|fcb61c@@|fcb60e@@@|fca80e@@|fcb62a@|c48c1c%|a8700e%|9a620e%|a8620e%|9a620e%%%%|8c620e%%|9a620e%%%%%|a8620e%%|b6701c%|fcc42a@|fc9a00@|fc9a0e@|fca80e@@@|fcb61c@|fcb62a@@|eec438@|eec446@|fcc454+|eed254=
+000000  |fcd262*|fcd254@|fcd246@|fcd238@@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@@|ee9a1c@|fcb62a@|c47e1c%|a8620e%|9a620e%%%%%%%%%%%|a8620e%|a8700e%|b67e1c%|fcc42a@|eea82a@|fca80e@|fcb60e@|fcc40e@@@|fcc41c@|fcc42a@|fcc438@|eec446@|e0c454@
+000000  |fce062#|fcd254%%|fcc446%|fcc438%|e0b62a@|eea81c@@|fcb60e@@@@|fca80e@|fca81c+|fcc438@|d29a2a@|a8701c%|a8620e%|9a620e%%%|a8620e%%|9a620e%%%|a8620e%|9a620e%|d29a2a%|fcd246%|fca80e@@@|eea80e@@@|fcb61c@|fcc42a@|fcd238@@|fce046@|fce054@|fce062@
+000000      |eeb646%|fcc42a@|fcd22a@|fcd21c@|fcd20e@|fcc40e@|fcb60e@|e0a81c@|ee9a0e%|fca80e@@|ee9a1c@|eeb638#|eea81c@|d29a2a@|b67e1c%|b6701c%|b67e1c%|a8701c%%%|c48c1c%|eeb62a@|eea82a@|fcb60e@|fca80e%|eea81c*#|fcb60e@|fcc40e@@|fcc41c@|fcb61c@|e0a82a@|d2a838@|e0b646+
+000000    |fcd254#@|fce046@|fce038@|fcd238@|fcc42a@|fcb62a%|eea82a@|fca80e@|fcb60e@|fcc40e@|fcb60e@|e09a0e@|eea81c%|fcb60e@|fca80e@|e08c0e%|fca81c@|fcb61c@|fca81c@@|fcb61c@|ee9a0e@|fca80e@|fcb60e@|eea81c%|e09a0e%|fcb60e@|fcc40e@|fcb60e@|eea81c@|eeb61c@|fcc41c@|fcd22a@|fcd238@@|fcd246@|e0b646@
+000000    |fce062#|fcd254#|fcc454*|eec446=|000000 |eeb646=|fcc42a@|fcc41c@|fcd21c@|fcc40e@|fcb60e@|e09a0e@|fca80e@|fcc40e@|fcb60e@|ee9a0e@@|fcb60e@@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fcc40e@|fca80e@|ee9a0e@|fcb60e@|fcd20e@|fcd21c@|fcc41c@|eeb638#|eeb646=|fcc446*|fcd246@|fce054@@|fce062%
+000000        |eec446#|fcd238@|fce038@|fcd238@|fcc42a@|eeb62a%|e0a82a@|fcb61c@|fcd20e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcd20e@|fcd21c@|fcb61c@|e0a81c@|fcb61c@|fcd22a@|fce038@|fcd238@|eec446@
+000000       |eed262#|fce054@@|fcd246@|eec446#|000000 |eeb646+|fcc42a@|fcd22a@@|fcc41c@|eea81c@|fcb61c@|fcd21c@@|fcb61c@|eeb61c@|fcc41c@|fcd21c@@|eeb61c@|eeb62a@|fcc42a@|fcd22a@|fcd238@|eeb638@|d2a846+|e0b638%|eec446@|fce054@@|eed262*
+000000       |fce070+|fcd262=|000000    |fcc446@|fce046@@|fcc438@|e0b638@|d2a838@|fcc438@|fce038@|fcd238@|eeb62a@|eec438@|fcc438@|fcd238@@|eec438@|e0b638@|eeb638@|fcd246@|fce046@|fcd246@|e0c454=|000000   |fcd262=|fce070=
+000000            |eec454=|fce054@@|eec446%|e0b654=|000000  |fcd246@|fce046@|fcd246@|e0b646@|eec446@|d2b646@|fcd246@|fce054@|eec454%|000000 |e0b654*|eec454%|fcd254%|fce062@
+000000             |fce070+|000000     |fce062@@|000000   |70c438@|a8c446@|fce062@
+000000                |70b638=*#%#|62a838*+|000000 |70c438@|62b62a%
+000000              |70c438%@@|70c42a@|70c438@@|70b62a@|70c438@@|70b638@|70c438@|62a82a%|000000  |70b638*%@|70c438@@|7ec438@|7ed238%|8cd246*
+000000            |8cd246*|7ed238@@|7ed246@|7ed238@@@|7ec438@@|70c438@|62b62a@%%|54a82a%|62b638%|62b62a%|70b62a@|70c438@|7ed238@@@@|8cd238@|7ed238@
+000000            |8cd246*|7ed238@@|7ec438@@@|70c438@@|70b62a@|62b62a%|62b638%|70b638%|70c438@|70b638%|70c438@@|7ec438@|70c438@@@@@|7ec438#
+000000               |70b638=+*++|000000   |7ec438@|62b62a@|62a82a%|000000 |62b638+*#|70b638#*=
+000000                       |70c438@|62a82a%|62a838+
+`,
+        plano: `
+                     #     =*
+               = =  *@@-+=*@@-    =
+               @@%#*#@@###%@%= -%@@
+          +=:  %@@###%@###%@%**%@@#   =#=
+          %@@#**%@%**%%#*#%%**%@@# =%@@@
+      -    %@@%**#%#**%#*#%#*#%%**#%@@%
+      @@@%*=*%%%*+##*+#*+*#+*##+*#%%#*-+%%@@@
+      -#%@@%#**##*=##***+##*#*=+##***#%@@@%+
+  #%%#*#**##%##==#*=-:::::--+***+=*#%%%##*
+   %%@@@%%#*++*##-::::::::::::-********##%%@@@@
+   -#########*#*:::::::::::::::-**+*#%%%%%%%#=
+ *%@%%%%###**+#-:::::::::::::::::#+*****####
+ =#%%%%%###***%-::::::::::::::::-#**##%%%@@@@@%
+   =########**#=-:::::::::::::::-#+****#####+-
+  *@@@@@%%#**++#=:::::::::::::--#**##%%%%%##
+  ##%#*****###*-#+-:::::::::::+#*#****#%%@@@@
+      *#%%%%**+*****+------=**#*=+#%%%#**=
+    *@@@%#***#%#++#*+*#**#+*#*+#%#**#%@@%#
+    #*+- -#%@%#+*%#*+##+*#**#%*+#%%#+-+%@@%
+        *%@@%**#%%**#%#*#%#*#%%#*#%@@#
+       *@@%+ =%@@#*#%@#*#@%#*%@@#-*%@@*
+       +=    %@@%**%@@###@@#*#%@@-   ==
+            -@@#-  %@%##*@@# =*%@
+             +     @@   **@
+                :==+=-: *+
+              +**+*++++++=  =+++***=
+            +*##******+++=+++****##*
+            +*****++++=+*++***+**+=
+               :----   *+= --==-:
+                       *=:
+`
+      },
+      {
+        color: `
+000000                      |fce062%|000000     |fce062=
+000000                |fce070*|000000 |e0c462*|000000  |fcd254@|fce054@|fcd254@|000000 |e0c462+=|fcd254%|fce054@|fcd254@
+000000               |eec454#|fce054@|fcd254@|eec446@@|e0b638@|fcc438@|fce046@|fcd238@|e0b638@|eec446@|eeb638@|fcd246@|fce046@|fcc446@|000000   |fcd254%|fce062@|fcd262@
+000000           |fce062%|eec454%|d2b646*|000000 |e0b654+|fcd238@|fce038@|fcd238@|eeb62a@@|fcc42a@|fcd22a@@|eeb61c@|eeb62a@|fcc42a@|fcd22a@@|eeb62a@|d2a846%|eeb638@|fcd238@|fce046@|fcd246@|eec454*|000000    |fce070=
+000000           |fcd254@|fce046@|fcd246@|eeb638@|d2a82a@|eeb62a@|fcd22a@|fcd21c@|fcc41c@|eea81c@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcc40e@|fcd20e@|fcc41c@|eea81c@|eeb61c@|fcc42a@|fcd22a@@|eeb638@|000000 |eec446+|fcc446@|fcd246@|fce054@|fcd262@
+000000      |fce070#|fce062#|fcd254+|000000  |eec454=|fcc438@|fcd22a@@|fcc41c@|e0a80e@|fcb60e@|fcc40e@@|fca80e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@@|eea80e@@|fcc40e@|fcd20e@|fcc40e@|eea81c@|e0a82a%|fcc42a@|fcd22a@|fce038@|fcd238@|fcc446@
+000000      |eec462+|fcd254@|fce046@|fcd238@|fcc438@|fcc42a%|eeb638#|fcb61c@|fcc40e@@|fcb60e@|ee9a0e@|eea80e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fc9a0e@|fcb60e@|fc9a0e@|ee9a0e@|fcb60e@|fcc40e@|fcb60e@|e09a0e@|fca80e@|fcc40e@|fcd21c@@|fcc42a@|eeb638*|000000 |eec438+|fcc446#|fcd254%|fce054@|fce062@|fce070+
+000000       |d2a846#|eeb638@|fcc42a@|fcd22a@|fcd21c@|fcc40e@|fcb61c@|eea81c%|fcb60e%@@|e08c0e%|fca82a%|fcb61c@|eea81c@|e09a1c@|fcb61c@|e09a1c@|fcb62a@|fcb61c@|eea82a@|fca80e@@|fca81c#|e09a1c@|fca80e@|fcc40e@|fcb60e@@|e0a80e@|eea82a@|fcc41c@|fcc42a@|fcd238@|fce038@|fce046@|fcd254@|eed254*
+000000  |fce070#|fce062@|fce054@|fcd246@|fcd238@|fcc438@|eeb62a@|eea81c@@|fcb60e@@@@|fca81c#|eeb646=|fcc42a@|eea82a@|c48c1c%|b67e1c%|a8620e%%|9a620e%%|a8620e%|a8700e%%|d29a2a%|e0a82a@|fcb62a%|fca80e@@|ee9a1c%|e09a1c@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcc41c@|fcc42a@|eeb638@|e0b646#
+000000   |e0c462+|eec446@|fcc438@|fcd238@|fcd22a@|fcd21c@|fcd20e@|fcc40e@|fcb60e@|fca80e@|e09a0e@|ee9a0e%|fca81c@|eeb62a@|a8701c%|9a620e%%%%%%%%|a8620e%%|9a620e%%|b67e1c%|e0a82a@|fcc438*|fca80e@|fcb60e@@|fca80e@@|eea80e@|eea81c@|eeb62a@@|fcc438%|fcd246@|fcd254@%|fce062#
+000000    |e0b646@|e0b638@|eeb62a@|eeb61c@@|fcb60e@@|fca80e@@@|fca81c@|eeb62a@|a8620e%%|9a620e%%%%%%%%%%%|a8620e%|9a620e%|a8700e%|e0a82a@|eea82a@|ee9a0e@|fc9a0e@|fca80e@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@@|fcd246@|fcd254@|fcd262+
+000000 |fce062@|fce054@|fce046@@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@@|fca80e@|fc9a00@|fcb62a@|b67e1c%|a8700e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|fcc42a@|fca800@|fca80e@@@|fcb60e@@|fcb61c@|eeb62a@|eeb638@|e0c446@
+000000   |eec454#|eec446@|fcc438@|fcc42a@|fcb61c@|fcb60e@@|fca80e@@@|fc9a00@|fcc42a@|a8701c%|9a620e%%%%%%|8c620e%%|8c540e%|9a620e%|8c620e%|9a620e%%%%%|a8700e%|fcc42a@|fca80e@@|fcb60e@@|fcc40e@@|fcc41c@|fcd22a@|fcd238@|fcd246@|fcd254@*
+000000   |e0c454%|eec446@|fcc438@|fcc42a@|fcc41c@|fcc40e@@|fcb60e@@|fca80e@@|fcc42a@|c48c1c%|a8700e%|9a620e%|a8620e%|9a620e%%%%|8c620e%%|9a620e%%%%%|a8620e%%|b6701c%|fcc42a@|ee9a00@|ee9a0e@|fca80e@@|fcb60e@|fcb61c@|fcc41c@|fcc42a@|fcc438@|fcd246@|fcd254@|fce062%|fce070+
+000000 |fce070*|fce062@|fce054@|fce046@|fce038@|fcd22a@@|fcc41c@|fcb60e@@|eea80e@|ee9a0e@@|fc9a0e@|fcb62a@|c47e1c%|a8620e%|9a620e%%%%%%%%%%%|a8620e%|a8700e%|b67e1c%|fcc438@|fca81c%|fca80e@|fcb60e@@|fcc40e@@|fcc41c@|fcb62a@|eeb638@|e0b646@|e0b654%
+000000   |eec454=|eec446==|e0b646%|e0a82a@|eeb61c@|fcb61c@|fcb60e@|fcc40e@|fcb60e@@|fca81c%|e09a2a*|fcb62a@|d29a2a@|a8701c%|a8620e%|9a620e%%%|a8620e%%|9a620e%%%|a8620e%|9a620e%|d29a2a%|fcc438@|fca80e@@|ee9a0e@@|eea80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fce046@@|fcd254@|eed262=
+000000     |eec446#|fcc438@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|eea80e@|ee9a1c@|fca80e@|fcb60e@|fca80e@|eea82a*|fcb62a@|e0a81c@|d29a2a@|b67e1c%|b6701c%|b67e1c%|a8701c%%|a87e1c%|c48c1c%|eeb638@|eea81c@|fcb61c@|fca81c*|eea82a+|fca80e@|fcc40e@@@|fcb61c@|eea81c@|e0a82a@|e0b638%|fcc446*|fcd246#|fce062#*
+000000   |fce062+|fce054@@|fce046@|fcd238@|fcc438@|fcb638#|e0b638%|eeb61c@|fcc40e@@@|fca80e@|e09a1c@|fca80e@|fcb60e@|fc9a00@|e09a1c%|fcb60e@|fca81c@@|fcb61c@|fca81c@|ee9a0e@|fca80e@@|e09a1c%|fca80e@|fcb60e@@|fca80e%|eea81c@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcc438@|e0b638@|d2b654+
+000000         |fcc438@|fcd22a@@|fcd21c@|fcb60e@|e0a81c@|eea80e@|fcb60e@|fcc40e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|e09a0e@|fca80e@|fcc40e@|fcd20e@|fcc41c@|eeb62a%|eeb638+|fcc438#|fcd238@|fce046@|fce054@|fcd254@
+000000       |eec454*|fcd246@|fce046@|fce038@|fcc42a@|fcb638%|e0b638*|fcb61c@|fcc41c@|fcd20e@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fca80e@@|fcc40e@@|fca80e@|eea80e@|fcc40e@|fcd20e@|fcc41c@|e0a81c@|eeb61c@|fcc42a@|fcd22a@|fcd238@|fcc438@|000000    |fce062=
+000000       |fce062@|fce054@|fcd254@|eec446+|000000  |fcc438@|fcd22a@@|fcc42a@|eeb61c@|eea81c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|fcb61c@|fcd21c@@|fcc41c@|eeb61c@|fcb61c@|fcd22a@@|fcc42a@|d2a838%|e0a838@|fcc438@|fce046@|fce054@|fcd254@
+000000            |eec446@|fce046@@|fcc438@|e0b638@|d2a846#|eeb638@|fcd238@|fce038@|fcc42a@|eeb638@@|fcd238@|fce038@|fcc438@|e0b638@|eeb638@|fcc438@|fce046@@|eec454#|000000  |e0b654=|fcd262*|fce062%
+000000            |fce062@|fce054@|fcd254%|000000   |fcc446@|fce054@|fcd246@|e0b646@|eec454@|e0b646@|fcd246@|fce054@|fcd246@|000000 |e0b654#|eec454@|fcd254%|fce062@|eed262#
+000000                  |fcd262%|fce062@|eed262+|000000   |9ac438@|eee054@|e0c462+
+000000                |70b638=*%%|62b62a#|62a838*+|000000 |70c438@|62b62a%
+000000              |70c438%@@|70c42a@|70c438@@|70b62a@|70c438@@|70b638@|70c438@|62a82a%|000000  |70b638*%@|70c438@@|7ec438@|7ed238%|8cd246*
+000000            |8cd246*|7ed238@@|7ed246@|7ed238@@@|7ec438@@|70c438@|62b62a@%%|54a82a%|62b638%|62b62a%|70b62a@|70c438@|7ed238@@@@|8cd238@|7ed238@
+000000            |8cd246*|7ed238@@|7ec438@@@|70c438@@|70b62a@|62b62a%|62b638%|70b638%|70c438@|70b638%|70c438@@|7ec438@|70c438@@@@@|7ec438#
+000000               |70b638=+*++|000000   |7ec438@|62b62a@|62a82a%|000000 |62b638+*#|70b638#*=
+000000                       |70c438@|62a82a%|62a838+
+`,
+        plano: `
+                      %     =
+                * +  %@% =-#@%
+               *@@##*%@%###@@%   #@%
+           %#= =%@%#*#@%###@@#*#%@@+    =
+           %@%#*#%@#*#%%**%%#**%@%# =#@@@
+      #*=  -%@@#**%%**##**##**#%%**#%@@%
+      =@@@%*+#%%#+*#*+*#+*#*+###+*%%%#+ =*#@@+
+       =#%%%%#+*##+*#*+*+##**#=+*##***#%@@@%+
+  #@@@%%#***###+-#*=-:::::--+****++*#%%%%#*
+   =%%%%%%%#*++*#-::::::::::::-*+*##*****##%%%#
+    *##*******#*:::::::::::::::-**+**#%%%@@@@%+
+ @@@@@@%%%#**+#-:::::::::::::::::#*****#####
+   *######***+%-::::::::::::::::-#**###%%%%%%+
+   ##########*#=::::::::::::::::-#++**###%%%@#+
+ *@@@@@%%#**++*#=:::::::::::::--#**########*
+   ---***#####*-#+-:::::::::::+%**++*#%%@@@%=
+     *%%@%%#++*#*=#*+------=**#=-*#%##***+***
+   +@@@%%+**#%#*+*#++#**#**#*+*##**#%@@%#=
+         #%@%#**#%*+*#**##+*%#+*%%%*=*%@@%
+       +%@@%*=#%%#**%%**%%**%%#**%@@#    =
+       @@%=  #@@%**%@%*#%@#*#@@#+*#@@%
+            %@@%*+#@@###%@%*#%@@*  -*%
+            @@#   %@@##*%@% +##@*
+                  #@=   *@=
+                :====-: *+
+              ++*+*++++++=  =+++***=
+            +**#******+++=+++****##*
+            +*****++++=+*++***+**+=
+               :----   *+= --==-:
+                       *=:
+`
+      },
+      {
+        color: `
+000000                      |fcd262+|fce062%
+000000                |fce070*|fce062#|e0c454=|eec462#|d2b654=|000000 |fcd254@|fce054@|eec454@|000000 |e0c462=|000000 |fcd254@|fce062@|eed254%
+000000                |fcd254@|fce054@|fcd246@|eec446@|eeb646@|e0b638@|fcd238@|fce038@|fcc438@|e0b646@|eec446@|fcc438@|fce046@@|eec454@|000000   |fcd254%|fce062@|fcd270+
+000000           |fce070@|fce054@|eec454@|d2b646%|d2a838=|eec446@|fcd238@|fce038@|fcc42a@|eeb62a@@|fcc42a@|fcd22a@|fcc42a@|eeb62a@@|fcc42a@|fce02a@|fcd22a@|e0b638@|d2a846#|eeb638@|fcd246@|fce046@|fcd246@
+000000           |eec454*|fcd246@|fce046@|fcd238@|eeb62a@|e0a82a@|fcc41c@|fcd21c@@|fcb61c@|eea80e@|fcc40e@|fcd20e@|fcc40e@|eea80e@|fcb60e@|fcd20e@|fcd21c@|fcb61c@|e0a81c@|fcb61c@|fcd22a@@|fcd238@|eec446#|000000 |eec446=|fcc446#|fcd254@|fce062@@
+000000      |fce070=|fce062@|fce054@|fcd246#|eec446=|000000 |eec438#|fcc42a@|fcd22a@|fcd21c@|fcb61c@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcd21c@|fcc41c@|e0b638%|eeb62a*|fcc42a@|fcd238@|fce046@|fcd246@|fcc446@
+000000       |e0c454%|fcd246@|fce046@|fcd238@|fcc42a@|fcb62a%|eea82a%|fcb61c@|fcc40e@@|fca80e@|e09a0e%|fca80e@|fcb60e@|ee9a0e@@|fcb60e@|fc9a0e@|ee9a0e@|fcb60e@|fca80e@|e09a0e@|fca80e@|fcb60e@@|fca81c@|e0a81c@|fcb60e@|fcc41c@|fcd21c@|fcd22a@|fcc42a@|eec446+|000000  |eec446=|eed254+|fcd254+|fce070+
+000000   |fce062=|fcd262+|eec446+=|000000 |d2a846%|eeb62a@|fcc42a@|fcd21c@|fcd20e@|fcc40e@|eea80e@|eea81c#|fcb60e@@|fc9a0e@|e0a82a%|fcb61c@|fca81c@|e09a1c@|fca81c@|e09a1c@|fcb62a@|fcb61c@|fcb62a@|ee9a0e@|fca80e@@|e09a1c#|ee9a0e@|fcb60e@|fcc40e@@|fcb60e@|e0a81c@|eeb62a@|fcc42a@@|fcd238@|fce046@|fce054@@|fcd262+
+000000   |fcd262%|fce054@|fce046@@|fcd238@|fcc42a@|fcb61c@|eea80e@@|fca80e@|fcb60e@@|fca80e@|fca82a+|fcc438@|eea82a@|c48c1c%|b67e1c%|a8620e%%|9a620e%%|a8620e%|a8700e%%|d29a2a%|e0a82a@|fcc438*|fca80e@@@|ee9a1c@|ee9a0e@|fcb60e@|fcc40e@|fcd21c@@|fcd22a@|fcd238@|fcc438@|eec446*
+000000    |e0b654@|eec446@|fcc438@|fcc42a@|fcc41c@|fcc40e@@@|fca80e@|ee9a0e@|e09a1c%|fca81c@|fcb62a@|a8701c%|9a620e%%%%%%%%|a8620e%%|9a620e%%|b67e1c%|eea82a@|eeb638#|fca81c%|fca80e@|fcb60e@@@@|eeb61c@|eeb62a@|e0b62a@|e0b646%|eec446+=|eec454=
+000000 |fcd262=|fcd254*|fcd246#|fcc446%|eeb638@|eeb62a@|fcb62a@|eeb61c@|eea80e@@|fca80e@@@@|eeb62a@|a8620e%%|9a620e%%%%%%%%%%%|a8620e%|9a620e%|a8700e%|e0a82a@|fca81c@|ee9a0e%@|fca80e@|fcb60e@@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fce046@@|fce054@|fce062@|fce070=
+000000 |fce062#|fce054@|fcd246@@|fcd238@|fcd22a@|fcd21c@|fcd20e@|fcc40e@@|fcb60e@|fca80e@|fc9a0e@|fcb62a@|b67e1c%|a8700e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|fcc42a@|fca800@|fca80e@|fcb60e@@@@|fcc41c@|fcc42a@|fcc438@|eec446@|eec454*
+000000   |e0c462%|eec446@|eeb638@|eeb62a@|eeb61c@|fcb60e@|fca80e@@@|ee9a0e@|ee9a00@|fcc42a@|a8701c%|9a620e%%%%%%|8c620e%%|8c540e%|9a620e%|8c620e%|9a620e%%%%%|a8700e%|fcb62a@|fc9a0e@|fca80e@@|fcb60e@@|fcb61c@|fcc41c@|fcc42a@|fcc438@|eec446@|eec454+
+000000  |eed254+|fcc446@|fcd246@|fcd238@|fcd22a@|fcd21c@|fcc40e@@@|fcb60e@|fca80e@@|fcb62a@|c48c1c%|a8700e%|9a620e%|a8620e%|9a620e%%%%|8c620e%%|9a620e%%%%%|a8620e%%|b6701c%|fcb62a@|ee9a0e@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd22a@@|fcd238@|fce046@|fce054@|fce062@|fce070*
+000000 |fce062#@|fcd254@|fcd246@|fcd238@|fcc42a@@|fcb61c@|fcb60e@|eea80e@@|fca80e@@@|fcb62a@|c48c1c%|a8620e%|9a620e%%%%%%%%%%%|a8620e%|a8700e%|b67e1c%|fcc438@|fcb61c@|fca80e@|fcb60e@@@@|eeb61c@|eeb62a@|e0b638@|e0b646@|e0b654*
+000000     |d2b662=|e0b638@|eeb62a@|fcc41c@|fcc40e@@@|fcb60e@|fca81c@|e09a1c%|ee9a1c#|fcb62a@|d29a2a@|a8701c%|a8620e%|9a620e%%%|a8620e%%|9a620e%%%|a8620e%|9a620e%|d29a2a%|fcc42a@|fca80e@|ee9a0e@|e09a0e@|ee9a0e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@@|fcc446@|eec454@
+000000    |fcd254#|fcd246@|fcd238@@|fcd22a@|fcc41c@|fcb61c@|eea80e@|ee9a0e@|fca80e@|fcb60e@@|ee9a0e@|eea838+|fcb61c@|e09a1c@|d29a2a%|b67e1c%|b6701c%|b67e1c%|a8701c%%|b67e1c%|c48c1c%|eea82a@|fcb61c@@|eea82a=|fca80e#|fcb60e@|fcc40e@|fcb60e@@|eea81c@|e0a81c@|eeb62a@|fcc438@|fcd246@|fce054@|fce062@|fce070#
+000000   |fce062@@|fcd254@|fcd246@|fcc446#|eeb638+#|eeb62a@|fcc40e@@@|fcb60e@|e09a1c@|eea81c%|fcb60e@|fca80e@|e08c00%|ee9a1c@|fcb60e@|fca81c@@|fcb61c@|eea81c@|fca80e@|fcb60e@|eea81c%|e08c0e%|fcb60e@@|fcb61c@|eea81c%|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcc42a@|eeb638@|d2a846#
+000000        |eec438@|fcd238@|fcd22a@@|fcc41c@|eeb61c@|e0a81c@|fcb60e@|fcc40e@|fcb60e@|eea80e@|ee9a0e@|fcb60e@@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@@|eea80e@|ee9a0e@|fcb60e@|fcc40e@@|fcb62a@|e0b638#|fcb62a%|fcc438@|fce046@@|fcd254@|e0c462*
+000000      |eec462=|fcd254@|fce046@@|fcc438@%|eeb646=|eeb62a@|fcc41c@|fcd21c@|fcc40e@|fca80e@|eea80e@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcd20e@|fcc40e@|eea80e@|eea81c@|fcc41c@|fcd22a@@|fcc438@|eec446=|000000  |fcd254*|fce062#|fce070%
+000000      |fce070@|fce062%|fcd254*|eec454=|000000  |eec438@|fcd238@|fce038@|fcd22a@|eeb62a@|e0a82a@|fcb61c@|fcd21c@@|fcb61c@|eeb61c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@@|fcc42a@|fcd22a@|fcc42a@|e0a82a@|d2a838@|eec438@|fcd246@|fce046@|fcd246@
+000000           |eec454#|fce046@@|fcd238@|e0b638@|d2a846+|eeb646@|fcd238@|fce038@|fcd22a@|eeb62a@|eeb638@|fcc438@|fce038@|fcd238@|eeb638@@|eec438@|fce046@@|eec446@|000000 |d2a846-|e0b646*|fcd254%|fce062@|fcd270+
+000000           |fce062@@|fcd254#|000000   |eec454@|fce054@|fce046@|eec446@|eec454@|d2b646@|eec446@|fce054@|fcd246@|e0b654*|d2b654#|eec454@@|fce054@|fcd262@
+000000                 |eed262+|fce062@|fcd262*|000000    |eee054@|c4c446@
+000000                |70b638=*%|62b62a##|62a838*+|000000 |70c438@|62b62a%
+000000              |70c438%@@|70c42a@|70c438@@|70b62a@|70c438@@|70b638@|70c438@|62a82a%|000000  |70b638*%@|70c438@@|7ec438@|7ed238%|8cd246*
+000000            |8cd246*|7ed238@@|7ed246@|7ed238@@@|7ec438@@|70c438@|62b62a@%%|54a82a%|62b638%|62b62a%|70b62a@|70c438@|7ed238@@@@|8cd238@|7ed238@
+000000            |8cd246*|7ed238@@|7ec438@@@|70c438@@|70b62a@|62b62a%|62b638%|70b638%|70c438@|70b638%|70c438@@|7ec438@|70c438@@@@@|7ec438#
+000000               |70b638=+*++|000000   |7ec438@|62b62a@|62a82a%|000000 |62b638+*#|70b638#*=
+000000                       |70c438@|62a82a%|62a838+
+`,
+        plano: `
+                      =%
+                *#-*- @@% - %@#
+                %@%##*%@%###@@%   #@=
+           @@#*-#@@%#*%@%##%@%*+#@@%
+           +@@%**#@%#*#%#*#%%#*#%@%+ -*@@%
+      =@%*- *%@%#*#%#**%#*#%#*#%%#*+%@@@%
+       *%@@%**#%%*+*#++#*+##+*##*+#%@%#=  -=++
+   ===- *#%%%#*+##++#*+*+###+#*=+#%#***#%@@@@+
+   #@@@%%#***##*-#*=-:::::--+*+***++*%%@%%#+
+    ###%%%%#**+*#-::::::::::::-**+#####****==-
+ =+*####******#*:::::::::::::::-**++**#%%@@@@@@=
+ #@@@@@%%%##**#-:::::::::::::::::#**########+
+   #####****++%-::::::::::::::::-#***#######=
+  =%%%%%%%%##*#=::::::::::::::::-#+**##%%@@@@@*
+ #@@%%%##******#=:::::::::::::--%######**#*=
+     -*##%%%#*+=#+-:::::::::::+#*+++#%%@@%%#
+    *%@@@%#*+*##+-#++------=*##-+###***#%%@@#
+   @@@%*=+*#%%#+*#*+*#**#**#++###+*%%%%#=
+        #%@@%**#%#*+##**#*+##*+#%%#+*%@@%+
+      -%@@%*-#%%%**#%#*#%#*#%%**#@@%-  +#%
+      @%*-  #@@%#*#@%#*#@%**%@%**#@@%
+           +@@%#-#%@%##%@%###@@% :=#@+
+           @@*   %@@#%*%@@=+##@@
+                 +@*    @#
+                :=+==-: *+
+              ++*+*++++++=  =+++***=
+            +**#******+++=+++****##*
+            +*****++++=+*++***+**+=
+               :----   *+= --==-:
+                       *=:
+`
+      },
+      {
+        color: `
+000000                       |fce062##
+000000                 |fce062@|fcd262%|e0b654+|eec454%|d2b654=|eec454*|fce054@@|eec454#|000000   |fcd254@|fce062@|eed262+
+000000             |e0c462=|000000  |e0c462=|fcd246@|fce054@|fcd246@|eec446@|e0b646@|eeb638@|fce038@@|fcc438@|e0b646@|eec446@|fcc438@|fce046@@|eec446*|000000   |fcd262*|fce062@
+000000            |fce062@|fcd254@|eec446@|d2b638@|d2a846#|fcc438@|fcd238@@|fcc42a@|eeb62a@|fcb61c@|fcd22a@@|fcb62a@|eeb62a@|fcb62a@|fcd22a@|fcd238@|fcc42a@|e0b646*|d2a846*|fcc438@|fcd246@|fce054@|fcd254@
+000000            |eec446@|fce046@|fce038@|fcc42a@|e0a82a@|eea81c@|fcc41c@|fcd21c@|fcc41c@|eea80e@|fcb60e@|fcc40e@@|fcb60e@|eea81c@|fcc40e@|fcd21c@|fcc41c@|eea81c@|e0a82a@|fcc42a@|fcd22a@|fcd238@|fcc438@|eec454-|000000  |eec454*|fcd254%|fce062@|fce070=
+000000       |fce062%|fce054@|fcd254@|fcc446%|eec438+|e0b646=|fcc438@|fcd22a@|fcd21c@|fcc41c@|eea80e@@|fcc40e@@|fca80e@|eea80e@|fcb60e@@|fca80e@@|fcc40e@@|fca80e@|eea80e@|fcc40e@|fcd21c@@|fcb62a@|eeb646+|eeb638#|fcc438@|fcd238@|fce046@|fce054@|eed254%
+000000        |e0b646@|fcd238@|fce038@|fcd22a@|fcc41c@|eea81c@@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@@|fcb60e@|fca80e@|ee9a0e@|fca80e@@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@@|fcb60e@|fcc40e@|fcb60e@|eea81c@@|fcb60e@|fcd21c@|fcd22a@@|fcc438@|eec446+
+000000   |fce070%|fce062@|fcd254@|fcd246%|fcc446*|e0b646*|d2a82a@|eeb62a@|fcc41c@|fcc40e@@|fcb60e@|e0a81c@|fca81c#|fcb60e@|fca80e@|e09a1c@|fcb62a@|fcb61c@|e09a1c@|eea81c@|e09a1c@|fcb62a@|fcb61c@|fcb62a@|e09a1c@|fca80e@|fcb60e@|fca81c#|e09a1c%|fca80e@|fcc40e@@@|fcb61c@|e0a82a@|eeb638#|fcc438#@|fcd246@|fce054@@|fce062@
+000000    |eed254@|fcd246@|fce046@|fcd238@|fcd22a@|fcc41c@|fcb60e@|eea80e@@|fca80e@|fcb60e@@|fca80e%|fcc446#|eea82a@|c48c1c%|b67e1c%|a8620e%%|9a620e%%|a8620e%|a8700e%%|d29a1c%|eea82a@|fcc446%|fca81c#|fca80e@@@|ee9a0e@|eea80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@@|fcd246@|eec454*
+000000    |d2b662-|e0b646@|e0b638@|eeb62a@|fcb61c@|fcc40e@@@|fcb60e@|fca80e@|ee9a1c%|eea82a%|eeb62a@|a8701c%|9a620e%%%%%%%%|a8620e%%|9a620e%%|b67e1c%|eea82a@@|ee9a1c#|fca81c@|fcb60e@|fcc40e@@@|fcb61c@|fcb62a@|eeb62a@|e0b646@
+000000 |fce062%|fce054@|fcd254@|fcd246@|fcd238@|fcc42a@|fcc41c@|fcb61c@|fcb60e@|fca80e@|eea80e@|ee9a0e@@|fca80e@|eeb62a@|a8620e%%|9a620e%%%%%%%%%%%|a8620e%|9a620e%|a8700e%|e0a82a@|fcb61c@|fc9a00@|ee9a0e@|eea80e@|fca80e@|fcb60e@|fcb61c@|fcc41c@|fcc42a@|fcd238@@|fcd246@|fce054@|fce062@|fce070=
+000000  |fcd254+|fcc446@|fcc438@@|fcc42a@|fcc41c@|fcc40e@@|fcb60e@@|fca80e@@|fcc42a@|b67e1c%|a8700e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|fcc438@|fca80e@@|fcb60e@@|fcc40e@@|fcc41c@|fcc42a@@|fcc438@|fcd246@|fcd254*
+000000   |e0c454@|eec446@|eec438@|eeb62a@|fcb61c@|fcb60e@|fca80e@@@|fc9a0e@|fc9a00@|fcc42a@|a8701c%|9a620e%%%%%%|8c620e%%|8c540e%|9a620e%|8c620e%|9a620e%%%%%|a8700e%|fcc42a@|fc9a00@|fc9a0e@|fca80e@@@|fcb61c@|eeb61c@|eeb62a@|eec438@|e0c454@
+000000 |fce062*|fce054@|fcd246@|fce046@|fcd238@|fcd22a@|fcd21c@@|fcc40e@@|fcb60e@|fca80e@|fc9a0e@|fcb62a@|c48c1c%|a8700e%|9a620e%|a8620e%|9a620e%%%%|8c620e%%|9a620e%%%%%|a8620e%%|b6701c%|fcb62a@|fc9a0e@|fca80e@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fce038@|fce046@|fce054@|fce062%
+000000  |fcd262+|fcd254#|fcc446#|eec438%|eeb62a@@|eeb61c@|eea80e@|fca80e@@@@@|fcb638@|c48c1c%|a8620e%|9a620e%%%%%%%%%%%|a8620e%|a8700e%|b67e1c%|fcc438@|fca80e@@@@@|eea80e@|eeb61c@|eeb62a@|eeb638@|eeb646@|fcd246*|fcd254+|fcd262=
+000000     |e0b646@|fcc438@|fcc42a@|fcc41c@|fcd21c@|fcc40e@@|fca80e@|ee9a0e@|e09a1c%|fc9a0e@|fcb61c@|d29a2a@|a8701c%|a8620e%|9a620e%%%|a8620e%%|9a620e%%%|a8620e%|9a620e%|d29a2a@|fcc42a@|fca80e@|e09a1c%|ee9a0e@|fca80e@|fcc40e@@|fcd21c@|fcd22a@|fcc42a@|fcc438@|e0b646@|e0b654%
+000000   |fcd262#|fce054@|fce046@@|fcd238@|fcc42a@|fcb62a@|eea81c@|eea80e@|fca80e@|fcb60e@@|fca80e@|e09a1c*|fcb62a*|fcb61c@|e09a1c@|d29a2a%|b67e1c%|b6701c%%|a8701c%%|b67e1c%|c48c1c%|eea82a@|fcb61c@|fcb62a#|ee9a1c=|fca80e@|fcb60e@@|fca80e@|eea80e@|eea81c@|fcb62a@|fcc42a@|fcd238@|fce046@|fce054@|fce062@
+000000   |fce062*|fcd262*|fcc454+|eec446=|000000 |eeb646=|eeb62a@|fcc41c@@|fcc40e@|fcb60e@|eea80e@|e0a81c%|fcb60e@@|fc9a0e@|e08c1c%|fca80e@@|eea81c@|fcb61c@@|eea81c@|fca80e@@|e08c1c%|fc9a0e@|fcb60e@@|eea82a%|eea80e@|fcb60e@|fcd20e@|fcd21c@|fcc42a@|eeb62a@|d2a838%
+000000       |eec446%|fcd238@@|fcd22a@|fcc41c@|fcb62a@|eea82a%|fcb61c@|fcc40e@@|fca80e@|e09a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|ee9a0e@|fca80e@|fcc40e@@|fcb61c@|e0a82a@|eeb62a@|fcc42a@|fcd238@|fce046@|fcd246@|e0b654%
+000000      |fcd254@|fce054@|fce046@|fcd246@|eec438#|eeb646-|eeb638#|fcc41c@|fcd21c@@|fcb60e@|e0a80e@|fcb60e@|fcc40e@@|fca80e@@|fcc40e@@|fca80e@@|fcc40e@|fcd20e@|fcb60e@|e0a80e@|fcb61c@|fcd21c@|fcd22a@|fcc42a@|eeb646#|000000 |eec446+|fcd246%|fce054@|fce062@|fce070+
+000000      |fce062+|eed262=|000000   |eec446%|fcd238@|fce038@|fcd22a@|fcb62a@|e0a82a@|eeb61c@|fcd21c@@|fcc41c@|eeb61c@|fcb61c@|fcd21c@@|fcb61c@|eeb61c@|fcc41c@|fcd22a@@|eeb62a@|d2a82a@|eeb62a@|fcd238@|fce046@|fcd246@|eec454+
+000000          |eec462=|fcd254@|fce054@|fcd246@|eec446%|d2a846=|e0b646+|fcc438@|fce038@|fcd238@|eeb62a@|eeb638@|eeb62a@|fcd238@@|fcc42a@|eeb638@@|fcd238@|fce046@|fcd246@|e0b654=|d2a846+|e0b646%|fcd254@|fce054@|fcd262@
+000000          |fce070*|fce062@|fcd254*|000000   |eec454*|fce054@@|fcc446@|eec446@|e0b646@%|fce046@|fce054@|d2b638@|d2b646%|eec454@@|fce054@@
+000000                 |fce062@|fcd254#|000000    |fce062@|eee054@|70b62a%|000000    |fce070=
+000000                |70b638=*#|62b62a##|62a838*+|000000 |70c438@|62b62a%
+000000              |70c438%@@|70c42a@|70c438@@|70b62a@|70c438@@|70b638@|70c438@|62a82a%|000000  |70b638*%@|70c438@@|7ec438@|7ed238%|8cd246*
+000000            |8cd246*|7ed238@@|7ed246@|7ed238@@@|7ec438@@|70c438@|62b62a@%%|54a82a%|62b638%|62b62a%|70b62a@|70c438@|7ed238@@@@|8cd238@|7ed238@
+000000            |8cd246*|7ed238@@|7ec438@@@|70c438@@|70b62a@|62b62a%|62b638%|70b638%|70c438@|70b638%|70c438@@|7ec438@|70c438@@@@@|7ec438#
+000000               |70b638=+*++|000000   |7ec438@|62b62a@|62a82a%|000000 |62b638+*#|70b638#*=
+000000                       |70c438@|62a82a%|62a838+
+`,
+        plano: `
+                       ##
+                 @#=*-+@@*   @@=
+             -  -@@%###@@###%@@+   *@
+            @@#*+#@@###@@###@@%==#@@%
+            %@@%**%@%**%%**#@%**%@@%-  +#@=
+       %@@#=-#%@%**%%**##**%%**#%%#=+%@@@#
+        #%@@#**#%#++#*+**+*#*+#%#**#%@%%=
+   %@%#+=**%%%#*+#*+##+*+#*#+*#++*%%#**+*%%@@@
+    %@@@@%#***##+**=-:::::--+**+##*+*#%%@@@%+
+    :*####%%#*+*#-::::::::::::-**+*##%####*
+ %@@@%%###**++**:::::::::::::::-*#++***##%%%@@@=
+  +%%%%%%%###*#-:::::::::::::::::#**##%%%%%%%+
+   #####*****+%-::::::::::::::::-#+****#####
+ +@@@@@@%%##*+#=-:::::::::::::::-#+*##%%@@@@@%
+  +**###*******#=:::::::::::::--#*******###*+-
+     ##%%%%#*++*#+-:::::::::::+#*++*%%%%%##*
+   *@@@@%#***##*=+#++=-----=*#*-*##***#%@@@@
+   +*+= -##%%#*+##*+*#*##**#+*##**#%%%*+
+       #%@@%#*#%%*+*#*+##+*%#+*%%#*#%@@%#
+      @@@%*-*%@%#*#%%**%%**%%#*#%@%+ =#@@=
+      +-   *%@@#*#%@#*#%%#*#@%#*#%@@=
+          -@@%*-=%@@###@@###%@%--*%@%
+          *@+   +@@%##*@@**%#@@
+                 @*    @@+    =
+                :====-: *+
+              +**+*++++++=  =+++***=
+            +*##******+++=+++****##*
+            +*****++++=+*++***+**+=
+               :----   *+= --==-:
+                       *=:
+`
+      },
+      {
+        color: `
+000000                        |fce062%|fce070*
+000000                 |eed262=|fce062@|fcd254%|e0b654*|eec454%|d2b654=|eec454@|fce054@|fcd254@|e0c454=|000000   |fce062@@
+000000             |eed262+|e0c454#|d2b654=|000000 |eec446#|fce046@@|fcc438@|eec446@|e0b638@|fcc438@|fce038@|fcd238@|eeb638@|e0b646@|eec446@|fcd246@|fce046@|fcd246@|000000    |fce062+|fce070*
+000000            |fcd254#|fce054@|fcd246@|eec446@|e0a838@@|fcc438@|fce038@|fcd22a@|eeb62a@@|fcc42a@|fcd22a@@|eeb62a@@|fcc42a@|fcd238@@|fcc438@|000000 |e0b646+|fcc446@|fce046@|fce054@|eed262%
+000000        |fce070+|000000    |fcc438@|fce038@|fcd238@|fcc42a@|e0a81c@|fcb61c@|fcd21c@@|fcb60e@|eea80e@|fcb60e@|fcd20e@|fcc40e@|eea80e@|fcb60e@|fcc41c@|fcd21c@|fcc41c@|e0a82a@|eeb62a@|fcc42a@|fce038@|fcd238@|fcc446@|000000    |fcd262+|fce070*
+000000        |fcd254@|fce054@|fcd246@|fcc438@|e0b638*#|fcc42a@|fcd21c@@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcd21c@|fcc41c@|fcb62a@|eeb646=|eeb638*|fcc438@|fcd246@|fce054@@|fcd262#
+000000         |eeb638@|fcd238@|fcd22a@@|fcb61c@|e0a81c@|eea81c@|fcc40e@@|fca80e@|e09a0e%|fca80e@|fcb60e@|ee9a0e@|fc9a0e@|fcb60e@|ee9a0e@@|fcb60e@@|e09a0e@|fca80e@|fcc40e@@|fcb60e@|eea81c%|fcb62a%|fcc41c@|fcd22a@@|fcd238@|fcc438@|eec454=
+000000   |fce070=|fce062@|fce054@|fcd246@@|fcc438%|eeb638%|e0a82a@|eeb61c@|fcc40e@@@|fca80e@|e0a82a#|fca80e@|fcb60e@|ee9a0e@|eeb638@|fcb61c@|e09a1c@|e0a81c@|eea81c@|eea82a@|fca81c@|fcb61c@|e0a838%|ee9a00@|fcb60e@@|eea81c#@|fcb60e@|fcc40e@@|fcc41c@|eeb61c@|e0a838@|e0b646=|eec446+|fcc446#|fcd254%%|fce062%|fce070+
+000000    |e0c462+|eec446@|fcd238@@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|eea80e@|eea81c@|fca80e@|fcb60e@|fca80e@|fcc438*|eea82a@|c48c1c%|b67e1c%|a8620e%%|9a620e%%|a8620e%|a8700e%%|d29a1c%|eea82a@|fcc42a@|eea838=|fca80e@|fcb60e@@|fca80e@|eea80e@@|fcb61c@|fcc41c@|fcd22a@|fcd238@|fce038@|fce046@|fcd254@#
+000000   |eec454=|eec446=|e0b646%|e0b638@|eeb62a@|eeb61c@|fcb61c@|fcb60e@@@@|fca81c%|eeb638#|eeb62a@|a8701c%|9a620e%%%%%%%%|a8620e%%|9a620e%%|b67e1c%|eea82a@|fca81c@|e09a1c#|ee9a1c@|fca80e@|fcb60e@|fcc40e@@|fcc41c@@|fcc42a@|eeb638@|e0b646#
+000000 |fce062%|fce054@@|fce046@|fcd238@|fcd22a@|fcd21c@|fcc41c@|fcb60e@@|fca80e@|ee9a0e@@|fca81c@|eea82a@|a8620e%%|9a620e%%%%%%%%%%%|a8620e%|9a620e%|a8700e%|e0a82a@|fcb61c@|fca80e@@@|eea80e@@|eeb61c@@|eeb62a@|eec438@|fcc446%|fcd246#|fcd254*|fcd262=
+000000   |e0c454@|eec446@|fcc438@|fcc42a@|fcc41c@|fcb60e@@@@|fca80e@|fca800@|fcb62a@|b67e1c%|a8700e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|fcc42a@|fc9a0e@|fca80e@|fcb60e@@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fcd246@@|fcd254@|fce062%
+000000   |e0c454@|eec446@|fcc438@|fcc42a@|fcc41c@|fcb60e@@@|fca80e@@|fc9a00@|fcc42a@|a8701c%|9a620e%%%%%%|8c620e%%|8c540e%|9a620e%|8c620e%|9a620e%%%%%|a8700e%|fcc42a@|ee9a00@|ee9a0e@|fca80e@@@|fcb60e@|eeb61c@|eeb62a@|eec438@|e0c446@|e0c462=
+000000 |fce062@|fce054@@|fce046@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@|fca80e@@|ee9a0e@|fcb62a@|c48c1c%|a8700e%|9a620e%|a8620e%|9a620e%%%%|8c620e%%|9a620e%%%%%|a8620e%%|b6701c%|fcc42a@|fca80e@@|fcb60e@|fcc40e@@|fcc41c@|fcd22a@@|fcd238@|fcd246@|fcd254#
+000000    |eec454=|e0b646@|e0b638@|eeb62a@|eeb61c@|fcb60e@@@@|fca80e@|fca81c@|eeb638@|c48c1c%|a8620e%|9a620e%%%%%%%%%%%|a8620e%|a8700e%|b67e1c%|fcc42a@|fca80e@@@|eea80e@@|fcb60e@|fcb61c@|fcc42a@|fcc438@|fcd246@|fcd254@|fce054@|fce062%
+000000    |eec454%|fcc438@|fcd238@|fcd22a@|fcd21c@@|fcc40e@|fcb60e@|eea80e@|e09a0e@|ee9a0e@|fca80e@|fcb62a@|d29a2a%|a8701c%|a8620e%|9a620e%%%|a8620e%%|9a620e%%%|a8620e%|9a620e%|d29a2a@|fcc42a@|eea82a#|e09a1c#|fca81c@|fcb60e@|fcc40e@@|fcc41c@|fcc42a@|eeb62a@|e0b638@|d2b646@
+000000  |fce070+|fce062@|fce054@|fce046@|fcd238@|fcc438@|fcc42a%|e0a82a@|eea80e@|fca80e@|fcb60e@@@|ee9a0e@|eea82a=|fcb61c%@|e0a82a@|d29a2a%|b67e1c%|b6701c%%|a8701c%%|b67e1c%|d28c1c%|eea82a@|fcb62a@|eeb646+|ee9a0e%|fcb60e@@|fca80e@|eea80e@@|fcb61c@|fcc42a@|fcd238@|fce038@|fce046@|fcd254@|eec462@
+000000        |eeb638@|fcc42a@|fcd21c@@|fcc40e@|fcb60e@|e0a82a@|fca80e%|fcb60e@@|e09a0e%|ee9a1c%|fca80e@@|eea81c@|fcb61c@|fca81c@@|fcb60e@|fca81c@|e08c00%|fca80e@|fcb60e@|fca81c@|e09a1c@|fcb60e@|fcc40e@|fcd20e@|fcc41c@|eeb61c@|e0a838@|e0b646+|eec446+|fcd254#|fce062##
+000000      |eec454%|fcd246@|fce046@|fcd238@|fcc42a@|fcb62a@|eeb638#|fcb61c@|fcc40e@@|fcb60e@|ee9a0e@@|fcb60e@@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@@|eea80e@@|fcb60e@|fcc40e@|fcb60e@|e0a81c@|eea81c@|fcc41c@|fcd22a@|fce038@|fcd238@|e0b646@
+000000     |fce062@@|fcd254@|fcd246%|eec446*|000000 |eeb646+|fcc42a@|fcd22a@|fcd21c@|fcc41c@|eea80e@@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|eea80e@@|fcc41c@|fcd21c@|fcd22a@|eeb638@|d2a838=|eeb638*|fcd246@|fce046@|fce054@|fcd262@
+000000          |eec454*|fcd238@|fce038@|fcd238@|fcc42a@|e0a82a@@|fcc42a@|fcd21c@|fcc41c@|fcb61c@|eeb61c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|fcb61c@|fcd22a@@|fcc42a@|e0a82a@|eeb62a@|fcd238@|fce038@|fcd246@|eec446%|000000    |fce070=
+000000          |fcd254@|fce054@|fcd246@|eec446#|000000  |fcc438@|fce038@|fcd238@|fcc42a@|eeb638@@|fcd238@|fce038@|fcc438@|eeb638@@|fcc438@|fce046@|fcd246@|e0b646%|d2a846+|e0b646@|eec446@|fce054@@
+000000          |fce070#|fcd262+|000000    |fcd254@|fce054@|fcd246@|eec446@|e0b646@*|fcd246@|fce054@|eec446@|b6b638@|eec454@|e0c454@|fcd254@|fce054@|eec462*|000000    |fce070=
+000000                |fce062@|fcd262#|000000    |fcd262#|fce062@|9ac438@|62b62a%|a8b662-|000000  |fce070*
+000000                |70b638=*#|62b62a##|62a838*+|8cb662-|70c438@|62b62a%
+000000              |70c438%@@|70c42a@|70c438@@|70b62a@|70c438@@|70b638@|70c438@|62a82a%|000000  |70b638*%@|70c438@@|7ec438@|7ed238%|8cd246*
+000000            |8cd246*|7ed238@@|7ed246@|7ed238@@@|7ec438@@|70c438@|62b62a@%%|54a82a%|62b638%|62b62a%|70b62a@|70c438@|7ed238@@@@|8cd238@|7ed238@
+000000            |8cd246*|7ed238@@|7ec438@@@|70c438@@|70b62a@|62b62a%|62b638%|70b638%|70c438@|70b638%|70c438@@|7ec438@|70c438@@@@@|7ec438#
+000000               |70b638=+*++|000000   |7ec438@|62b62a@|62a82a%|000000 |62b638+*#|70b638#*=
+000000                       |70c438@|62a82a%|62a838+
+`,
+        plano: `
+                        %*
+                 =@#=#-%@@-   @@
+             ++- *@@%##%@@###%@%    +*
+            *@@#**%@%##%@%##%@@# -#@@#
+        +    %@@#*#%%#*#%%**%@#**%@@%    +*
+        @@@%++#%%#*#%#**%**#%#**%@%#-+%@@@*
+         #%@%#**#%*+*#++#++##+*#%#**%@@@%-
+   =@@@%#***%%%*+*#+##+****#++##=*#%%%#*-=+##%+
+    =#%@@%%#***#*+*=-:::::--+*#-*##***#%%@@@@*
+   --****#####*+*-::::::::::::-**=+*#%%%%##+
+ %@@@@@%%##*++**:::::::::::::::-*#******####**=
+   #########**#-:::::::::::::::::#**##%%%@@@@@#
+   ########***%-::::::::::::::::-#++****####-
+ @@@@@@%%##**+#=-:::::::::::::::-#*##%%%%%%%*
+    -#***####**#=:::::::::::::--#******##%%@@%
+    #%%@@%%#*++*#+-:::::::::::+#++*#%%%##**
+  +@@@%%#***###*:*#*+=-----+*#=+##***#%@@@%#
+        #%%%%***##++#**#**#*+*#*+#%%%**==*##
+      *@@@%#+##%#**##**#*+##**#%#**#@@%#
+     %@@#+ =#%@#**%%#*#%#*#%%**%@%#-+%@@%
+          =%@@#**%@%**%@%*#%@#*#%@@#    =
+          @@@*  %@@##*%@%##%@@*=#%@@
+          #=    @@%##+@@%*%#@@+    =
+                @#    *@*+:  *
+                :====-::*+
+              +**+*++++++=  =+++***=
+            +*##******+++=+++****##*
+            +*****++++=+*++***+**+=
+               :----   *+= --==-:
+                       *=:
+`
+      },
+      {
+        color: `
+000000                         |fce062%|eed262=
+000000                  |fcd262%|fce062@|fcd254%|e0b654*|e0c454%|d2b654=|fcd246@|fce054@|fcd254@|000000    |fce062@@
+000000             |fce070%|eed262@|e0c454@|d2b646*|000000 |fcc446@|fce046@|fcd246@|eec438@|eec446@|eeb638@|fcd238@|fce038@|fcd238@|e0b646%|e0b654@|eec446@|fcd246@|fce054@|fcc446@
+000000             |fcd254@|fce054@|fcd246@|eeb638@|e0a838@|eeb62a@|fcd22a@@|fcc42a@|eeb62a@|eeb61c@|fcd22a@@|fcc42a@|eeb62a@@|fcd22a@|fce038@|fcd238@|eec446%|000000 |eeb646=|fcc446%|fce054@@|eed262+
+000000        |fce070*|fce062#|fcd254+|000000  |eec446*|fcd238@|fce038@|fcd22a@|eeb62a@|eea81c@|fcc41c@|fcd21c@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fcd20e@|fcb60e@|eea81c@|fcb61c@|fcd21c@@|fcb61c@|d2a838@|eeb62a@|fcd238@|fce038@|fcd246@|eec446@
+000000         |fcd254@|fce046@|fcd238@|fcc438@|e0a82a%@|fcc41c@|fcd21c@|fcc40e@|eea80e@@|fcc40e@@|fca80e@@|fcb60e@@|eea80e@|fca80e@|fcc40e@@|fcb60e@|e0a80e@|fcb60e@|fcd21c@|fcd22a@|fcc42a@|eeb638%|000000 |eec438+|fcc446%|fcd246@|fce054@|fce062@|fcd270+
+000000    |fce070=|fcd262+|eec454=|000000  |d2b646+|eeb638@|fcd22a@@|fcc41c@|fcb60e@|e09a0e@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|e09a0e@|fcb60e@|fcc40e@@|fcb61c@|eeb62a#|fcb62a@|fcc42a@|fcd22a@|fce038@|fcd246@@|eec454=
+000000    |fcd262#|fce054@|fce046@@|fcd238@|fcc42a@|eeb62a@|e0a81c@|fcb60e@|fcc40e@@|fcb60e@|e09a1c@|eea81c#|fcb60e@|fca80e@|eea82a@|fcb61c@|ee9a1c@|e0a81c@|eea81c@|eea82a@|fca81c@|fcb61c@|fcb62a%|e08c1c%|fca80e@|fcb60e@|fca80e@|e0a81c#|fca81c@|fcc40e@|fcd20e@|fcd21c@|fcc41c@|eeb62a@|e0b638#
+000000     |d2b654%|eeb638@|fcc438@|fcd22a@|fcd21c@@|fcc40e@|fca80e@|ee9a1c@|ee9a0e%|fca80e@@|fcb62a@|eeb62a@|c48c1c%|b67e1c%|a8620e%%|9a620e%%|a8620e%|a8700e%%|d28c1c%|eea82a@|fcb62a@|eeb646=|fca81c*|fcb60e@@@|fca80e@|eea80e@|eea81c@|eeb61c@|fcc42a@|fcd238@@|fce046@|fce054@@|fce062#
+000000 |fce070+|fce062#|fcd254%|fcd246%|fcc438%|eeb638@|eeb62a@|eea81c@|eea80e@|fca80e@|fcb60e@@@|fca80e@|fcb638#|eeb62a@|a8701c%|9a620e%%%%%%%%|a8620e%%|9a620e%%|b67e1c%|eea82a@|fcb61c@|ee9a0e%|e09a0e@|ee9a0e@|fcb60e@|fcc40e@@|fcd21c@@|fcd22a@|fcc438@|eec446@+
+000000  |fcd254#@|fcd246@|fcd238@|fcd22a@@|fcd21c@|fcc40e@|fcb60e@@|fca80e@|ee9a0e@|eea81c@|eea82a@|a8620e%%|9a620e%%%%%%%%%%%|a8620e%|9a620e%|a8700e%|e0a82a@|fcb61c@|fca80e@@@@@|eeb60e@|eeb61c@|eeb62a@|e0b638@|e0b646*
+000000   |e0c454@|eec446@|eeb638@|eeb62a@|fcb61c@|fcb60e@@|fca80e@@@|fca800@|fcb62a@|b67e1c%|a8700e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|fcc42a@|fc9a00@|fca80e@@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fce046@@|fce054@|fce062@
+000000 |fcd262=|fcd254#|fcd246@|fcd238@@|fcc42a@|fcc41c@|fcc40e@@|fcb60e@@|fca80e@|fca800@|fcc42a@|a8701c%|9a620e%%%%%%|8c620e%%|8c540e%|9a620e%|8c620e%|9a620e%%%%%|a8700e%|fcc438@|fc9a00@|fc9a0e@|fca80e@@|fcb60e@@|fcb61c@|fcc42a@|fcc438@|eec446@*
+000000 |fce062*|fce054@|fcd254@|fcd246@|fcc438@|fcc42a@|fcc41c@|fcb60e@@|fca80e@@|ee9a0e@|ee9a00%|fcb62a@|c48c1c%|a8700e%|9a620e%|a8620e%|9a620e%%%%|8c620e%%|9a620e%%%%%|a8620e%%|b6701c%|fcc438@|fca80e@|fcb60e@@@|fcc40e@|fcc41c@|fcc42a@@|fcc438@|eec446@|e0c462=
+000000    |e0c462*|e0b646@|eeb638@|fcb62a@|fcb61c@|fcb60e@@@@|fca80e@|fca81c%|eeb638@|c47e1c%|a8620e%|9a620e%%%%%%%%%%%|a8620e%|a8700e%|b67e1c%|fcc42a@|fca80e@|ee9a0e@@|eea80e@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fce046@|fce054@@|fce062@
+000000   |fcd254#|fcd246@@|fcd238@|fcd22a@|fcd21c@|fcc41c@|fcb60e@|eea80e@|ee9a0e@@|fca80e@@|fcc438@|d29a2a%|a8701c%|a8620e%|9a620e%%%|a8620e%%|9a620e%%%|a8620e%|9a620e%|d29a2a@|fcc42a@|eea838*|fca81c%|fcb60e@|fcc40e@@@|fcb61c@|eeb62a@|e0b62a@|e0a838@|d2b646*
+000000  |fce062#@|fcd254@|fcd246@|fcc438%*|e0b638@|e0a81c@|fcb60e@@|fcc40e@|fcb60e@|fca80e@|ee9a1c*|fca81c+|fcb61c@|eea81c@|e0a838@|d29a1c%|b67e1c%|b6701c%%|a8701c%%|b67e1c%|d28c1c%|eea82a@|fcb62a@|eea838+|fca80e@|fcb60e@|fca80e@|eea81c@|eea80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@@|fcc446@|e0c446@|e0c462=
+000000       |eec438%|fcc42a@|fcd22a@|fcd21c@|fcc41c@|fcb60e@|eea81c%@|fcb60e@@|fca80e@|e08c0e%|fca80e@@|ee9a0e@|fca81c@|fcb61c@|fca81c@@|fcb60e@|e09a1c@|ee9a00@|fcb60e@|fca80e@|e09a2a@|eea80e@|fcc40e@@@|eeb61c@|e0a82a@|eeb638#|fcc438%|fcd246@|fce054@@|fce070@
+000000     |eed254*|fcd254@|fce046@@|fcd238@|fcc42a@|eeb638*|eeb62a%|fcc40e@@@|fca80e@|e09a0e@|fca80e@|fcc40e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fca80e@|fcb60e@@|ee9a0e@|fca80e@|fcc40e@@|eea80e@|e0a80e@|fcb61c@|fcd22a@@|fcd238@|eeb638@
+000000     |fce062%%|fcd254*|eec446=|000000  |fcc438@|fcd22a@@|fcc41c@|eeb61c@|e0a81c@|fcb60e@|fcc40e@@|fca80e@@|fcc40e@@|fca80e@@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcd21c@@|fcb62a@|e0a838#|e0b638%|fcc438@|fce046@|fce054@|fcd254@
+000000          |fcd246@|fce046@|fce038@|fcc438@|eeb638%|d2a838%|fcc42a@|fcd22a@|fcd21c@|fcb61c@|eea81c@|fcb61c@|fcd21c@@|fcb61c@|eeb61c@|fcc41c@|fcd22a@|fcc42a@|eeb62a@|e0b62a@|fcc42a@|fce038@|fcd238@|fcc446@|000000   |fcd254+|fce062#|fce070=
+000000         |fcd262@|fce054@|fcd254@|eec446*|000000  |eec446@|fcd238@|fce038@|fcc438@|eeb638@|e0b638@|fcc438@|fce038@|fcd238@|eeb62a@|eec438@|fcc438@|fce038@@|eec446@|d2a846*|e0b646@|eec446@|fce054@@|eec454+
+000000         |fce070=|000000     |fcd254@|fce054@|fcd246@|eec446@|e0b654@|d2b654=|fcc446@|fce054@|fcd246@|c4b638@|eec454@|e0b646@|fcd254@|fce054@|fcd254@|000000    |fce062*
+000000               |fce070@|fce062#|000000    |eed262+|fce062@|eed262*|70c438@|7eb638@|000000  |fce070*
+000000                |70b638=*#|62b62a##|62a838*|7eb638+|000000 |70c438@|62b62a%
+000000              |70c438%@@|70c42a@|70c438@@|70b62a@|70c438@@|70b638@|70c438@|62a82a%|000000  |70b638*%@|70c438@@|7ec438@|7ed238%|8cd246*
+000000            |8cd246*|7ed238@@|7ed246@|7ed238@@@|7ec438@@|70c438@|62b62a@%%|54a82a%|62b638%|62b62a%|70b62a@|70c438@|7ed238@@@@|8cd238@|7ed238@
+000000            |8cd246*|7ed238@@|7ec438@@@|70c438@@|70b62a@|62b62a%|62b638%|70b638%|70c438@|70b638%|70c438@@|7ec438@|70c438@@@@@|7ec438#
+000000               |70b638=+*++|000000   |7ec438@|62b62a%|62a82a%|000000 |62b638+*#|70b638#*=
+000000                       |70c438@|62a82a%|62a838+
+`,
+        plano: `
+                         %=
+                  #@#=*-%@%    %@
+             %%#= %@@###%@%**#@@%
+             %@%#*#%@%##%@%*#%@%* -#@@=
+        *#=  +%@%#*#%%**%%#*#%%#*#%@@#
+         %@@#+*#%%**#%**##**%%**#%@%* =#%@@+
+    ==-  -#%@%*+*%#++#*+#*+*#*+#%%#+#%@@@%-
+    *@@@%#***#%#++#**#+****#*+*#*+*#%%%#+
+     *#%%%%%*++****=-:::::--=*#-=###****#%@@@@*
+ +*####*****##*+*-::::::::::::-**+++##%%%%%#=
+  #%@@@%%%#**+**:::::::::::::::-*#********#+
+   ######*****#-:::::::::::::::::#+**##%%%@@@@@
+ =*%%%%%%###**%-::::::::::::::::-#+***######+
+ *%%%%%###**++#=::::::::::::::::-#*#########-
+    =########**#=:::::::::::::--#*++**#%%@@@@@
+   *%@@@%%#*++**#+-:::::::::::+#=+##%##***=
+  #@@%*+***#%#*--#**+=-----+*#=*#**+#%%@@%#-
+       *%%%%#+*##*+****#**#++#*+*#%#**+*%@@%
+     +@@@%#+*#%%*+*#*+*#+*#*+*%#*+#%@%#
+     %#+-  #%@%**#%%**%%**%%#*#%%#+*%@@%
+          %@@%*+#%%#*#%%**%@%**%@@#   +#=
+         @@@+  #@@%#*%@%###@@#=*#@@=
+         =     %@%##-%@%*##%@%    *
+               @#    =@+*+  *
+                :====-- *=
+              ++*++++++++=  =+++***=
+            +**#******+++=+++****##*
+            +*****++++=+*+++**++*+=
+               :----   *+= --==-:
+                       *=:
+`
+      },
+      {
+        color: `
+000000                          |fce070@
+000000                   |fcd254@|fce054@|eec454#|e0b654*|e0c454#|e0b654+|fcd254@|fce054@|eec454@|000000    |fce062%|fce070+
+000000             |eed270+|fce062@|eed254@|e0c454@|d2b646#|e0b646*|fcd246@|fce046@|fcd238@|eeb638@|eec446@|eeb638@|fcd238@|fce046@|fcc438@|d2b654+|e0b654#|eec446@|fce046@|fce054@|eec454#
+000000             |eec462=|fcd246@|fce046@|fcd238@|eeb638@|e0a82a@|fcc42a@|fcd22a@@|fcb62a@|eeb62a@|fcc41c@|fcd22a@@|fcb62a@|e0b638@|eeb62a@|fcd238@|fce038@|fcd238@|eec446+|000000  |fcd254%|fce054@|fce062@
+000000         |fce062@|fce054@|eec446#|e0b646+|000000 |eec438@|fcd238@|fcd22a@|fcc42a@|eea81c@@|fcc41c@|fcd20e@|fcb60e@|eea80e@|fcb60e@|fcd20e@|fcc40e@|eea80e@|eeb61c@|fcc41c@|fcd21c@|fcc42a@|eeb62a@|e0a838#|fcc438@|fcd238@|fce046@|fcd246@|eec454#
+000000         |eec454*|fcd246@|fce046@|fcd238@|fcb62a@|e0a82a@|eeb61c@|fcc41c@|fcd20e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|eea80e@|eea81c@|fcc41c@|fcd21c@|fcd22a@|fcc42a@|eec446*|000000 |eeb646=|fcc446*|fcd254%|fce062@@
+000000    |fce070+|fce062%|fcd254%|fcd246#|eec446+|000000 |e0b638#|fcb62a@|fcd22a@|fcd21c@|fcc40e@|eea80e@|ee9a0e@|fcb60e@|fcc40e@|fca80e@|e09a0e%|fca80e@@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@@|fcb60e@@|e09a0e@|eea80e@|fcc40e@@@|fcb61c@|eeb638#|fcb62a%|fcc42a@|fcd238@|fce046@@|fcd254@
+000000     |eec454@|fcd246@|fce046@|fce038@|fcd22a@|fcc42a@|eeb62a@|e0a81c@|fcb60e@|fcc40e@@|fca80e@|e09a2a#|fca80e@|fcb60e@|eea81c@|fcb62a@|eea81c@@|e0a81c@|fcb62a@|eea82a@|fcb61c@@|e09a2a#|ee9a0e@|fcb60e@@|eea80e@|eea81c%|fcb61c@|fcc40e@|fcd21c@@|fcc42a@@|e0b646*
+000000      |d2b646@|eeb638@|fcc42a@|fcc41c@|fcd21c@|fcc40e@|fcb60e@|fca81c@|eea82a%|fca80e#@|fcb61c@|eeb638@|c48c1c%|b67e1c%|a8620e%%|9a620e%%|a8620e%|a8700e%%|d28c1c%|e0a82a@|fcb61c@|fca82a*|ee9a2a+|fca80e@|fcb60e@|fcc40e@|fcb60e@@|eea81c@|e0a81c@|eeb638@|fcc438%|fcc446@|fcd246@|fcd254@|fce062@@
+000000 |fce070*|fce062@|fce054@|fcd246@|fcd238@|fcc438@|fcc42a@|fcb61c@|eea80e@@@|fca80e@@@|fcb62a@|eeb638@|a87e1c%|9a620e%%%%%%%%|a8620e%%|9a620e%%|b67e1c%|e0a82a@|fcb61c@|fc9a0e@|ee9a0e@@|fca80e@|fcb60e@|fcc40e@|fcd21c@@|fcd22a@|fcd238@|fcd246@@|fcd254*
+000000   |eec454@|fcc446@|fcc438@|fcd22a@|fcd21c@@|fcc40e@@|fcb60e@|fca80e@|fc9a0e@|eea82a@@|a8620e%%|9a620e%%%%%%%%%%%|a8620e%|9a620e%|a8700e%|e0a82a@|fcb62a@|fca80e@|fcb60e@@@@@|fcb61c@|eeb62a@|e0b638@|e0b654%
+000000   |e0b654#|e0b646@|eeb638@|eeb62a@|eeb61c@|eeb60e@|fca80e@@@|fc9a0e@|fc9a00@|fcb62a@|b67e1c%|a8700e%|9a620e%%%%%%%%%%%%%%|a8620e%|9a620e%|fcc42a@|ee9a00@|fc9a0e@|fca80e@|fcb60e@@@|fcc41c@|fcc42a@|fcd238@|fcd246@|fcd254@@|fce062*
+000000 |fce062@|fce054@|fce046@@|fcd238@|fcd22a@|fcd21c@|fcc40e@@@|fcb60e@|fca80e@|fca800@|fcc42a@|a8701c%|9a620e%%%%%%|8c620e%%|8c540e%|9a620e%|8c620e%|9a620e%%%%%|a8700e%|fcc438@|fc9a00@|fca80e@@|fcb60e@@|fcc40e@|fcc41c@|fcc42a@|fcc438@|fcd246@@|fcd254#|fcd262=
+000000  |eed254=|fcc446*|eec446@|eec438@|fcb62a@|fcb61c@@|fca80e@@|eea80e@|ee9a0e@|fc9a00@|fcb62a@|c48c1c%|a8700e%|9a620e%|a8620e%|9a620e%%%%|8c620e%%|9a620e%%%%%|a8620e%%|b6701c%|fcc42a@|fca80e@@|fcb60e@@@|fcb61c@|fcb62a@|eeb638@|eec446@|e0c454@
+000000    |e0c446@|eec438@|fcc42a@@|fcc41c@|fcc40e@@|fcb60e@@|fca80e@|ee9a1c@|eeb62a@|c47e1c%|a8620e%|9a620e%%%%%%%%%%%|a8620e%|a8700e%|b67e1c%|fcc42a@|eea81c@|ee9a0e@@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fce046@|fcd254@%
+000000  |fce062#|fce054@@|fce046@|fcd238@|fcd22a@|fcc41c@|fcb61c@|eea80e@@@|fca80e@@@|fcc438%|d29a2a%|a8701c%|a8620e%|9a620e%%%|a8620e%%|9a620e%%%|a8620e%|9a620e%|d29a2a@|fcc438@|fca82a+|fca80e@|fcb60e@@@@|eea81c@@|e0b62a@|e0b638@|fcc446*|fcd254*|fcd262*|fce070=
+000000  |fce070=|fcd262+|eec454+|eec446+=|e0b646*|e0a82a@|fcb61c@|fcc40e@@@|fcb60e@|eea81c%|ee9a1c*|fca80e%@|eea82a@|e0a82a@|d29a2a%|b67e1c%%|b6701c%|a8701c%%|a87e1c%|d29a1c%|eea82a@|fcc438%|eea81c@|fca80e@@|eea81c%@|fcb60e@|fcc40e@|fcd21c@|fcd22a@@|fcc438@|e0b638@|d2b654%
+000000      |eec446%|fcd238@@|fcd22a@|fcd21c@|fcc41c@|eeb61c%|eea81c@|fcb60e@@@|e09a0e%|e09a1c%|fca80e@@|ee9a0e@|fcb61c@|fca81c@@|fcb61c@@|e08c0e%|fca80e@|fcb60e@|eea81c%|e09a0e@|fcb60e@|fcc40e@@|fcb60e@|e0a82a@|eeb638%|fcc438@|fcd238@|fce046@|fce054@|fcd254@|eed270=
+000000    |eed270=|fce054@@|fce046@|fcd238@|fcc438%|eeb638+#|fcc41c@|fcc40e@@|fcb60e@|ee9a0e@|eea80e@|fcb60e@@|ee9a0e@@|fcb60e@|fca80e@|ee9a0e@|fca80e@|fcb60e@|eea80e@|ee9a0e@|fcb60e@|fcc40e@|fcb60e@|e09a0e@|fcb60e@|fcc41c@|fcd22a@@|eeb62a@|e0b646=|000000   |fce070=
+000000     |fcd262=|000000    |fcc438@|fcd22a@@@|fcb61c@|e0a81c@|fcb60e@|fcc40e@@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@@|eea80e@|fcb60e@|fcc41c@|fcd21c@|fcc41c@|e0a82a@@|fcc42a@|fcd238@|fce046@|fcd246@|eec454=
+000000         |fcd246@|fce046@@|fcc438@|eeb638#|d2a846=|eeb62a@|fcd22a@@|fcc41c@|eeb61c@@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|fcb61c@|fcd21c@|fcd22a@|fcb61c@|e0a82a@|fcb62a@|fcd238@|fce038@|fcc438@|e0c454=|000000 |e0b646+|fcd254#|fce062@@
+000000        |fcd262#|fce062@|fcd254@|eec454*|000000  |eec446#|fcd238@|fce038@|fcd238@|eeb638@|e0b638@|eeb62a@|fcd238@|fce038@|fcc42a@|eec438@|eeb638@|fcd238@|fce038@|fcc438@|d2a838%|e0b646@|eec446@|fce046@|fce054@|eec454@
+000000              |fcd254@|fce054@|fcd246@|eec446@|e0b654%|000000 |eec446@|fce046@@|e0b646@|eec454@|e0c446@|eec454@|fce054@|fcd254@|000000  |e0c462=|eec454=|fce062#|fce070#
+000000              |fce070*|fce062#|000000     |fce062@|fcd262%|000000 |8cc438@|70b638%|000000 |fce062*|fce070+
+000000                |70b638=*#|62b62a##|7eb646#|62a838+|000000 |70c438@|62b62a%
+000000              |70c438%@@|70c42a@|70c438@@|70b62a@|70c438@@|70b638@|70c438@|62a82a%|000000  |70b638*%@|70c438@@|7ec438@|7ed238%|8cd246*
+000000            |8cd246*|7ed238@@|7ed246@|7ed238@@@|7ec438@@|70c438@|62b62a@%%|54a82a%|62b638%|62b62a%|70b62a@|70c438@|7ed238@@@@|8cd238@|7ed238@
+000000            |8cd246*|7ed238@@|7ec438@@@|70c438@@|70b62a@|62b62a%|62b638%|70b638%|70c438@|70b638%|70c438@@|7ec438@|70c438@@@@@|7ec438#
+000000               |70b638=+*++|000000   |7ec438@|62b62a@|62a82a%|000000 |62b638+*#|70b638#*=
+000000                       |70c438@|62a82a%|62a838+
+`,
+        plano: `
+                          @
+                   @@*+*=@@%    %+
+             =@%#+=%@%###@@%-*#@@*
+             =@@%#*#@@###@@#*#@@%=  #@@
+         @@*- #%@%**%%#*#%%**%@%*+#%@@+
+         +@@%#**%%#**%#**%**#%#**#@@%+ -+#@@
+    =%#*= +#%%%*+##*+#*+*#+*##+*#%##+#%@@@%
+     #@@@%#***##*=*#*#***#*##=+##**#%%%%#=
+      *##%%%#*++***=-:::::--=*#+-*####***#%%@@@
+ *@@@%%##******##-::::::::::::-*#+++*#%%@@@@%+
+   %%%%%%%%#*+**:::::::::::::::-*#*########*
+   +###******+#-:::::::::::::::::#+***##%%%%@%*
+ @@@@@@%%%##**%-::::::::::::::::-#***###%%%%%#=
+  =+####****++#=::::::::::::::::-#**########
+    ###%%%%##**#=:::::::::::::--#*++*#%%@@@@%
+  *@@@@%%#******#+-:::::::::::+#=*###****#+*+=
+  -===-=*##%%#+=*#**+------+*#*#****%%@%%#+
+      *%@@%#***##++#*+#**##+*#*+#%%***%%@@@-
+    =@@@%*=+#%%#+*##*+#***#**#%*+#%@%#-   =
+     =    #%@%#**%%#*#%#*#%#**%%#**#@@%-
+         %@@%+-#%@%**%@#*#@%#*#@@%- =*@@
+        *@%+  +%@%#*#@@###%@%**#@@#
+              %@@#* #@@###%@%  -=#*
+              *#     @# *+ *+
+                :=====: *+
+              ++*+*++++++=  =+++***=
+            +**#******+++=+++****##*
+            +*****++++=+*++***+**+=
+               :----   *+= --==-:
+                       *=:
+`
+      }
+    ]
   },
   {
-    cols: 41, alto: 25,
-    color: `
-000000                  |fce070=|000000    |fcd262*|fce062%
-000000            |fcd262%|fce054@|fcd246%|000000  |eec454=|fce054@|fcd254@|e0b646@|eec446@@|fce046@|fcd246@|e0c454=|000000 |eec446=|fcd254@|fce054@|eed262+
-000000            |eec454+|fcd246@|fce038@|fcc438@|e0b638@@|fcd238@@|fcb62a@|eeb62a@|fcc42a@|fce02a@|fcc42a@|e0b638@|eeb638@|fcd238@|fce038@|fcd238@|000000  |eec446=|fcd254#|fce062@|fcd262=
-000000        |eed262*|fce054@|fcd246@|fcc446%|e0b638+|eeb62a@|fcd22a@|fcd21c@|fcb61c@|eea81c@|fcc41c@|fcd21c@|fcb61c@|eea80e@|fcc40e@|fcd20e@|fcb60e@|eea81c@|fcc41c@|fcd21c@|fcc42a@|e0b638%|eeb638*|fcc438@|fce046@@|fcc454@
-000000         |eec446#|fcd238@|fcd22a@|fcc42a@|eea81c@|eea80e@|fcc40e@@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcb60e@@|eea80e@|fcb60e@|fcc40e@|fcb60e@|e0a80e@|fcb60e@|fcd21c@|fcd22a@|fcc42a@|eec438#
-000000     |fcd262%|fce054@|fcd246@|fcd238@|fcc42a%|eeb62a%|fcb61c@|fcc40e@@|fca80e@|e09a0e@|fcb60e@|fca80e@|ee9a0e@|fca80e@@|ee9a0e@|fcb60e@|ee9a0e@@|fcb60e@|fca81c@|e09a0e@|fcb60e@|fcc40e@|fcb60e@|eeb61c@|eeb638#|fcc438%|fcd238@|fce046@|fce054@|fcd262+
-000000      |e0b646#|eeb638@|fcc42a@|fcd21c@|fcc40e@|fcb60e@|eea81c@%|fca80e@@|eeb638%|eea81c@|d29a1c@|c48c1c%|b67e1c%%|c48c1c%|d29a1c%|d28c1c%|eea82a@%|fca80e@@|eea81c%|fca81c@|fcc40e@|fcd21c@@|fcc42a@|eeb638@|d2b654=
-000000  |fce062@|fce054@|fce046@|fcd238@|fcc42a@|fcb61c@@|eea80e@|fca80e@@@@|fcc438#|d29a2a@|9a701c%|9a620e%%%%%%|a8620e%|a8700e%|a8620e%|b67e1c%|e0a82a@|fcb62a#|fca80e@@@|eea80e@@|fcb61c@|fcc42a@|fcd238@|fcd246@|fce054@|fce062@
-000000   |e0c454*|eec446@|fcc438@|fcc42a@|fcc41c@|fcc40e@@|fcb60e@|fca80e@|fc9a0e@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%%%%%%%%|a8700e%|d29a2a@|fca82a@|fca80e@|fcb60e@@|fcc40e@|fcc41c@|fcc42a@|fcc438@@|eec446@|e0c462*
-000000  |fcd254+#|fcc446@|fcc438@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fc9a0e@|fca80e@|e0a82a@|a8620e%|9a620e%%%%%%%%%%%%%%|eeb62a@|ee9a00@|fca80e@@|fcb60e@@|fcc41c@|fcc42a@|fcc438@|fcc446@|fcd254#|fcd262=
-000000 |fce062*|fcd254@|fcd246@|fcd238@|fcc42a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@@@|e0a82a@|a8620e%|9a620e%%%%|8c620e%%%%%|9a620e%%%%|a8620e%|fcb62a@|fc9a00@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|fcd238@|fcd246@|fcd254@|fce062*
-000000   |e0c462+|eec446@|eec438@|fcc42a@|fcc41c@|fcb60e@@@|fca80e@@|fcb638@|b6701c%|9a620e%%%%%%%%%%%|a8620e%%|c48c1c%|fcb62a@|fca80e@@|fcb60e@@@|fcc41c@|fcc42a@|eec438@|eec446@|e0c454@
-000000  |fce062@|fce054@|fce046@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@|eea80e@|ee9a0e@|fca80e@@|fcb638@|c48c1c%|9a620e%%%%%%%%%%|a8700e%|e0a82a@|fcb62a@|fca80e@@|eea80e@@|fcb60e@|fcb61c@|fcc41c@|fcd22a@|fcd238@|fce046@|fce054@|fce062#
-000000     |e0b646=|e0b638@|eeb62a@|fcc41c@|fcc40e@@|fcb60e@|fca81c@|eea81c#|fca80e%|fcb60e@|eea82a%|e09a1c@|c48c1c%|a8701c%%%%%|c48c1c%|e0a82a@|eea82a@|fca80e@#|eea81c%|fcb61c@|fcc40e@@|fcc41c@|fcb62a@|e0b62a@|d2a838@|e0b646=
-000000    |eec454=|fcd246@|fcd238@@|fcd22a@|fcc41c@|eeb62a@|eea81c@|fcb60e@|fcc40e@|fcb60e@|e09a0e@|fca81c@|fca80e@|ee9a0e@|fca81c@@@|fcb60e@|eea81c@|fc9a0e@|fcb60e@|fca81c@|ee9a0e@|fcb60e@|fcc40e@|fcb60e@|eea81c@|fcb62a%|fcc42a@|fcd238@|fce046@|fcd246@|eec454@
-000000   |fce070=|fce062@|fce054@|fcd246#|eec446+|000000 |e0b646*|fcc42a@|fcd22a@|fcd21c@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fca80e@|eea80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@@|ee9a0e@|fcb60e@|fcc40e@|fcb60e@|e0a80e@|fcb61c@|fcd21c@|fcd22a@|fcc438@|eec454=|000000 |eec446=|fcd254*|fce062*
-000000        |eed254+|fce054@|fce046@|fcc438@|e0a82a@@|fcc41c@|fcd21c@|fcc41c@|eea81c@|fcb60e@|fcd20e@|fcb60e@|eea80e@|fcc40e@@|fcb60e@|eea81c@|fcc41c@|fcd22a@|fcc42a@|e0a838%|eeb638@|fcd238@|fce046@|fcd254@
-000000        |fce070+|fcd262+|e0b654-|000000  |fcd238@|fce038@|fcc438@|e0b638@@|fcd22a@@|fcb62a@|eeb62a@|fcc41c@|fcd22a@|fcc42a@|e0b638@|eeb638@|fcd238@|fce046@|fcc446@|000000   |fce062*+
-000000            |eed254*|fce054@|fcd254@|e0c446=|000000 |eec446#|fce046@|fcd246@|eeb646@|eec446@|fcc438@|fce038@|fcd238@|eec446#|000000 |eec454=|fce054%|fce062@
-000000                  |fce062@|fcd254+|000000 |b6c446@|9ab638@|fcd254@|fce054@|eec454=
-000000              |70b638+#@|62b62a%|62b638%|62a82a#|62a838+|70c438%|62b62a%|9ab646=|fce070=
-000000            |7ec438%@|70c438@@|7ec438@@|70c438@@@|70b638@|62b62a%|70a846=|62b638*|70b62a@|70b638@|70c438@|7ec438@|7ed238@@|8cd246%
-000000           |8cd246@|8cd238@|7ed238@@@|7ec438@|70c438@@|62b62a@%|70b62a@|62a82a%|70b638@|70c438@@|7ec438@@|7ed238@|7ec438@@
-000000            |7ec438-*#|70b638%%#+|000000 |7ec446-|70c438@|62a82a%|62b638*%|70b638%@@#=
-000000                    |7ec438#|62b62a@|62a838*
+    cols: 42, alto: 26,
+    marcos: [
+      {
+        color: `
+000000                  |fce062*|000000    |fce062*|fce070+
+000000              |e0c454+|d2b654-|000000 |fcd254@|fce054@|fcc446@|e0c454%%|eec446@|fce054@|fcd246@|000000   |fcd262*|fce062@
+000000            |eed254#|fce054@|fcd246@|eec446@|e0a838@|fcc438@|fce038@|fcd238@|eeb638@@|fcd238@|fce038@|fcc438@|d2b646#|e0b646@|fcd246@|fce046@|fcd254@
+000000        |fce062##|e0c446*|d2a846=|e0b654=|fcd238@|fce038@|fcc42a@|eeb62a@|fcb61c@|fcd21c@@|fcb61c@|eeb61c@|fcc41c@|fcd21c@|fcb61c@|eeb62a@|fcc42a@|fcd22a@|fcd238@|eeb646*|000000 |fcc446#|fcd246@|fce054@|fcd262%
+000000        |eec454=|fcd246@|fce046@|fcd238@|e0b62a@|e0a81c@|fcc41c@|fcd21c@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcd20e@|fcc41c@|eea81c@|eea82a@|fcc42a@|fcd238@@|fcc446@
+000000    |fce070+|fce062@|fcd254%|fcc446*|eec446=|e0b646*|fcc42a@|fcd22a@|fcd21c@|fcb60e@|ee9a0e@|fcb60e@|fcc40e@|fca80e@|ee9a0e@|fcb60e@|fc9a0e@@|fcb60e@|fc9a0e@|ee9a0e@|fcb60e@@|e09a0e@|fca80e@|fcc40e@|fcc41c@@|eeb638#+|fcc438%|fcd246@|fce046@|fce054@|fce062%
+000000     |e0c454@|fcd246@|fcd238@|fcd22a@|fcc41c@|fcb61c@|eea81c@|fcb60e@@@|e09a1c@|fca81c%|fcb61c@|eea82a@|ee9a1c@|e09a1c@@|fca81c@|eea82a@|fca81c@@|e09a1c%|fca80e@|fcb60e@|fca80e@|eea81c@|fcb61c@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fcc438@|eec454=
+000000  |fce062*|fcd254*|fcc446*|eec446#|e0b638@|eeb62a@|fcb61c@|fcb60e@|fcc40e@|fcb60e@@|eea81c*|fcb62a%@|c48c2a%|a8701c%|9a620e%|a8620e%|9a620e%%|a8620e%|a8700e%|a8701c%|d28c1c%|fcb62a@@|ee9a1c*|fca81c@|fcb60e@@@@|eea81c@|e0b62a@|eec438#|fcc438#|fcd254%|fce054%|fce062#
+000000  |fcd254*|fcd246@@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@@|fcb61c@|d29a2a%|9a620e%%|8c620e%|9a620e%%%%%%%%|a8620e%|c48c1c%|fcb61c@|ee9a0e@@|eea80e@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fcd246@|fcd254%|eed254=
+000000   |e0c454@|eeb638@|eeb62a@|eeb61c@|fcb60e@@@|fca80e@@|fcb61c@|e0a82a@|a8620e%|9a620e%%%%%%%%%%%%|a8620e%|c48c1c%|fcb61c@|fca80e@@|fcb60e@@@|fcb61c@|eeb62a@|e0b646@|e0c462+
+000000 |fce062@|fce054@|fcd246@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@|fca80e@@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%|8c620e%%%|9a620e%%%%%%|a8701c%|fcb62a@|fca80e@@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fcd246@|fce054@|fce062%
+000000  |eec454=%|eec438@|fcc42a@|fcb61c@|fcb60e@|fca80e@@@|fc9a0e@|fcb61c@|c48c1c%|a8620e%|9a620e%%%%|8c620e%%%%|9a620e%%%%|a8620e%|c47e1c%|fcb61c@|fc9a0e@|fca80e@@@|fcb60e@|fcb61c@|fcc438@|eec438@|eec454#
+000000   |eec454@|fcc446@|fcc438@|fcd22a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@|ee9a1c@|eeb62a@|b67e1c%|9a620e%%%%%%%%%%%|a8700e%|b6701c%|fcb62a@|ee9a1c@|fca80e@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fcd246@|eec454@
+000000 |fce070=|fce062@|fce054@|fcd246@|fcd238@|fcc42a@|eeb61c@|eea80e@|fca80e@@|fcb60e@|fca80e@|fca81c#|fcc438%|d29a2a@|a8700e%|a8620e%|9a620e%%|a8620e%%|9a620e%%%|a8700e%|c49a2a%|fcc438@|fca81c#|fcb60e@@@|fca80e@|eea81c@|eeb61c@|eeb62a@|fcd246@|fcd254@|fce054@|fce070*
+000000     |eec446=|eeb638@|fcc42a@|fcd21c@|fcc40e@@|fca81c@|eea81c%|fca80e@@|ee9a0e@|fcb62a%|eea81c@|d29a2a@|d28c2a%|c48c1c%%|d29a2a%|c48c1c%|eea81c@|fcc42a@|ee9a1c@|fca80e@@|eea81c@|fca81c@|fcc40e@|fcd21c@|fcd22a@|fcc42a@|eec438@|d2b646@
+000000    |fcd254@|fce046@@|fcd238@|fcc42a@|eeb638#|eeb61c@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@|eea80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fc9a0e@@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fcc40e@@|eeb62a@|eeb638#|fcc438%|fcd246@|fce046@|fce054@|eed262#
+000000    |fce062+|fcd254=|000000  |eec446*|fcc42a@|fcd22a@|fcd21c@|fcb61c@|e0a80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|e0a81c@|fcb61c@|fcd22a@|fcd238@|fcc438@|eec454=
+000000       |eec454#|fce046@@|fcd238@|eec438#|e0b638*|fcc42a@|fcd21c@|fcc41c@|eeb61c@@|fcc41c@@|fcb60e@|fcb61c@|fcc41c@|fcd21c@|eeb61c@@|fcd22a@@|fcc42a@|d2a838#|e0b638%|fcc446@|fce054@@
+000000       |fce062@|fce054%|eec446+|000000  |fcc446@|fce038@|fcd238@|fcc42a@|e0b638@|fcc42a@|fcd238@|fcd22a@|eeb62a@@|fcd238@|fce038@|fcc438@|e0b638@|eec438@|fcd246@|fce046@|eec454%|000000   |fce062=
+000000            |fce054@@|eec446%|e0b654+|000000 |fcd246@|fce046@|fcc446@|e0c446@@@|fce054@|fcd254@|000000 |d2b654=|eec454*|fce062%#
+000000            |fce070+|000000    |fcd262+|fce062@|000000  |7ec438@|62a82a%|fce062+
+000000             |70b638=#@|62b62a%%|62b638%%*|70c438@|62a82a%|000000    |70b638=-
+000000           |7ec438+@@@|70c438@|7ec438@@|70c438@@@|70b638@|62a838%=|62b638%|70b62a@|70c438@@|7ed238@@|8cd238@|8cd246*
+000000          |9ad254=|8cd246@|8cd238@|7ed238@@|7ec438@|70c438@|70c42a@|70b62a@|62b62a%|62b638%|70c42a@|62a82a%|70c438@@@|7ec438@@@@%
+000000            |7ec438=|70c438*#|70b638%#*=|000000 |7ec438#|62b62a@|62b638%*%%|70b638@%*
+000000                    |70c438@|62a82a%|62a838=
 `,
-    plano: `
-                  =    *%
-            %@#  -@@#%#@@- -@@+
-            =@@%*#@@##%@%*#%@%  -#@-
-        +@@*-#%@#*%@#*%%#*%@%*=%@@%
-         *%@%**%%**%#*##*#%#*#%@%+
-     %@@%**#%%*+##+***#*+#*+#%#**#%@@+
-      +#%%%#*+#***+=--=++****+*%%%%#-
-  @@@@%##***#**+::::::::::=***#***#%%@@@
-   +%%%%%%#**#-:::::::::::::+**##%%%%%#+
-  +*%%###*****:::::::::::::::#+**###%%%*=
- *%@%%%%##****:::::::::::::::#**###%%%%%*
-   =#######**#-:::::::::::::=#*#########
-  %@@@%%#*****#=::::::::::-*#****##%@@@@#
-     -*##%%#*+*#*+=-----=**#++#%%%#**-
-    -%@@%#**#%#+##+*#*#**#*+#%#**%@@@#
-   =@@#= +%@%#*#%**##*##*#%#*#@@%- =+*
-        +@@%**%@#*#%#*#%#*%@%*#%@@
-        ++:  %@%##%@##%@%*#@@%   *+
-            +@%- +@@###@@+ -%@
-                  @+ #*@@-
-              -=+++=-++-=
-            +********++:=++***#*
-           ####***++++=+*******
-            :=+++=- :*+-=+++=:
-                    ++-
+        plano: `
+                  *    *+
+              =: %@%*##@%   +%
+            *@%#*%@%##%@%+#%@%
+        *#+:-%@%*#%%#*%%#*%@%+ *@@%
+        -@@%**%%#*#%**%#*#%%**%@@%
+    +@#+-=#%%#+#%*+#**#**##+*%%#*=#%@@#
+     #%@@%#*###+*#***+****+*#**#%%@%%-
+  **++**##%##=*#=-:::::--+##=*####****###
+  *%@@@%%#*++#+::::::::::::=#++**#%@@@@%-
+   #######**#*::::::::::::::=#**######=
+ @@@@@%%##**#-::::::::::::::-#**##%%@@@@%
+  -*####****#+::::::::::::::=#****####*
+   %%%%%%##*+#-:::::::::::--#**##%%%%%#
+ =@@@%#****##+#+-::::::::-+#+###***#%@%*
+     -#%%%#*+*#+**+++=+=*#+#***#%%%#*
+    %@@%#**#%#+*#*+#*+#+*#*+#%#*+#%@@#
+    +=  +%@%#*#%#*#%**%#*#%#*#@@%-
+       *@@%*=#@%**%%**%%**%@#=*%@@
+       @%=  %@@#*#@%##%@#*#@@*   =
+            @@#= %@%###@% -+%#
+            +    =@  *++
+             -=++++=-+=    ::
+           -********++=:+++**##+
+          -###***+++++=+******+
+            :=++=-: ++=-=+++-
+                    *=:
 `
+      },
+      {
+        color: `
+000000                  |fce062*|fcd262+|000000    |fce062#
+000000             |fce070*|eed262+|eec454#|d2b654=|e0c454=|fce054@@|eec446#|e0c454%|e0b654#|fcd246@|fce054@|eec454%|000000   |fce062*|fce070=
+000000             |fcd254@|fce054@|fcc446@|eeb638@|e0b638@|fcd238@|fce038@|fcc42a@|eec438@|eeb62a@|fcd238@@|eeb638@|d2b646+|eec446%|fcd246@|fce054@|eec454#
+000000         |fce062@|fcd254@|e0b646%|d2a838+|eeb646@|fcd238@|fcd22a@|fcb62a@|eea81c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|fcb61c@|fcd21c@|fcc41c@|eea82a@|eeb62a@|fcd22a@|fcd238@|fcc438@|000000  |fcc446*|fcd254@|fce062@|fcd270=
+000000         |eec446%|fcd246@|fcd238@|fcc42a@|e0a81c@|fcb61c@|fcd21c@|fcc40e@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fca80e@|eea80e@|fcc40e@|fcd21c@|fcb61c@|e0a82a@|fcb62a@|fcd22a@|fce038@|fcd246@|eec454#
+000000     |fce062@|fce054@|fcd246@|fcc438#|eeb638+%|fcc41c@|fcd21c@|fcc40e@|eea80e@@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fcc40e@|fca80e@|eea80e@|fcb60e@|fcd21c@@|fcc42a@|eeb646*|eeb638=|fcc446#|fcd246@|fce054@|fce062@|fce070=
+000000      |eeb646@|fcd238@|fcd22a@|fcd21c@|fcc41c@|fcb61c@|eea81c%|fcb60e@@|ee9a0e@|eea82a%|fcb61c@|eea81c@|e09a1c@|eea81c@|e09a1c@|fca81c@|eea82a@|fca81c@|fcb60e@|ee9a2a#|ee9a0e@|fcb60e@@|eea80e@|eea81c@|fcb61c@|fcc41c@|fcd22a@|fcd238@@|fcd246@
+000000  |fce062@|fce054@|fcd246@|fcd238@|fcc438@|eeb62a@|eea81c@|fcb60e@@@@|fca81c#|fcb638#|fcb62a@|c48c1c%|a8701c%|9a620e%|a8620e%|9a620e%%|a8620e%|a8700e%|b6701c%|d28c1c%|eeb62a@|fcb61c@|ee9a1c*|eea81c%|fcb60e@|fcc40e@@@|fcb61c@|eeb62a@|e0b638%|eec446=|eec454=|eed254=
+000000   |eec454@|fcc446@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|ee9a1c@|fcb61c@|d29a2a@|9a620e%%|8c620e%|9a620e%%%%%%%%|a8620e%|c48c1c%|fcb62a@|fc9a0e@|ee9a0e@@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd22a@|fcd238@|fce046@|fce054@|fce062@
+000000   |eec446%|eeb638@|eeb62a@|eeb61c@|fcb60e@|fca80e@@@@|fca81c@|e0a82a@|a8620e%|9a620e%%%%%%%%%%%%|a8620e%|c48c1c%|fcb62a@|fca80e@|fcb60e@@@@|fcc41c@|fcc42a@|eec438@|eec454%
+000000 |fce062@|fce054@|fce046@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@|fca80e@@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%|8c620e%%%|9a620e%%%%%%|a8701c%|fcb62a@|fca80e@@|fcb60e@@|fcc40e@|fcc41c@|fcc42a@|fcc438@|fcd246@|fcd254#|fce062=
+000000   |e0c454@|eeb646@|eeb62a@|eeb61c@|fcb60e@|fca80e@@@@|fcb61c@|d28c1c%|a8620e%|9a620e%%%%|8c620e%%%%|9a620e%%%%|a8620e%|c47e1c%|fcb61c@|ee9a0e@|fca80e@@|fcb60e@@|fcc41c@|fcc42a@|fcc438@|fcd246%|fcd254#|fce062=
+000000  |fcd254*|fcd246@|fcd238@@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|ee9a1c@|fcb62a@|b67e1c%|9a620e%%%%%%%%%%%|a8700e%|b6701c%|eeb62a@|fca81c@|fca80e@|fcb60e@|fcc40e@@|fcc41c@|fcc42a@|fcc438@|eec446@|e0c462*
+000000 |fce070=|fce062*|fcd254#|fcd246#|fcc438#|e0b638@|eea81c@|fcb60e@@@@|fca80e@|ee9a1c*|fcb62a@|d29a2a@|a8700e%|a8620e%|9a620e%%|a8620e%%|9a620e%%%|a8700e%|c48c1c%|fcc446%|fca80e@@@|eea80e@@|fcb61c@|fcc42a@|fcd238@|fcd246@|fce054@@|fce070+
+000000     |fcc446@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb61c@|eea81c@|eea80e@|fca80e@@|e09a1c#|fcb62a@|eea81c@|d29a2a@|d28c1c%%|c48c1c%|d29a2a%|c48c1c%|eea81c@|fcb638%|fca80e@|fcb60e@|fca80e#|eea81c%|fcb60e@|fcc40e@|fcd21c@|fcc42a@|eeb62a@|e0a838@|d2b654=
+000000   |fce062#|fce054@|fce046@|fcd246@|fcc438%|eeb638*|eeb62a%|fcb61c@|fcc40e@@|fca80e@|e09a0e@|fcb60e@@|ee9a0e@@|fca80e@|ee9a0e@|fca80e@@|ee9a0e@|fca80e@|fcb60e@|e09a0e@|fca80e@|fcc40e@@|fcb61c@|eeb62a%|fcc42a%|fcd238@|fce046@@|eec454@
+000000       |eec446=|fcc438@|fcd22a@@|fcc41c@|eea81c@|eea80e@|fcc40e@@|fca80e@|eea80e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@@|eea80e@|eea81c@|fcc41c@|fcd22a@@|eec446#|000000  |fcd254=|fce062+
+000000      |eec462=|fcd254@|fce046@|fcd246@|fcc438%|eeb654-|eeb638@|fcd22a@|fcd21c@|fcb61c@|eea81c@|fcb61c@|fcd21c@|fcc40e@|eea80e@|fcc41c@|fcd21c@|fcc41c@|eea81c@|fcc41c@|fcd22a@@|e0b62a@|e0a838@|fcc438@|fce046@|fce054@|eed254#
+000000      |fce070*|fce062*|eec454=|000000  |eec446*|fcd246@|fce038@|fcc438@|e0b638@@|fcd238@|fcd22a@|fcc42a@|eeb638@|fcc42a@|fce038@|fcd238@|e0b638@|eeb638@|fcd238@|fce046@|fcd246@|000000   |fcd262+|fce070#
+000000           |fcd254@|fce054@|fcd246%|e0b646=|000000 |eec454#|fce046@|fcd246@|e0b646@|eec454@|d2b646@|fce054@@|e0b654=|d2b654=|eec454#|fcd254%|fce062@
+000000                 |fce062@|eed262=|000000  |70c438@|9ab638@|fce070+
+000000             |70b638=#@|62b62a%%|62b638%%*|70c438@|62a82a%|000000    |70b638=-
+000000           |7ec438+@@@|70c438@|7ec438@@|70c438@@@|70b638@|62a838%=|62b638%|70b62a@|70c438@@|7ed238@@|8cd238@|8cd246*
+000000          |9ad254=|8cd246@|8cd238@|7ed238@@|7ec438@|70c438@|70c42a@|70b62a@|62b62a%|62b638%|70c42a@|62a82a%|70c438@@@|7ec438@@@@%
+000000            |7ec438=|70c438*#|70b638%#*=|000000 |7ec438#|62b62a@|62b638%*%%|70b638@%*
+000000                    |70c438@|62a82a%|62a838=
+`,
+        plano: `
+                  *=    #
+             *=*--@@+#+%@#   +=
+             %@%#*@@###@@#=#@@*
+         @%*-#@@#*%@#*#@%*#@@%  +@@=
+         #@@%*#%%**%#*#%**%%#*#%@@*
+     @@@*=*%%%**##+#*+#*+#%**#%%#=-*%@@=
+      #%@%%**##++#*+*+***#=+##**#%@@@%
+  @@@%#***###++#=-:::::--+##=*#%%##**---
+   %%%%%%#*++#+::::::::::::=#*+**##%@@@@%
+   *###*****#*::::::::::::::=#*#######*
+ @@@@@%%%##*#-::::::::::::::-#**###%%%%*=
+   #####****#+::::::::::::::=#+**###%%%*=
+  *@@@@%%#*++#=:::::::::::--#**#%%%%%#+
+ =***+***####=#+-::::::::-+#*#***##%@@@+
+     #%@@%#**#*=#*+++=+=***#+*#%%%#*-
+   #@@%#+*#%%*+##+*#+**+*#+*%%#*#%@@%
+       -%@@%**%%**%#*#%**%%**%@%*  =+
+      -@@%*-#%@#*#@#*#@#*#@%**%@@*
+      **-  +@@%**@@###@%*#%@%   +#
+           @@#- *@@###@@--*#@
+                 @=  **+
+             -=++++=-*=    ::
+           -********++=:++***##+
+          -###***+++++++******+
+            :=++=-: ++=-=+++-
+                    *=:
+`
+      },
+      {
+        color: `
+000000                   |fce062%|000000     |fce070*
+000000              |fce062%|eec454*|e0c454%|d2a846=|eec454%|fce054@|fcd246@|e0b646+|eec454%|e0c446#|fce054@@|eec454=|000000   |fce070+
+000000             |eec454+|fce046@@|eec438@|e0b638@|eeb62a@|fce038@|fcd238@|eeb638@|eec438@|fcc438@|fce038@|fcd238@|e0b646*|d2b646+|fcc446%|fce054@@
+000000         |fcd262%|fce054@|fcc446@|e0b638@|d2a838#|fcc42a@|fcd22a@@|eeb61c@@|fcd21c@@|fcb61c@|eeb61c@|fcc41c@|fcd21c@|fcb61c@|e0a82a@|fcc42a@|fcd238@@|eec446%|000000  |fcd254*|fce054%|fce062@
+000000          |fcc446@|fce038@|fcd22a@|fcb61c@|e0a81c@|fcc40e@|fcd20e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcd21c@|fcc41c@|eeb62a@*|fcc438@|fcd238@|fce046@|fcd246@|eec454=
+000000     |eed262=|fce054@|fce046@|fcd246@|fcc438%|eeb638*|fcb62a@|fcc41c@|fcc40e@|fcb60e@|ee9a0e@|fcb60e@@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcc40e@|fcd21c@|fcd22a@|fcc438@|eec454=|000000 |eec446+|fcd254*|fce062#|fce070*
+000000      |d2b646*|eeb638@|fcc42a@|fcd21c@|fcc41c@|fcb60e@|eea81c%|fcb61c%|fcb60e@|fca80e@|e09a1c%|fcb61c@|fca81c@|e09a1c@|eea81c@|d29a1c%|fca81c@|fcb62a@|ee9a1c@|fca80e@|fca81c#|e09a1c@|fcb60e@|fcc40e@|fcb60e@|eea80e@|eea81c@|fcb62a@|fcc42a@|fcd238@|fce046@|fcd246@|fcd254%
+000000  |fce062#|fce054@|fce046@|fcd238@@|fcb62a@|eeb61c@|eea80e@|fca80e@|fcb60e@@|fca80e@|fcb638*|fcb62a@|c48c1c%|a8701c%|9a620e%|a8620e%|9a620e%%|a8620e%|a8700e%|b6701c%|d28c1c%|eeb62a@|fcb61c@|fca80e%|ee9a1c%|fca80e@|fcb60e@|fcc40e@@|fcc41c@|fcb62a@|e0b638@|e0b654-
+000000   |e0c454#|eec446@|fcc438@|fcc42a@|fcc41c@|fcc40e@@|fcb60e@|fca80e@|ee9a1c@|fcb62a@|d29a2a%|9a620e%%|8c620e%|9a620e%%%%%%%%|a8620e%|c48c1c%|fcb62a@|fca80e@@@|eea80e@|fca80e@|fcb61c@|fcc41c@|fcc42a@|fcd238@|fcd246@|fce054@|fce062@|fce070=
+000000 |fce062+|fcd254#|fcd246%|fcc438@|fcc42a@|fcb61c@|fcb60e@|fca80e@@@|fc9a0e@|fca81c@|e0a82a@|a8620e%|9a620e%%%%%%%%%%%%|a8620e%|c48c1c%|fcb62a@|fca80e@|fcb60e@@|fcc40e@@|fcc41c@|fcc42a@|fcc438@|fcc446@|eec454+
+000000 |fce062+|fcd254%|fcd246@|fcd238@|fcc42a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%|8c620e%%%|9a620e%%%%%%|a8701c%|fcb62a@|fc9a0e@|fca80e@@|fcb60e@@|fcb61c@|fcc438@|eec446@|eec454#
+000000   |e0c454@|eec446@|fcc42a@|fcb61c@|fcb60e@@@|fca80e@@|fcb61c@|c48c1c%|a8620e%|9a620e%%%%|8c620e%%%%|9a620e%%%%|a8620e%|c47e1c%|fcb61c@|fc9a0e@|fca80e@|fcb60e@@|fcc40e@|fcc41c@|fcd22a@|fcd238@|fcd246@|fce054@|fce062#
+000000 |fce062*|fce054@|fce046@@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@|eea80e@|ee9a0e@@|fcb62a@|b67e1c%|9a620e%%%%%%%%%%%|a8700e%|b6701c%|eeb638@|fca81c@|fcb60e@@@@|fcb61c@|eeb62a@|eeb638@|e0b646@|e0c462=
+000000     |e0b646#|e0b62a@|eeb61c@|fcb60e@|fcc40e@@|fcb60e@|fca81c@|ee9a1c*|fcb62a@|d29a2a%|a8700e%|a8620e%|9a620e%%|a8620e%%|9a620e%%%|a8700e%|c48c2a%|fcc438%|fca80e@@|ee9a0e@|eea80e@|fca80e@|fcc41c@|fcd22a@|fcd238@|fce046@|fcd254@@
+000000    |fcd246#@|fcd238@|fcd22a@|fcc41c@|fcb61c@|eea80e@@|fca80e@|fcb60e@|fc9a0e@|eea82a*|fcb61c@|e09a1c@|d29a2a@|c48c1c%|d29a2a%|c48c1c%%|d28c1c%|eea81c@|eeb62a@|fca80e@%|eea81c*|fca80e@|fcc40e@@|fcc41c@|fcb61c@|e0a82a@|e0a838%|eec446=|fcd254=|fce062=
+000000   |fce062@|fce054@|fcd246%|fcc446#|eeb638+#|fcb61c@|fcc41c@|fcc40e@|fcb60e@|ee9a0e@|eea81c@|fcb60e@|fca80e@|e09a0e%|fca80e@@|ee9a0e@|fcb60e@|fc9a0e@|ee9a0e@|fcb60e@|fca80e@|e09a0e@|fcb60e@|fcc40e@|fcb60e@|eeb62a@|fcb62a%|fcc42a@|fcd238@|fce046@|fcd246@|e0b654#
+000000       |fcc446@|fcd238@@|fcc42a@|fcb62a@|e0a82a@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcc41c@|fcd21c@|fcd22a@|fcc438@|000000 |eec446=|fcd246*|fce054%|fce062%
+000000      |fcd254@|fce054@|fcd246@|fcc446#|000000 |eeb646*|fcc42a@|fcd22a@|fcc41c@|eeb61c@@|fcc41c@|fcd21c@|fcb60e@|fcb61c@|fcc41c@|fcd21c@|fcb61c@|eeb61c@|fcd21c@|fcd22a@|fcb62a@|d2a82a@|eeb62a@|fcd238@|fce046@|fcd246@
+000000      |fce062=|000000    |fcd246@|fce046@|fcd238@|eeb638@|d2a838@|fcc42a@|fce038@|fcd22a@|eeb62a@@|fcd238@@|eeb62a@|eeb638@|fcc438@|fce046@|fcd246@|eec454+|000000 |e0b646+|fcd254#|fce062@|fcd270=
+000000          |fcd262#|fce062@|fcd254%|e0b646-|000000  |fcd246@|fce046@|eec446@|eec454@|e0b646@|fcd246@|fce054@|eec454%|d2b654=|e0c454%|eed254%|fce062@|eed262+
+000000                |fce062@|fcd262*|000000   |8cc438@|d2d254@
+000000             |70b638=#@|62b62a%%|62b638%%*|70c438@|62a82a%|000000    |70b638=-
+000000           |7ec438+@@@|70c438@|7ec438@@|70c438@@@|70b638@|62a838%=|62b638%|70b62a@|70c438@@|7ed238@@|8cd238@|8cd246*
+000000          |9ad254=|8cd246@|8cd238@|7ed238@@|7ec438@|70c438@|70c42a@|70b62a@|62b62a%|62b638%|70c42a@|62a82a%|70c438@@@|7ec438@@@@%
+000000            |7ec438=|70c438*#|70b638%#*=|000000 |7ec438#|62b62a@|62b638%*%%|70b638@%*
+000000                    |70c438@|62a82a%|62a838=
+`,
+        plano: `
+                   %     *
+              %+*:#@%=*+@@-   +
+             =@@###@@##%@%=-#@@
+         %@%*+#@%**%%**%@#*#@@#  +%@
+          %@@#*#%#*#%**%#*#%%#=#@@@-
+     =@@%*=#%%#+##+*#+*#+*%#+*%@%#- =*#*
+      =#%%%#**#*+#*+*+*#+#++###**#%@@@#
+  #@@@%#***##*=#=-:::::--=##++*#%%%##-
+   *##%%%%#*+*+::::::::::::=#*****##%%@@@=
+ +*#%###***+**::::::::::::::=#*###%%%%%=
+ +#%%%%%##**#-::::::::::::::-#***#####*
+   #######**#+::::::::::::::=#+*##%%%@@@#
+ *@@@@%%#**+*#=:::::::::::--#*########-
+     +*#####*=#+-::::::::-=#*****#%@@@%
+    *%@@%#***#*=#++=+=++****=*#%%#**-==
+   %@#*=+#%%#+*#*+**+#*+#*+#%#**%@@%+
+       %@@%#*#%#**%**%#*#%#*#@%# -+%%
+      @@@* +%@%**%%**%%**%@#*#@@%
+      =    %@%#*%@%##%@###@@= =*@-
+          *@%-  @@##*%@#-##@+
+                %*   *%
+             -=++++=-+=    ::
+           -*******+++=:+++***#+
+          -###***+++++=+******+
+            :=++=-: ++=-=+++-
+                    *=:
+`
+      },
+      {
+        color: `
+000000                   |fcd262=|fce062@
+000000              |fce062@%|e0c454%%|d2b646=|fcd246@|fce054@|fcc446@|d2b654=|e0c454*|eec446%|fce054@|fcd254@
+000000          |fce062+|e0c454+|000000  |fcc446@|fce046@|fcd246@|eec438@|e0b638@|fcd238@|fce038@|fcc42a@|eeb638@@|fcd238@|fce038@|fcc438@|000000 |e0b646=|fcd246%|fce054@|fcd262@
+000000          |fce054@@|fcc446@|e0a838@|e0b62a@|fcd22a@@|fcc41c@|eea81c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|fcb61c@|fcd21c@|fcc41c@|e0a82a@|e0b62a@|fcd22a@|fce038@|fcd238@|eec454+|000000  |fcd254+|fce062#|fce070=
+000000      |fce062*|fcd254+|000000  |eec454*|fcd238@|fcd22a@|fcc42a@|eea81c@|fcb60e@|fcc40e@@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcc41c@|fcd21c@|fcc42a@|eeb638#+|fcc438@|fcd246@|fce046@|fcd254@
+000000      |eec454%|fce046@@|fcd238@|fcc42a%|eeb62a%|fcb61c@|fcc40e@@|eea80e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fc9a0e@|ee9a0e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fcc40e@|fcb60e@|eea81c@|fcb61c@|fcd21c@|fcd22a@|fcc42a@|eec438%
+000000   |fce062+|fcd254+|eec446=|e0b646=|e0a838@|eeb62a@|fcc41c@|fcd21c@|fcc40e@|fca80e@|eea81c%|fcb60e@@|e09a0e@|fcb62a@|fca81c@|e09a1c@|eea81c@|d29a1c%|eea81c@|fcb61c@|eea82a@|fca80e@@|ee9a1c#|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea81c@|eea82a@|fcc42a%|fcc438@|fcd238@|fce046@|fce054@|fce062#
+000000   |fcd254@|fcd246@|fce046@|fcd238@|fcc42a@|fcb61c@|fca80e@|eea80e@|fca80e@|fcb60e@|fca80e@|fcb62a*@|c48c1c%|a8701c%|9a620e%|a8620e%|9a620e%%|a8620e%|a8700e%|b6701c%|d28c1c%|fcb638%|fca81c@|fca80e@|ee9a0e@@|fca80e@|fcc40e@@|fcd21c@|fcc42a@|fcc438@|eeb646%
+000000    |e0b646@|eeb638@|fcb62a@|fcc41c@|fcc40e@@|fcb60e@@|fca81c@|eeb62a@|d29a2a%|9a620e%%|8c620e%|9a620e%%%%%%%%|a8620e%|d28c1c%|fcc438%|fca80e@@@@@|eea81c@|eeb62a@@|fcc438%|fcd246%|fcd254#|fce062*
+000000 |fce062@|fce054@|fcd246@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|ee9a0e@|fca81c@|e0a82a@|a8620e%|9a620e%%%%%%%%%%%%|a8620e%|c48c1c%|fca81c@|fc9a0e@|fca80e@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fcd246@|fcd254@|fcd262+
+000000  |eec454+|eec446@|fcc438@|fcc42a@|fcc41c@|fcb60e@@@|fca80e@@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%|8c620e%%%|9a620e%%%%%%|b6701c%|fcb62a@|fc9a00@|fca80e@@@|fcb60e@|eeb61c@|eeb62a@|eec446@|e0c462#
+000000  |eec454+|eec446@|fcc438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@@@|fca80e@|fcb62a@|c48c1c%|a8620e%|9a620e%%%%|8c620e%%%%|9a620e%%%%|a8620e%|c47e1c%|fcb62a@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd22a@|fcd238@|fcd246@|fce046@|fce054@|fce070*
+000000 |fce062%|fce054@|fcd246@|fcd238@|fcc438@|fcc42a@|fcb61c@|fcb60e@|fca80e@|eea80e@|fc9a0e@|fca80e@|fcb62a@|b67e1c%|9a620e%%%%%%%%%%%|a8700e%|b6701c%|fcb638@|fca80e@@|fcb60e@@@|eeb61c@|eeb62a@|eeb638@|e0b646@|eec454=
+000000     |e0b638@|fcb62a@|fcc41c@|fcc40e@@|fcb60e@|fca80e@|ee9a1c@#|fcb61c@|d29a2a%|a8700e%|a8620e%|9a620e%%|a8620e%%|9a620e%%%|a8701c%|c48c2a%|fcc42a@|fca80e@|ee9a0e@@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcd246@@|e0c462*
+000000   |fcd262#|fcd246@|fce046@|fcd238@|fcc42a@@|eea81c@|eea80e@|fca80e@|fcb60e@|fca80e@|e09a1c%|fca82a*|fca81c@|e0a82a@|d29a2a@|c48c1c%|d29a2a%|c48c1c%%|d28c1c%|eea82a@|eea81c@|fcb60e@|fca81c*|eea81c#|fcb60e@|fcc40e@@|fcb61c@|eea81c@|e0a82a@|fcc446#|fcd246#|fce062%#
+000000   |fce062+|fcd254+|eec446=|000000 |eeb646=|fcb62a@|fcc41c@|fcd21c@|fcc40e@|fca80e@|e0a81c@|fcb60e@@|ee9a0e@@|fcb60e@|fc9a0e@@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|eea81c@|eeb61c@|fcc41c@|fcd22a@|fcd238@@|e0b646@
+000000      |eec454#|fcd246@|fce038@|fcd22a@|fcc42a@|eeb62a#|fcb61c@|fcc40e@@|fca80e@|eea80e@|fcb60e@@|eea80e@|fca80e@|fcc40e@|fca80e@|eea80e@|fcc40e@@|eea80e@|fcb60e@|fcc41c@|fcd21c@|fcc42a@|eeb646+|eeb638=|fcc446#|fcd254@|fce054@|fcd262#
+000000     |fce062#@|fcd254@|fcc446#|000000  |fcc438@|fcd22a@@|fcb61c@|e0a81c@|fcc41c@|fcd21c@|fcc40e@|eea80e@|fcc41c@|fcd21c@|fcc41c@|eea81c@|fcc41c@|fcd21c@|fcc42a@|e0a82a@|eeb62a@|fcd238@|fce046@|fcd246@|eec454=
+000000          |fcc446@|fce046@|fcd246@|eec438@|d2a838#|eeb638@|fcd238@|fcd22a@|fcb62a@|eeb62a@|fcc42a@|fce038@|fcd22a@|eeb638@@|fcd238@|fce046@|fcc446@|000000 |d2b646*|eec454%|fce054@|fce062@
+000000          |fce062@|fcd254%|eec446=|000000  |fcd254@|fce054@|fcd246@|eec446@|e0b646@|eec446@|fce054@|fcd246@|d2b654+|e0c454%|eec454%|fce054@|fcd262@
+000000               |fce062*%|000000    |d2d254@|9ab646@
+000000             |70b638=#@|62b62a%%|62b638%%*|70c438@|62a82a%|000000    |70b638=-
+000000           |7ec438+@@@|70c438@|7ec438@@|70c438@@@|70b638@|62a838%=|62b638%|70b62a@|70c438@@|7ed238@@|8cd238@|8cd246*
+000000          |9ad254=|8cd246@|8cd238@|7ed238@@|7ec438@|70c438@|70c42a@|70b62a@|62b62a%|62b638%|70c42a@|62a82a%|70c438@@@|7ec438@@@@%
+000000            |7ec438=|70c438*#|70b638%#*=|000000 |7ec438#|62b62a@|62b638%*%%|70b638@%*
+000000                    |70c438@|62a82a%|62a838=
+`,
+        plano: `
+                   =@
+              %%**-%@%-+*@%
+          ==  %@%#*%@%##@@# -#@@
+          @@%**%@#*#@#*#@%**%@%=  =*=
+      *+  =%@%**%%**%#*#%**%@%+=%@@%
+      #@@%**#%%**#*+#**#*+#%#*#%@%*
+   +=--*#%%%*+##+#*+*+*#**#=*#%#**#%@@@#
+   @@@@%#***#*+#=-:::::--+#***+*#%%%#*
+    ########**+::::::::::::+#******#####*
+ @@@%%%##**+**::::::::::::::=***#%%%%@%%+
+  =#%#####**#-::::::::::::::-#+****###*
+  =%%%%####*#=::::::::::::::=#**#%%%@@@@*
+ #@@%%##*****#=:::::::::::--#**#######-
+     *##%%#*++#+-::::::::-=#**+*#%@@%%+
+   *@@@%#***##++#*+=+==+**#=+#%%#***#%#
+   ++= -#%%%**##++#++#+*#+*%#**#@@%#
+      *@@%#+#%%**##**%**%%**%%#=-*@@*
+     *@@*  #@@#*#@#*#@#*#@%**%@%-
+          %@@#+#@@##%@%##%@% =#@@
+          @%-  %@%##%@%=##@@
+               *#    %*
+             -=++++=-+=    ::
+           -*******+++=:+++***#+
+          -###***+++++=+******+
+            :=++=-: ++=-=+++-
+                    *=:
+`
+      },
+      {
+        color: `
+000000                    |fce062#%
+000000               |fce062@|fcd254%|e0c454@|e0b654%|e0b646#|fce046@|fce054@|eec454#|d2b654-|e0c454+|fcd254@|fce054@|eed254*
+000000          |fce070+|fcd262%|e0b654#|d2a846=|e0c454+|fcd246@|fce046@|fcc438@|eeb638@|eeb62a@|fcd238@@|eeb62a@|eeb646@|fcc438@|fce038@|fcd246@|eec446*|000000 |eec446=|fcd254%|fce062@|fcd262*
+000000          |eec454#|fce054@|fcd246@|eec438@|e0a82a@|fcb62a@|fcd22a@@|eeb61c@|fcb61c@|fcd21c@@|fcb61c@|eeb61c@|fcc41c@|fcd22a@|fcc42a@|e0a838@|eeb62a@|fcd238@|fce046@|fcd246@|000000    |fce070=
+000000      |fce062#@|fcd254#|eec446=|000000 |fcc438@|fcd22a@@|fcb61c@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcc40e@@|fca80e@@|fcc40e@@|eea80e@|fcb60e@|fcd21c@|fcd22a@|fcc42a@|eeb646=|eec438+|fcc446@|fcd246@|fce054@|fcd262@
+000000       |eec446@|fce046@|fcd238@|fcc42a@|eeb62a@|eea81c@|fcc40e@@|fcb60e@|ee9a0e@|fcb60e@@|ee9a0e@|fca80e@@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fca80e@|fcc40e@@|eea81c@|eeb61c@|fcc41c@|fcd22a@@|fcd238@|eec446*
+000000   |fce062%|fce054%|fcd246%|fcc438*|e0b638#|e0a82a@|fcb61c@|fcc41c@|fcc40e@|fcb60e@|eea81c@|fca81c%|fcb60e@|fca80e@|eea82a@|fcb61c@|e09a1c@@@|eea81c@|fcb61c@|eea82a@|ee9a0e@|fcb60e@|fca81c#|ee9a1c%|fcb60e@|fcc40e@@|fcb61c@|eea81c@|eeb638%|fcc438#|fcd238@|fcd246@|fce054@|fce062@|fce070=
+000000   |eec462+|fcc446@|fcd238@@|fcd22a@|fcc41c@|fcb60e@|eea80e@|ee9a0e@|fca80e@@|fca81c@|eeb638@|c48c1c%|a8701c%|9a620e%|a8620e%|9a620e%%|a8620e%|a8700e%|a8701c%|d29a1c%|fcb638@|fca81c%|fca80e@@|ee9a0e@|eea80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fcc438@|fcc446*
+000000   |eec446=|e0b646@|e0b638@|eeb62a@|eeb61c@|fcb60e@@@@|fca80e@|fcb62a%|d29a2a%|9a620e%%|8c620e%|9a620e%%%%%%%%|a8620e%|d28c1c%|fcc438@|fca80e@@|fcb60e@@@|fcb61c@|eeb62a@|e0b638@|e0b646%|eec446=
+000000 |fce062%|fce054@|fce046@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@|fca80e@|fc9a0e@|eea81c@|e0a82a@|a8620e%|9a620e%%%%%%%%%%%%|a8620e%|b68c1c%|fca81c@|fc9a0e@|fca80e@|fcb60e@@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fce046@|fce054@|fce062@|fce070=
+000000   |e0c446@|eec438@|eeb62a@|fcb61c@|fcb60e@|fca80e@@@|fc9a0e@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%|8c620e%%%|9a620e%%%%%%|b6701c%|fcc42a@|fc9a0e@|fca80e@@@|fcb60e@|fcb61c@|eeb62a@|eec446@|e0c454%
+000000 |fcd262=|fcd254#|fcd246@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@@|fca80e@|fcb61c@|c48c1c%|a8620e%|9a620e%%%%|8c620e%%%%|9a620e%%%%|a8620e%|c47e1c%|fcb62a@|fca80e@|fcb60e@@|fcc40e@|fcc41c@|fcd22a@|fcd238@@|fcd254@*
+000000 |fce062+|fcd254#|fcd246%|fcc438%|eeb638@|fcb62a@|fcb61c@|fca80e@@@@@|fcb62a@|b67e1c%|9a620e%%%%%%%%%%%|a8700e%|b6701c%|fcb62a@|fca80e@@@@@|eeb61c@|eeb62a@|eeb638@|fcc446@|fcd254#|fce062+
+000000    |e0c446%|fcc438@|fcc42a@|fcd21c@|fcc40e@@|fcb60e@|ee9a0e@|ee9a1c@|fca80e@|fcb61c@|d29a2a%|a8700e%|a8620e%|9a620e%%|a8620e%%|9a620e%%%|a8701c%|c48c2a%|fcb62a@|fca80e@|ee9a1c%|ee9a0e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcc438@@|e0c446@
+000000  |fce062=|fce054@@|fcd246@|fcd238@|fcc42a@|eeb62a@|eea80e@|fcb60e@@@|fca80e@|e09a2a*|fcb61c%|fca81c@|e0a82a@|e09a1c@|c48c1c%|d28c1c%|c48c1c%%|d28c1c%|e0a82a@|fcb61c@@|eea81c+|fca80e@|fcb60e@|fcc40e@|fcb60e@|eea81c@@|fcc438@|fcd246@@|fce054@|fce062%
+000000       |fcc438%|fcc42a@|fcd21c@@|fcb60e@|eea81c@|fca81c@|fcb60e@@|e09a0e%|fca80e@@|ee9a0e@|fca80e@@|ee9a0e@|fca80e@@|e09a0e%|fcb60e@|fcc40e@|fcb61c@|eea81c@|fcb60e@|fcd21c@|fcd22a@|fcc438@|e0b638@
+000000     |eec454+|fcd246@|fce046@|fcd238@|fcc438@|eeb638*%|fcc41c@|fcd20e@|fcc40e@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcb60e@@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcc40e@|fcd21c@|fcc41c@|eeb638%+|fcc438%|fcd246@|fce054@|fcd254@
+000000     |fce062%#|fcc454+|000000  |eec438@|fcd238@|fcd22a@|fcc41c@|e0a81c@|eeb61c@|fcd21c@@|fcb60e@|fcb61c@|fcc41c@|fcd21c@|fcb61c@@|fcd21c@@|eeb61c@|e0a82a@|fcc42a@|fce038@|fcd238@|eec446%|000000   |fce070=
+000000         |eec454%|fce046@@|fcc438@|e0b638*|e0b646#|fcd238@|fce038@|fcc42a@|eeb62a@@|fcd238@@|eeb62a@|eeb638@|fcc438@|fce038@|fcd238@|e0b646*|d2a846#|eec446@|fce054@@
+000000         |fce070@|fce062#|eec454=|000000  |eec454*|fce054@|fcd246@|eec446@|e0c446@|e0b646%|fce046@@|c4b638@|e0b654%|eec454@|fcd254@|fce054@
+000000               |fce062%|000000    |fce062*|d2d254@|62a82a%
+000000             |70b638=#@|62b62a%%|62b638%%*|70c438@|62a82a%|000000    |70b638=-
+000000           |7ec438+@@@|70c438@|7ec438@@|70c438@@@|70b638@|62a838%=|62b638%|70b62a@|70c438@@|7ed238@@|8cd238@|8cd246*
+000000          |9ad254=|8cd246@|8cd238@|7ed238@@|7ec438@|70c438@|70c42a@|70b62a@|62b62a%|62b638%|70c42a@|62a82a%|70c438@@@|7ec438@@@@%
+000000            |7ec438=|70c438*#|70b638%#*=|000000 |7ec438#|62b62a@|62b638%*%%|70b638@%*
+000000                    |70c438@|62a82a%|62a838=
+`,
+        plano: `
+                    ##
+               @##*+@@+-=%@+
+          +#+-=@@%##@@###@@+ -%@+
+          *@@#*#@%##%%##%@#*#@@%    =
+      #%*- #@@#*#%#*%%**%#*#%%#-=%@@%
+       %@@%**#%#+##+*#+*#+*%#**%@@%+
+   %%#++*#%%#*+#**#+++*#**#++#%%#***%@@@=
+   =%%@@%#*****#=-:::::--+#***+*#%%@%%+
+   -*#*#####**+::::::::::::+#*####****-
+ %@@@@%%##*+**::::::::::::::=*+*##%%@@@@@=
+   #####****#-::::::::::::::-#****#####
+ =#%%%%%%##*#=::::::::::::::=#*##%%%%%%*
+ +*####******#=:::::::::::--#*****####*+
+    *#%%%%#*+*#+-::::::::-+#*+*#%%%%%#
+  =@@@%#***##*=***+=+==+*##-*###**#%@@%
+       *%%%#**##+*#+**+#*+###*#%@%#
+     =@@@%+*%%#**%#*##**%#*#%%*=#@@@
+     %#=  #%@%**%%**%%*#%%#*%@@*   =
+         *@@%=+%@%##@@##%@%=+#@@
+         @#-  +@@##*@@**#@@
+               %    *%+
+             -=++++=-+=    ::
+           -********++=:+++**##+
+          -###***+++++=+******+
+            :=++=-: ++=-=+++-
+                    *=:
+`
+      },
+      {
+        color: `
+000000                     |fce062@|fcd262+
+000000               |fcd262%|fce054@|eec454%@|d2b654#|eec446@|fce054@|fcd246@|000000  |eec454+|fcd254@|fce062@
+000000           |fce062@|eed254@|e0b646%|d2a846=|eec446@|fce046@|fcd238@|eeb638@@|fcc42a@|fce038@|fcd238@|e0b638@|eeb638@|fcd238@|fce046@|fcd246@|000000  |eec454=|fce054%|fce062@
+000000           |fcd246@|fce046@|fcd238@|eeb62a@|e0a82a@|fcc42a@|fcd22a@|fcc41c@|eea81c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|fcb61c@|fcd22a@@|eeb62a@|e0a838#|fcc438@|fce046@@|eec454%
+000000       |fce062@|fce054@|fcd246#|eeb638+|e0b646+|fcc42a@|fcd22a@|fcc41c@|eea80e@|fca80e@|fcc40e@@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcc40e@@|fcb60e@|eea81c@|fcc41c@|fcd22a@@|eec438%|000000 |eec446+|fcd246%|fce054@@|fce062*
+000000       |e0b654+|fcc438@|fcd238@|fcd22a@|fcc41c@|eea81c@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|fc9a0e@@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fcc40e@|fcb60e@|eeb62a%|fcb62a%|fcc42a@|fcd22a@|fcd238@|fcd246@|eec454+
+000000   |fce062%|fce054@|fcd246@@|fcc438%|e0b638@|eea81c@|fcb61c@|fcc40e@@|fca80e@|eea81c%|fcb60e@|fca80e@|eea82a@|fcb61c@|e09a1c@@|ee9a1c@|eea81c@|fca81c@|fcb62a@|e09a0e@|fca80e@|fcb60e@|eea81c#|fca80e@|fcc40e@@@|fcb61c@|e0b62a@|eeb638+|fcc438+|fcd246#|fcd254#|fce062#|fce070*
+000000    |e0b654@|fcc438@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|eea80e@|eea81c@|fca80e@@|eeb638%|c48c1c%|a8701c%|9a620e%|a8620e%|9a620e%%|a8620e%|a8700e%|a8701c%|d29a1c%|fcb62a@|fcb638*|fca80e@@@|eea80e@@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcd246@@|fcd254*
+000000 |fce062+|fcd254#|fcd246#|fcc446%|eeb638@|eeb62a@|eeb61c@|fca80e@@|fcb60e@|fca80e@@|fcb62a%|d29a1c%|9a620e%%|8c620e%|9a620e%%%%%%%%|a8620e%|d28c1c%|fcb62a@|fc9a1c%|fca80e@|fcb60e@@@|fcb61c@|fcb62a@|eeb62a@|e0b646@
+000000 |fcd262=|fcd254%|fcd246@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@|fca80e@@|fca81c@|e0a82a@|a8620e%|9a620e%%%%%%%%%%%%|a8620e%|b68c1c%|fca81c@|ee9a0e@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd22a@|fcd238@|fcd246@|fce054@|fce062@|fce070=
+000000   |e0c454@|eec438@|eeb62a@|fcb61c@|fcb60e@|fca80e@@@|fc9a00@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%|8c620e%%%|9a620e%%%%%%|b6701c%|fcc42a@|fca80e@@|fcb60e@@@|fcc41c@|fcc42a@|fcc438@|eec446@|eec454=
+000000 |fce062%|fce054@|fce046@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@|fca80e@@|fcb61c@|c48c1c%|a8620e%|9a620e%%%%|8c620e%%%%|9a620e%%%%|a8620e%|c47e1c%|fcb62a@|fca80e@|fcb60e@@|fcc40e@|fcc41c@|fcc42a@|fcc438@|fcc446@|eec454@
+000000   |eec446=|e0b646%|eeb638@|eeb62a@|eeb61c@|fcb60e@@@|fca80e@@|eeb638@|b67e1c%|9a620e%%%%%%%%%%%|a8700e%|b6701c%|fcb62a@|fca80e@|fc9a0e@|fca80e@@|fcb60e@|fcb61c@|fcc42a@|fcc438@|fcd246@|fce054@|fce062@
+000000   |eec454+|fcc446@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@@|fca80e@|fcb62a@|d29a2a%|a8700e%|a8620e%|9a620e%%|a8620e%%|9a620e%%%|a8701c%|c48c2a%|fcb61c@|eea81c%|ee9a1c%|fca80e@|fcc40e@@|fcc41c@|fcc42a@@|e0b638@|d2b654#
+000000  |fce062#@|fcd254@|fcd246@|fcc438#|eeb638%|eea81c@|fcb60e@@|fcc40e@|fcb60e@|ee9a1c%|fca81c*|fcb60e@|eea81c@|e0a82a@|e09a1c@|c48c1c%%%%|d28c1c%|e0a82a@|fcb61c@|fcb62a#|ee9a1c#|fcb60e@@@|eea80e@|eea81c@|fcb62a@|fcd238@@|fce046@|fcd254@|eed270=
+000000      |eec446#|fcc438@|fcd22a@|fcd21c@|fcc41c@|fcb61c@|eea81c@|fcb60e@@|fca80e@|e09a0e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fc9a0e@@|fcb60e@|ee9a0e@@|fcb60e@@|eea81c@|fca80e@|fcc40e@|fcd21c@|fcc42a@|eeb62a@|d2a846*
+000000     |fcd254@|fce054@|fcd246@|fcc438@|eeb638**|fcc41c@|fcd21c@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@|fca80e@|eea80e@|fcc40e@@|eea80e@|fca80e@|fcc40e@|fcc41c@|fcb62a@|e0a82a%|eeb62a@|fcd238@|fce046@|fcd246@|eec462=
+000000     |fce062=|000000   |eec446#|fcd238@|fce038@|fcd22a@|eeb61c@|e0a82a@|fcc41c@|fcd21c@|fcc40e@|eea81c@|fcb61c@|fcd21c@|fcc40e@|eea81c@|fcc41c@|fcd21c@|fcc41c@|e0a81c@|fcb62a@|fcd22a@|fcd238@|fcc438@|000000  |eec454=|fce062*|fce070#
+000000        |eec462=|fce054@@|fcd246@|eeb638+|000000 |fcc438@|fcd238@|fcd22a@|eeb62a@@|fcc42a@|fce038@|fcc42a@|eeb638@@|fcd238@@|eeb638@|d2a838#|e0b646@|fcd246@|fce054@|eed262*
+000000        |fce070=|fce062*|000000    |fcd254@|fce054@|eec446@|e0c454@|d2b646*|fcd246@|fce054@|eec446@|c4b646@|eec454@@|fce054@|fcd254%
+000000              |fce062%|fcd262=|000000   |eed262=|fce070@|8cc438@|62a82a%
+000000             |70b638=#@|62b62a%%|62b638%%*|70c438@|62a82a%|000000    |70b638=-
+000000           |7ec438+@@@|70c438@|7ec438@@|70c438@@@|70b638@|62a838%=|62b638%|70b62a@|70c438@@|7ed238@@|8cd238@|8cd246*
+000000          |9ad254=|8cd246@|8cd238@|7ed238@@|7ec438@|70c438@|70c42a@|70b62a@|62b62a%|62b638%|70c42a@|62a82a%|70c438@@@|7ec438@@@@%
+000000            |7ec438=|70c438*#|70b638%#*=|000000 |7ec438#|62b62a@|62b638%*%%|70b638%%*
+000000                    |70c438@|62a82a%|62a838=
+`,
+        plano: `
+                     @+
+               #@*#+%@%  =@@
+           @%*-#@@##%@%*#%@%  -#@
+           %@%#*%@#*#@%*#@%*+#@@#
+       @@*-=%@%**%#*#%#*#%**%@%# =#@@+
+       =%@@#**%#+*#**#+*#*+#%#**%@@%=
+   %@@%***#%%*+#**#+++**#+*#+*#%%#*==*##*
+    ##%%%%#*****=-:::::--+#=*****#%%@@%+
+ +*####****#**+::::::::::::+#+*######*
+ =#%%%%%%#****::::::::::::::=*+**##%%%@@@=
+   ####****+#-::::::::::::::-#**#####%#=
+ %@@@@%%%#***=::::::::::::::=#*###%%%%#
+   -*#***##**#=:::::::::::--#*****##%@@%
+   =%%@%%#*+**#+-::::::::-=#++*#%%%##+
+  #@@%***##%#+=#**+====+*#+=###**#%@@@=
+      +%@%%**##*+#*+#++#++##**%%%#=
+     @@@%=+#%%**#%**%**#%**%%#+#%@@=
+     =   +%@%**%@#*#%#*#@%*#@@%  -*#
+        -@@%= #@@#*%@%##@@#+#@@*
+        =*    @@%#=%@#*#%@#
+              %=   -@*=
+             -=++++=-+=    ::
+           -*******+++=:+++***#+
+          -##****+++++=+******+
+            :==+=-: ++=-=+++-
+                    *=:
+`
+      },
+      {
+        color: `
+000000                      |fce062@
+000000                |fce054@@|e0c446%|eec454@|e0b646#|fcd246@|fce054@|fcc446@|000000  |eec454+|fce062@@
+000000           |fce062#@|eec454@|e0b646@|d2a846#|fcd238@|fce038@|fcc438@|eec438@|eeb62a@|fcd238@|fce038@|fcc42a@|e0b646@|eec438@|fcd246@|fce046@|eec446@|000000  |eec454=|fce062#|fce070*
+000000           |eec454=|fcd246@|fce038@|fcc438@|e0a82a@|fcb61c@|fcd21c@@|fcb61c@@|fcd21c@@|fcb61c@|eeb61c@|fcc41c@|fcd22a@|fcc42a@|e0a838#|eeb638#|fcd238@|fce046@@|eec454+
+000000       |fcd262#|fce054@|fcd246@|eec438@|e0a838*|eeb638@|fcc42a@|fcd21c@|fcb61c@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@@|eea80e@|fcb60e@|fcc40e@@|eea81c@|fcb61c@|fcd21c@|fcd22a@|fcc42a@|eec446*|000000 |eec446=|fcd254#|fce054@|fce062@
+000000        |e0b646@|fcd238@|fcd22a@|fcd21c@|fcb61c@|eea80e@|fcb60e@|fcc40e@|fca80e@|ee9a0e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@|fca80e@|ee9a0e@|fcb60e@@|ee9a0e@|fca80e@|fcc40e@@|fcb61c@|eeb638#|fcc42a@@|fcd238@|fce046@|fcd246@
+000000    |fcd254@|fce054@|fcd246@|fcd238@|fcc42a@|e0a82a@|eea81c@|fcb60e@|fcc40e@|fcb60e@|e09a1c@|fca81c#|fcb60e@|eea81c@|fcb62a@|ee9a1c@|e09a1c@|ee9a1c@|eea81c@@|fcb61c@|e09a2a%|fca80e@|fcb60e@|fca80e%|eea81c%|fcb60e@|fcc40e@|fcd21c@|fcc41c@|fcb62a@|e0b638#|000000  |eec454=|fcd262=
+000000     |e0b646@|eec438@|fcc42a@|fcc41c@|fcc40e@@|fca80e@|ee9a1c@|fca80e%|fcb61c@|eeb62a@|c48c2a%|a8701c%|9a620e%|a8620e%|9a620e%%|a8620e%|a8700e%|a8701c%|d29a1c%|fcb62a@|fcb638*|fca80e%|fcb60e@@|fca80e@|eea80e@@|fcb61c@|fcc42a@|fcd238@|fce046@@|fce054@|fce062*
+000000 |fce062%|fce054@|fcd246@|fcd238@|fcc438@|fcc42a@|fcb61c@|fca80e@|eea80e@|fca80e@@@|fcb62a@|d29a1c%|9a620e%%|8c620e%|9a620e%%%%%%%%|a8620e%|d28c1c%|fcb62a@|ee9a1c%|fca80e@|fcb60e@|fcc40e@@@|fcc41c@|fcc42a@|eec438@|e0c446+
+000000  |eec462+|eec446@|fcc438@|fcc42a@|fcc41c@|fcc40e@@|fcb60e@@|fca80e@|fca81c@|e0a82a@|a8620e%|9a620e%%%%%%%%%%%%|a8620e%|b68c1c%|fca81c@|fc9a0e@|fca80e@@@|fcb60e@|fcb61c@|fcc42a@|fcc438@|fcd246%|fcd254#|fce062+
+000000  |eec454=|eec446@|fcc438@|fcc42a@|fcb61c@|fcb60e@@|fca80e@@|fc9a0e@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%|8c620e%%%|9a620e%%%%%%|b6701c%|fcb62a@|fca80e@@|fcb60e@@|fcc40e@|fcc41c@|fcc42a@|fcd238@|fcd246@|fcd254%|fce062+
+000000 |fce062@|fce054@|fcd246@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@|fc9a0e@|fca81c@|c48c1c%|a8620e%|9a620e%%%%|8c620e%%%%|9a620e%%%%|a8620e%|c48c1c%|fcb62a@|fca80e@@|fcb60e@@|fcb61c@|fcb62a@|eec438@|eec446@|e0c454#
+000000    |e0b646@|eeb638@|eeb62a@|fcb61c@|fcb60e@@@|fca80e@|fca81c@|eeb62a@|b67e1c%|9a620e%%%%%%%%%%%|a8700e%|b6701c%|fcb62a@|fca81c@|ee9a0e@|eea80e@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fce046@|fce054@|fce062@
+000000  |fcd262=|fcd254@|fcd246@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fca80e@|eea80e@|ee9a0e@|fca80e@@|fcc438%|d29a2a%|a8700e%|a8620e%|9a620e%%|a8620e%%|9a620e%%%|a8701c%|c48c2a%|fcb62a@|eea82a#|fca81c@|fcb60e@|fcc40e@@|fcc41c@|fcb62a@|e0b62a@|e0b638@|e0b646+
+000000  |fce062+|fcd262*|fcd254*|fcc446+|eeb638+|e0b638@|fcb61c@|fcc40e@@@|fca80e@|ee9a1c#|fca80e%@|eea82a@@|e09a1c@|c48c1c%%%%|c48c2a%|e0a81c@|fcb61c@|eea82a*|fc9a0e@|fcb60e@@|eea80e@@|fcb61c@|fcc42a@|fcd238@|fce046@|fcd246@|eec454@
+000000     |eec446+|fcd238@@|fcd22a@|fcc41c@|fcb61c@|eea81c%|fcb60e@|fcc40e@|fcb60e@|ee9a0e@|eea80e@|fcb60e@|ee9a0e@@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|e09a0e%|fca80e@|fcb60e@|fca81c@|ee9a0e@|fcb60e@|fcd20e@|fcc41c@|fcb62a@|e0b638%|eeb646=|fcc446+|fcd254*|fce062*
+000000    |fce062%|fce054@|fcd254@|fcd246%|eec438+|eeb646+|fcb62a@|fcc41c@|fcd21c@|fcc40e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcc40e@|fcd20e@|fcc41c@|e0a82a@|eeb62a@|fcc42a@|fce038@|fcd246@|eec454%
+000000         |fcd238@|fce038@|fcd238@|fcc42a@|e0a82a@|fcb61c@|fcd21c@@|fcb60e@|eeb61c@|fcc41c@@|fcb60e@|fcb61c@|fcd21c@@|eeb61c@@|fcc42a@|fcd238@@|eec454+|000000 |eec446+|fcd254%|fce062@|fce070=
+000000        |fcd254@|fce054@|fcd246@|eec446*|000000 |eec446#|fcd238@|fce038@|fcc42a@|eeb638@|eeb62a@|fcd238@|fcd22a@|eeb62a@|eeb638@|fcc438@|fce038@|fcc438@|d2a846%|e0b638@|fcd246@|fce054@|fcd254@
+000000        |fce070=|000000    |fcd254@|fce054@|fcd246@|e0c454@|d2b646*|eec446%|fce046@|fcd246@|c4b638@|eec454@|e0c446@|fce054@|fcd254@|000000   |fcd262=|fce070*
+000000             |fce070*|fce062+|000000    |fce062@|eed270=|70c438@|70b638%
+000000             |70b638=#@|62b62a%%|62b638%%*|70c438@|62a82a%|000000    |70b638=-
+000000           |7ec438+@@@|70c438@|7ec438@@|70c438@@@|70b638@|62a838%=|62b638%|70b62a@|70c438@@|7ed238@@|8cd238@|8cd246*
+000000          |9ad254=|8cd246@|8cd238@|7ed238@@|7ec438@|70c438@|70c42a@|70b62a@|62b62a%|62b638%|70c42a@|62a82a%|70c438@@@|7ec438@@@@%
+000000            |7ec438=|70c438*#|70b638%#*=|000000 |7ec438#|62b62a@|62b638%*%%|70b638@%*
+000000                    |70c438@|62a82a%|62a838=
+`,
+        plano: `
+                      @
+                @@*%+%@%  =@%
+           #@%*+%@%##@@###@@#  -#*
+           =@@%*#@%##%%#*%@%++%@@=
+       *@@#=#%@#*#%**%#*#%#*#%@%+ -*%@
+        *%@%#*#%*+#*+#*+##+*%%#*#%@@%
+    @@@%#**#%#++#*#++***#+*#**#%%%#+  --
+     *#%%%#**+##=-:::::--+#=*##***#%@@@@+
+ %@@%%##*****#+::::::::::::+#+*##%%%##=
+  +%%%%%%##***::::::::::::::=*+***###%#*+
+  =######***#-::::::::::::::-#**##%%%%%#+
+ @@@@%%%##***=::::::::::::::=#*#######*
+    ########*#=:::::::::::--#*+**#%%@@@@
+  -@@@@%#**+**#+-::::::::-+#=*#%%##**-
+  +*+==*##%#*=+***+===++*#=*##**#%@@%%
+     =%@@%#*#%#+*#++#+*#+*#*+#%%#*-=**
+    %@@#==#%%#**%#*#%**%#*#%#**%@@#
+         %@@#*#%%**%%*#%%#*%@%= =#@=
+        @@%+ *@@###@@##%@%*#%@%
+        =    %@%#=#@@*##@@   =*
+             *+    @=*+
+             -=++++=-+=    ::
+           -********++=:+++**##+
+          -###***+++++=+******+
+            :=++=-: ++=-=+++-
+                    *=:
+`
+      },
+      {
+        color: `
+000000                 |fce070+|000000    |fcd262+|fce062%
+000000                |eec454*|fce054@|fcd254@|e0b654%|eec454@|e0b646#|fce046@|fce054@|eec454+|000000  |fcd254*|fce062@|eed262=
+000000            |fce054@|fcd254@|eec446@|e0b638@@|fcd238@|fce038@|eec438@@|fcc42a@|fce038@|fcd238@|e0b638@|e0b646@|fcc438@|fce046@|fcd246@|eec454=|000000   |fce062+
+000000        |fce062+|eec454=|000000  |eec446@|fce038@|fcd238@|eeb62a@|eea81c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|fcc41c@|fcd21c@|fcc41c@|eeb61c@|fcb61c@|fcd22a@@|eec438@|d2b646=|eec438#|fcd246@|fce054@|fcd254@
+000000        |fcd254@|fce046@|fcd238@|eeb638@|e0a838%|fcb61c@|fcd21c@|fcc41c@|eea80e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcc40e@@|fcb60e@|e0a81c@|fcc41c@|fcd22a@|fcd238@|fcc438@|000000   |fcd254+|fce062*|fce070=
+000000    |fce062*|fcd254*|fcc446+|000000  |eeb638@|fcd22a@@|fcc41c@|eea80e@@|fcc40e@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|fca80e@|eea80e@|fcc40e@@|fcc41c@|eeb62a%|eeb638*|fcc438@|fcd238@|fce046@@|fcd254@
+000000    |eec462+|fcd246@|fce046@|fcd238@|fcc42a@|fcb62a@|eea81c@|eea80e@|fcb60e@@|fca80e@|ee9a1c#|fcb60e@|fca81c@|eea82a@|eea81c@|e09a1c@@|eea81c@@|fcb61c@|eea82a%|ee9a0e@|fcb60e@@|eea81c%@|fcb60e@|fcc40e@|fcd21c@|fcc42a@|eec438@|eeb646+
+000000     |d2b646%|e0b638@|eeb62a@|fcc41c@|fcc40e@@|fcb60e@|fca81c@|eea81c#|fcb61c@|eeb62a@|c48c2a%|a8701c%|9a620e%|a8620e%|9a620e%%|a8620e%|a8700e%|a8701c%|d28c1c%|fcb62a@#|fca81c*|fcb60e@@@|fca80e@|eea80e@|eeb61c@|fcb62a@|fcc438@|fcd246@@|fce054@|fce062@
+000000 |fce070*|fce054@@|fce046@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@|eea80e@|ee9a0e@|fc9a0e@|fcb61c@|d29a2a%|9a620e%%|8c620e%|9a620e%%%%%%%%|a8620e%|c48c1c%|fcb62a@|ee9a1c@|ee9a0e@|fca80e@|fcb60e@|fcc40e@|fcd20e@|fcd21c@|fcd22a@|fcc438@|fcc446@|eec454=
+000000   |e0c454@|eec438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@@@|fca80e@|fcb62a@|e0a82a@|a8620e%|9a620e%%%%%%%%%%%%|a8620e%|b68c1c%|fcb61c@|fca80e@@@@|fcb60e@|eeb61c@|eeb62a@|eeb646@|eec446+
+000000 |fcd262+|fcd254#|fcd246@|fcc438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%|8c620e%%%|9a620e%%%%%%|a8701c%|fcb62a@|fca80e@@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fce046@|fce054@|fce062@
+000000 |fce062+|fcd254%|fcd246@|fcc438@|fcc42a@|fcc41c@|fcb60e@@|fca80e@@|ee9a0e@|fcb61c@|c48c1c%|a8620e%|9a620e%%%%|8c620e%%%%|9a620e%%%%|a8620e%|c48c1c%|fcb61c@|fca80e@@@|fcb60e@|fcb61c@|eeb62a@|eeb638@|eec446@|e0c454#
+000000   |e0c454*|eec446@|fcc438@|fcc42a@|fcc41c@|fcc40e@@|fcb60e@|fca80e@|fca81c@|eeb62a@|b67e1c%|9a620e%%%%%%%%%%%|a8700e%|b6701c%|fcb62a@|ee9a1c@|ee9a0e@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fcd246@|fcd254@|fcd262=
+000000  |fce062@|fce054@|fce046@|fcd238@|fcd22a@|fcc41c@|fcb61c@|eea80e@@|fca80e@@@|fcc438#|d29a2a%|a8700e%|a8620e%|9a620e%%|a8620e%%|9a620e%%%|a8700e%|c49a2a%|fcc42a@|eea82a*|fca80e@|fcb60e@@@|fcb61c@|eeb61c@|e0b62a@|e0b638@|fcc446+|fcd254+|fce062=
+000000      |e0b646*|eeb62a@|fcc41c@|fcc40e@@|fcb60e@|eea81c%#|fca80e@@|eea838%|eea81c@|d29a1c@|d28c2a%|c48c1c%%|d29a1c%|c48c2a%|eea81c@|fcb62a@|e0a82a#|fca80e@|fcb60e@|fca80e@|eea81c@|fcb60e@|fcc41c@|fcd22a@|fcd238@@|eec446@|d2b654*
+000000     |fcd246@|fce046@|fcd238@|fcd22a@|fcc42a@|eeb62a%|fcb61c@|fcb60e@|fcc40e@|fca80e@|e09a0e@|fcb60e@|fca80e@|ee9a0e@|fca80e@@|ee9a0e@|fca80e@@|ee9a0e@|fcb60e@@|e09a0e@|fca80e@|fcc40e@@|fcb61c@|e0b62a@|eeb638*|fcc446#|fcd246@|fce054@|fce062@
+000000    |fce062@|fce054%|fcd254#|eec446=|000000 |eec438%|fcc42a@|fcd21c@|fcc41c@|eea80e@@|fcc40e@@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|eea80e@|fca80e@|fcc40e@@|eea81c@|e0a81c@|fcc42a@|fcd238@@|fcc446@
+000000        |fcc446@|fce046@|fce038@|fcc42a@|eeb62a#|e0b62a@|fcc41c@|fcd21c@|fcc41c@|eea81c@|fcb61c@|fcd21c@|fcc40e@|eea81c@|fcc41c@|fcd21c@|fcc41c@|eea81c@|fcb61c@|fcd22a@@|eec438@|d2a846=|eeb646#|fcd246@|fce054@|fce062@
+000000       |fcd262#|fce054@|fcd254@|eec446+|000000  |fcc438@|fce038@|fcd238@|eeb62a@|e0b62a@|fcd22a@|fce038@|fcc42a@|eeb638@|fcb62a@|fcd238@@|e0b638@@|fcc438@|fce046@|fcd246@
+000000            |eec454*|fce054@|fcd246@|eec446@|d2b654*|e0b654+|fcd246@|fce046@|eec446@@|e0b646@|fcd254@|fce054@|eec454+|000000 |e0b654=|eec454+|fce062%
+000000             |fce062+|000000    |fce062%#|000000 |7ec438@|62a838%|000000 |fce062+
+000000             |70b638=#@|62b62a%%|62b638%%*|70c438@|62a82a%|000000    |70b638=-
+000000           |7ec438+@@@|70c438@|7ec438@@|70c438@@@|70b638@|62a838%=|62b638%|70b62a@|70c438@@|7ed238@@|8cd238@|8cd246*
+000000          |9ad254=|8cd246@|8cd238@|7ed238@@|7ec438@|70c438@|70c42a@|70b62a@|62b62a%|62b638%|70c42a@|62a82a%|70c438@@@|7ec438@@@@%
+000000            |7ec438=|70c438*#|70b638%#*=|000000 |7ec438#|62b62a@|62b638%*%%|70b638@%*
+000000                    |70c438@|62a82a%|62a838=
+`,
+        plano: `
+                 +    +%
+                +@@*#*@@=  +@-
+            @@#*#@@###@@##%@@-   +
+        +-  %@@#*%@#*#@%*#@@#:+%@@
+        @@%#*#@%**%#*#%**%%#*#@@%   =*=
+    *+=  #%@%**%#+*#+*#+*#**#%%*+#%@@@
+    +%@@%#**##*+#***++**#++##**#%@%#-
+     **##%%#*=##=-:::::--+#+=###***#%%@@@
+ *@@@@%%#****#+::::::::::::=#++*#%%%%%%-
+   ########*#*::::::::::::::=#*****###=
+ +#%%%%###**#-::::::::::::::-#*##%%%@@@@@
+ +#%%%###**+#=::::::::::::::=#****####*
+   +##%%%%#**#=:::::::::::--#*+*#%%@@@@=
+  @@@@%##***#**+-::::::::-+#=#####**#++=
+      +#%%%#*+****++==+=*#=*#***%@@%#+
+     %@@%#*##%*+##+**+#*+##+*%%#*=*%@@
+    @%*- *%@%**#%**%#*#%**%%**%@@%
+        %@@%+*%@#*#@#*#@%*#@@#-+%@@
+       *@@+  %@%#*%@###@@**%@@
+            +@@#==@@###@@= -=%
+             +    %* *+ +
+             -=++++=-*=    ::
+           -********++=:++***##+
+          -###***+++++=+******+
+            :=++=-: ++=-=+++-
+                    *=:
+`
+      }
+    ]
   },
   {
-    cols: 35, alto: 22,
-    color: `
-000000                |fce062=|000000   |fce062@|eed262=|000000   |fce070=
-000000          |eed262*|fce054@|fcd246@|e0b646=|000000 |fcd246@|fce054@|eeb646@|eec446@|fcc438@|fce046@|fcc446@|000000 |eec446*|fce054@@
-000000       |fce062*|fcd254+|000000  |fcc438@|fcd238@|fcc42a@|e0b638@|fcc42a@|fcd22a@|fcc42a@|eeb62a@|fcd22a@@|eeb62a@@|fcd22a@|fcd238@|eec438%|000000 |fcc446*|fcd254@|fce054@
-000000       |eec454+|fcd246@|fcd238@|fcc42a@|e0a82a@|fcc41c@|fcd20e@|fcb60e@|eea80e@|fcc40e@|fcb60e@|eea80e@|fcc40e@|fcb60e@|eea80e@|fcc40e@@|eeb61c@|eeb62a@|fcc42a@|fcd238@@|eec446+
-000000    |fce062%|fce054@|fcd246%|fcc438+|eeb638*|fcc42a@|fcd21c@|fcc40e@|eea80e@|fca80e@|fcb60e@|ee9a0e@|fca80e@@|ee9a0e@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|eea80e@|fca80e@|fcc40e@@|fcb62a@|eeb638*|fcc446*|fcd254%|fce054@
-000000     |eeb646@|fcc438@|fcd22a@|fcc41c@|fcb61c@|eea81c@|fca80e@|fcb60e@|ee9a0e@|fcb62a@|eea81c@|d29a1c@|d28c1c%|c48c1c%|e09a1c@@|fca81c@|eea82a%|fca80e@@|eea81c@@|fcc41c@|fcd21c@|fcd22a@|fcc438@|e0c454+
-000000 |fce070=|fce062@|fcd246@@|fcc438@|fcb62a@|eeb61c@|fca80e@|fcb60e@@|fca80e@|fcb638%|d29a1c@|a8701c%|9a620e%%%%|a8620e%|a8700e%|a8620e%|b67e1c%|eea82a@|fcb62a#|fca80e@|fcb60e@@@|eeb61c@|fcc438@|fcd246@@|fce062@
-000000   |eec446@|fcc438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|fcb62a@|b67e1c%|a8620e%|9a620e%%%%%%%%%|a8620e%|d29a2a@|fca81c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|fcc438@|eec446@|e0c454@
-000000 |fce062+|fcd254%|fcd246@|fcc438@|fcc42a@|fcc41c@|fcb60e@@|fca80e@|fc9a0e@|e0a82a@|a8620e%|9a620e%%%%|8c620e%%|9a620e%%%%%|a8620e%|fcb62a@|fc9a0e@|fca80e@|fcb60e@@|fcc41c@|fcc42a@|fcd238@|fcd246@|fce062#
-000000 |fcd262=|fcd246*|eec446@|fcc438@|fcc42a@|fcb60e@@|fca80e@@|fc9a0e@|eeb62a@|a8620e%|9a620e%%%%|8c620e%%%|9a620e%%%%|b6701c%|fcb62a@|fc9a0e@|fca80e@@|fcb60e@|fcb61c@|fcc42a@|fcc438@|eec446@|eed262=
-000000  |eed254+|fcd246@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|fca81c@|d29a1c%|a8620e%|9a620e%%%%%%%%|a8620e%|b6701c%|eea82a@|ee9a1c@|fc9a0e@|fcb60e@|fcc40e@@|fcd21c@|fcd22a@|fcd238@|fcc446@|e0c462*
-000000 |fce070+|fce062%|fcd254%|fcd238%|eeb638@|eeb61c@|eeb60e@|fcb60e@@@|fca81c%|fcb62a#|eea81c@|b67e1c%|a8620e%|9a620e%|a8620e%%|9a620e%%|b67e1c%|c48c1c%|fcb62a@|fca81c*|fca80e@|fcb60e@@@|eeb61c@|eeb62a@|eec438@|fcd246%|fce054%|fce062#
-000000    |eec446*|fcc438@|fcd22a@|fcd21c@|fcc41c@|eea81c@|fca81c@|fcb60e@@|e09a1c@|fcb61c@|fca81c@|e09a1c@|eea81c@@|fca81c@|e09a1c@|fcb60e@|fca81c%|ee9a0e@|fcb60e@@|eea81c@|fcb61c@|fcc41c@|fcd22a@|fcd238@|eec446@
-000000   |fce062@|fce054@|fcd246@|fcc438#|eeb638=%|fcc42a@|fcd21c@|fcb60e@|eea80e@|fcb60e@@|ee9a0e@|fcb60e@@|ee9a0e@|fcb60e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcc40e@|fcd21c@|fcc42a@|eeb646+|eec446=|fcd246*|fce054%|fce062#
-000000       |fcd254%|fce046@|fcd238@|eeb62a@|e0a82a@|fcc41c@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcc40e@@|eea80e@|fcc41c@|fcd22a@|fcc42a@|e0a838%|eec438@|fcd246@|fce046@|eed254=
-000000       |fce062+|000000   |fcd246@|fce046@|fcc438@|e0b646@|fcc42a@|fcd238@|fcc42a@|eeb62a@|fcc42a@|fcd22a@|eeb62a@|e0b638@|fcd238@|fce046@|eec454#|000000  |fcd262=|fce062=
-000000           |fce062@|fcd254+|000000  |fcd254@|fce054@|e0b646@|eec446@|fcc438@|fce046@|fcc446@|000000  |fce062*+
-000000               |c4c454*+|000000 |8cc446%|8cb638@|fce062@|fcd262*
-000000           |70c438#@@|70b62a@@|62b62a@|70b638@|70c438@|62a82a%|000000 |70b638=*%|70c438%|7ec438#|7ed246+
-000000         |8cd254+|7ed238@@@@|7ec438@@|70c438@|62b62a%%|62a82a%|62b62a%|70c438@|7ec438@@|7ed238@@@
-000000          |7ec438+#@|70c438@|70b638@%|62b638*|70b646=|70c438@|70b638%%|62b638@|62b62a@|70b638@%+
-000000                 |7ec446*|62b62a%|62a838=
+    cols: 36, alto: 22,
+    marcos: [
+      {
+        color: `
+000000               |fce062#|000000    |fce062%
+000000           |fce062#|eec454%|d2b654+|e0b646*|fce046@|fcd246@|e0c446@@|fcd246@|fce046@|eec446*|000000 |eec446=|fce054@|fce062%
+000000           |fcd246@@|eeb638@|e0b62a@|fcd22a@@|eeb62a@@|fcd22a@@|e0b638@|eeb638@|fcd238@|fcd246@|eec446*|000000  |fce054*|fce062#
+000000       |fcd254@|fce054@|fcc438@|e0a838%|eeb62a@|fcd22a@|fcc41c@|eea80e@|fcb60e@|fcc40e@|fcb60e@@|fcc40e@|fcb60e@|eea81c@|fcc41c@|fcd21c@|eeb62a@|e0b62a#|fcc438@|fce038@|fcd246@|eec454=
+000000    |fce062#|fcd254*|fcc446=|000000 |eec438@|fcd22a@|fcd21c@|fcb60e@|eea80e@|fcc40e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@|fcb60e@|ee9a0e@|fca80e@|fcc40e@|eea80e@|fca80e@|fcc40e@|fcd21c@|fcc42a@|eeb638*|fcc438*|fcd246%|fce054@|fce062@|fce070=
+000000    |e0c454*|fcd246@|fcd238@|fcd22a@|fcc41c@|eea81c@|fcb61c@|fcb60e@|fca80e@|e09a1c%|fcb61c@|eea81c@|ee9a1c@|e09a1c@@|eea81c@|ee9a1c@|fcb61c@|e09a1c%|fca80e@|fcb60e@|fca80e@|eea81c@|fcb61c@|fcc41c@|fcd22a@|fcd238@|fcc446%
+000000 |fce070+|fce054%|fcd246%|fcd238%|eeb638@|eeb61c@|fcb61c@|fcb60e@@@|fca81c#|fcb62a@|d29a1c@|a8701c%|9a620e%%%%|a8620e%|a8700e%|b67e1c%|e09a1c@|fcb62a@|fca81c#|fca80e@|fcb60e@@@|eeb61c@|eeb62a@|fcc438%|fcd246@|fce054@|fce062@
+000000  |eec454#|fcc446@|fcc438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|eeb62a@|b67e1c%|9a620e%%%%%%%%%%|a8701c%|eeb62a@|ee9a0e@|fca80e@|fcb60e@|fcc40e@@|fcc41c@|fcc42a@|fcc446@|fcc454*
+000000 |fcd262=|fcd254#|fcc446@|fcc42a@|fcc41c@|fcb60e@@|fca80e@@|fca81c@|d28c1c%|a8620e%|9a620e%%%%%%%%%%|a8620e%|b67e1c%|fcb61c@|fc9a0e@|fca80e@|fcb60e@@|fcc41c@|fcc438@|fcc446@|fcd254*|fcd262=
+000000 |fce062+|fcd254#|fcc446@|fcc42a@|fcc41c@|fcb60e@@|fca80e@@|fca81c@|c48c1c%|9a620e%%%%|8c620e%%%%|9a620e%%%%|c48c1c%|fca81c@|fca80e@@|fcb60e@@|fcc41c@|fcc438@|fcc446@|fcd254#|fce062+
+000000  |eec454+|fcc446@|fcc438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fc9a0e@|eeb62a@|b67e1c%|9a620e%%%%%%%%%|a8620e%|a8701c%|eeb62a@|fc9a0e@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|fcd238@|eec446@
+000000 |fce070+|fce054@|fcd246@%|fcc438@|eeb61c@|fcb60e@@@@|fca81c#|fcb62a@|d29a1c%|a8700e%|9a620e%%|a8620e%|9a620e%%%|b6701c%|c48c1c%|fcb62a@|fca81c#|fcb60e@@@@|eeb61c@|eeb638@|fcd246%|fce054%|fce062#
+000000    |eec446+|fcc438@|fcd22a@|fcd21c@|fcc41c@|eea81c@|eea80e@|fcb60e@|fca80e@|e09a1c%|fcb61c@|eea81c@|e09a1c@@@|e0a81c@|e09a1c@|fcb61c@|ee9a1c%|fca80e@|fcb60e@|fca81c@|eea81c@|fcc41c@|fcd22a@|fcd238@|fcc438@|e0b646@
+000000   |fce062@|fce054@|fcd246@|fcc438*|eeb638*|fcb62a@|fcc41c@|fcc40e@|fcb60e@|eea80e@|fcb60e@@|ee9a0e@|fcb60e@|fca80e@@|fcb60e@|ee9a0e@|fcb60e@|fcc40e@|eea80e@|fcb60e@|fcc41c@|fcd21c@|fcb62a@|eeb646+|fcc446+|fcd254#|fce062%
+000000      |eec454+|fcd246@|fce038@|fcc42a@|eeb62a%|eeb61c@|fcc41c@|fcc40e@|eea80e@|fcb60e@|fcc40e@|fcb60e@@|fcc40e@|fcb60e@|eea80e@|fcc41c@|fcd21c@|eeb62a@|e0a82a@|fcc438@|fce046@|fcd246@
+000000      |fce062@|fce054@|fcc446+|000000 |eec446*|fcd238@@|eeb62a@|e0b62a@|fcd22a@@|fcb62a@|eeb62a@|fcd22a@@|e0b62a@|eeb638@|fcd238@|fcd246@|eec454=|000000  |fce062*
+000000          |fcd254@|fce054@|eec446#|d2b646=|e0c454+|fce046@|fcd246@|e0c446@@|eed246@|fce054@|e0c454=|d2b654=|eec454*|fce062%|fcd262=
+000000               |e0d254@|000000  |70c438@|70a838#
+000000          |70c438-%@@|70b638@|62b62a@%|70b638@|70c438@|54a82a#|000000 |70b638=*#|7ec438#*|7ed246=
+000000         |8cd246%|7ed238@@@@|7ec438@|70c438@@|62b62a%%|62a82a%|62b62a%|70c438@|7ec438@|7ed238@@@|7ed246@
+000000          |7ec438*%|70c438@@|70b638@%|62b638+|7ec438#|70b62a@|70b638%@|70b62a@@|70b638@%=
+000000                 |7ec438@|62a82a%
 `,
-    plano: `
-                -   @-   =
-          +@%- %@##%@# +@@
-       *+  %@%*#@##%@##@@# +@@
-       =@@#*#%#*%#*%#*%%#*%@%=
-    %@#++#%%**#***+#+*#**%%#++%@
-     #%@%#*##*#*+==++***#**%%%%=
- =@@@%#**##**+::::::::=*+##**##%@@
-   #%%%%##*#-:::::::::::+**##%%%%#
- +#%%%%##***:::::::::::::#**##%%%@#
- -+%%###***#::::::::::::-#***###%#=
-  =%%%%%#*+*+::::::::::-***##%%%%%+
- =%%##**###++*=::::::-=#=####*###%#
-    +%@%%**##+##+***+#+*##*#%@@#
-   @@%*-*%@#*##*##*#**%**%@%=-+##
-       #@%#*%%#*%#*%%*#@#+#@@=
-       +   %@#*%@##%@##%@*  ==
-           @+  @@##%@%  ++
-               += *+@*
-           =+++++++= :=+++-
-         =##*****++=++*****
-          -+**++--*++++++-
-                 =+:
+        plano: `
+               #    %
+           **==@@##%@+ -@%
+           @@#*%@##@%*#@@+  *#
+       %@%+#%%*#%#*%#*%%#+%@@=
+    #*= #%%#*%#+#**#*#%**%%#=+#@@=
+    +%@%%*##*+#**++*+#+*#**#%@%#
+ +%###**###+#+-::::::-+#+###**##%@%
+  *%%%%%#**#-::::::::::-#+*#%%%%%+
+ =*%%###***+::::::::::::=#**###%%*=
+ +#%%%##***+::::::::::::=***##%%%#+
+  =%%%%%#**#-::::::::::-***#%%%%%
+ +%%%#**###+#+-::::::-=#+###**####
+    =%%%%**#*+#*+++*+#+*#**%%@%#
+   @@%+=#%%#*##+#**#+##**%%#==*#
+      =%@%**%%*#%#*%#*%%**%@@
+      @%+ +@@#*%@##@%*#@@=  +
+          @@*-=@@##%@--+%=
+               %  *=
+          :+++++++*- :==+=-
+         *##****+++=+******
+          =+*++=-=+++++++-
+                 *=
 `
+      },
+      {
+        color: `
+000000                |fce062#|000000   |fcd262+|fce062*
+000000           |fce062%|fcd254%|e0c454@|d2a846+|fcc446@|fce046@|eec446@|eec454@|eec446@|fce046@|fcd246@|000000  |fcd254+|fce062@
+000000        |fcd262=|000000  |fcc446@|fce046@|fcc438@|eeb62a@|fcb62a@|fcd22a@|fcc42a@|eeb62a@|fcc42a@|fcd22a@|fcc42a@|e0b638@|fcc438@|fce046@|fcd246@|000000   |fce062+
+000000        |fce054@|fcd246@|eeb638@|e0a82a@|fcc41c@|fcd21c@|fcb61c@|eea80e@|fcc40e@|fcb60e@|eea80e@|fcc40e@@|eea80e@|fcb61c@|fcd21c@|fcc42a@|e0b638%|fcc438#|fcd238@|fce046@|fcd254@
+000000    |fce062#|fce054@|fcd246#|fcc438+|eeb646*|fcc42a@|fcd21c@|fcc40e@|eea80e@|fcb60e@|fcc40e@|ee9a0e@|fca80e@@|ee9a0e@|fcb60e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fcd21c@|fcc42a@|fcc438%|eeb646=|fcc446+|fcd254#|fce062%#
+000000     |eeb646@|fcd238@|fcd22a@|fcc41c@|fcb61c@|eea81c@|fcb60e@@|ee9a0e@|fcb61c@|fca81c@|e09a1c@@%|fca81c@|e09a1c@|fcb60e@|fca81c#|ee9a0e@|fcb60e@@|eea81c@|fcb61c@|fcc41c@|fcd22a@|fcd238@|fcd246@|fcd254*
+000000  |fce054@|fcd254@|fcd246@|fcc438@|fcb61c@|eeb60e@|fca80e@|fcb60e@@|fca80e%|fcb638%|d29a1c@|a8701c%|9a620e%%%%|a8620e%|a8700e%|b67e1c%|d29a2a@|fcb61c@|eea81c#|fca81c@|fcb60e@@@|fcb61c@|eeb62a@|eeb638#|fcc446*|fcd254*|fce062+
+000000  |e0c462=|eec446@|fcc438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|eeb62a@|b67e1c%|9a620e%%%%%%%%%%|a8701c%|fcb62a@|ee9a0e@|fc9a0e@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fcd254@+
+000000 |fce062%|fcd254@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|fca81c@|d29a2a%|a8620e%|9a620e%%%%%%%%%%|a8620e%|b67e1c%|fcb61c@|fca80e@@@|fcb60e@|fcb61c@|eeb638@|eec446@|eec454=
+000000  |eec454*|eec446@|fcc438@|fcb61c@|fcb60e@|fca80e@@@|fca81c@|d28c1c%|9a620e%%%%|8c620e%%%%|9a620e%%%%|c48c1c%|fca81c@|fca80e@|fcb60e@@|fcc40e@|fcc41c@|fcd238@|fcd246@|fce054@|fce062%
+000000  |fcd254%|fcd246@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|fcb62a@|b67e1c%|9a620e%%%%%%%%%|a8620e%|a8701c%|eeb62a@|fca81c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|eec438@|e0c454@
+000000 |fce062=|fcd254+*|fcc446*|e0b638@|eeb61c@|fcb60e@@@|fca80e@|ee9a0e#|fcb62a@|d28c1c%|a8700e%|9a620e%%|a8620e%|9a620e%%%|b6701c%|c48c1c%|fcc438%|fca80e%|fcb60e@|fca80e@@|fcb60e@|fcb61c@|fcc438@|fcd246@|fce054@|fce062%
+000000    |fcd246@|fcd238@|fcd22a@|fcc41c@|fcb61c@|eea81c@|fca80e@|fcb60e@|fc9a0e@|eea82a#|fcb61c@|eea81c@|e09a1c@@@@|ee9a1c@|fcb61c@|ee9a1c@|fcb60e@@|eea81c@|fcb61c@|fcc41c@|fcd22a@|fcc438@|e0b638@|d2b654=
+000000   |fce062#|fcd254#|fcc446+|eeb646=|eeb638#|fcc42a@|fcd21c@|fcc40e@|eea80e@|fca80e@|fcb60e@|fca80e@|eea80e@|fcb60e@|ee9a0e@|fca80e@@|ee9a0e@|fcb60e@@|eea80e@|fcc40e@|fcd21c@|fcc41c@|eeb638#|fcc438*|fcd246%|fce054@|fcd262@
+000000      |fcd246@|fce046@|fcd238@|fcc438%|e0b638#|fcc41c@|fcd21c@|fcb60e@|eea80e@|fcc40e@@|eea80e@|fcb60e@|fcc40e@|eea80e@|fcb60e@|fcd21c@|fcc41c@|e0a82a@|fcb62a@|fcd238@|fcd246@|eec454*
+000000     |fce070+|fce062%|fcd254+|000000  |fcc438@|fce038@|fcc42a@|e0b638@|fcb62a@|fcd22a@|fcc42a@|eeb62a@|fcc42a@|fcd22a@|fcc42a@|e0b638@|fcc438@|fce046@|fcc446@|000000 |e0b646=|fcd254*|fce062@
+000000         |fcd254*|fce054@|fcd254%|e0b646=|000000 |fcd246@|fce046@|eec446@|eec454@|d2c446@|fce054@|fcd254@|000000 |e0c454#|fcd254#|fce062@
+000000              |d2c454#|d2d254#|000000  |70c438@|a8c446@
+000000          |70c438-%@@|70b638@|62b62a@%|70b638@|70c438@|54a82a#|000000 |70b638=*#|7ec438#*|7ed246=
+000000         |8cd246%|7ed238@@@@|7ec438@|70c438@@|62b62a%%|62a82a%|62b62a%|70c438@|7ec438@|7ed238@@@|7ed246@
+000000          |7ec438*%|70c438@@|70b638@%|62b638+|7ec438#|70b62a@|70b638%@|70b62a@@|70b638@%=
+000000                 |7ec438@|62a82a%
+`,
+        plano: `
+                #   +*
+           ###-%@###@%  =@
+        =  %@%##@%#%@#*%@%   +
+        @@#*%@#*%#*%%*#@%*+%@@
+    #@*==%@%*##**#*#**%#*#%%*-=*%*
+     #%@%#*##+#*+++*+#++##*#%%@%*
+  @@@%#**##**+-:::::--+#=*####**+++
+  -##%%%#***-::::::::::-#+*##%%@%%+
+ %@%%%##***+::::::::::::=#***####-
+  +####****+::::::::::::=#*##%%%@@%
+  %%%%%%#*+#-::::::::::-***##%###
+ =+++*#####=#+-::::::-=#*#***#%@@#
+    %@@%#**#*+#*++++*#+##*#%%%#-
+   #*+-*%%%**#**#*##*##*#%#++#@@
+      %@@#+#%#*%%*#%*#@%*#@@+
+     +%+  %@%*#@%#%@##%@% -*%
+         +@#- %@###@% +#@
+              +*  **
+          :+++++++*- :==+=-
+         *##*****++=+******
+          =+*++=-=+++++++-
+                 *=
+`
+      },
+      {
+        color: `
+000000                |fce062%|fcd262+|000000   |fce062*
+000000           |eed262=|fce062@|eec454@|e0b646@#|fce046@|fcd246@|e0b646%|eec454@|fcd246@|fce054@|eec454#|000000  |fcd262+|fce062*
+000000        |fce062#|eec454*|d2a846=|e0b654+|fcd246@|fcd238@|eeb62a@@|fcd22a@@|eeb62a@@|fcd22a@@|e0b638@@|fcd238@|fce046@|eec454#
+000000        |fcd254%|fce046@|fcd238@|e0b62a@|eeb61c@|fcd21c@|fcc41c@|eea80e@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|fcb60e@|eea81c@|fcc41c@|fcd22a@|fcc438@|eeb638=|fcc438%|fcd246@|fce054@|fcd262*
+000000     |fce054@|fcd246@|fcd238%|eec438+|fcb638%|fcc41c@@|fca80e@@|fcc40e@|fca80e@@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fcb60e@|fcc40e@|eea80e@|eeb61c@|fcc41c@|fcd22a@|fcc438@|eec446+|000000 |eec446=|fcd254+|fce062+
+000000     |e0b646*|eeb638@|fcd22a@|fcd21c@|fcc40e@|fca81c@|fcb61c%|fcb60e@|fc9a0e@|fca82a@|fcb61c@|e09a1c@|ee9a1c@|e09a1c%|eea81c@@|fca80e@%|e09a1c@|fcb60e@@@|eea80e@|fcb61c@|fcc42a@|fcd238@|fce046@|fcd254@|fcd262+
+000000  |fce062%|fcd246@@|fcd22a@|fcc41c@|fcb60e@|fca80e@@@@|fcb638#|d29a2a@|a8701c%|9a620e%%%%|a8620e%|a8700e%|b67e1c%|d29a2a@|fcb61c@|eea81c#@|fcb60e@|fcc40e@@|fcb61c@|eeb62a@|e0b638@
+000000   |e0b646@|eeb638@|fcb62a@|fcb61c@|fcb60e@@|fca80e@@|eeb62a@|b6701c%|9a620e%%%%%%%%%%|a8701c%|fcb62a@|ee9a0e@@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fce046@|fce054@|fce070=
+000000 |fce062@|fce046@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@@|fca80e@|fca81c@|d29a1c%|a8620e%|9a620e%%%%%%%%%%|a8620e%|b67e1c%|fcb61c@|fca80e@@|fcb60e@@|fcb61c@|eeb638@|e0b646@
+000000  |e0c454*|eec446@|eeb638@|fcb61c@|fcb60e@@|fca80e@@|fca81c@|d29a2a%|9a620e%%%%|8c620e%%%%|9a620e%%%%|c48c1c%|fcb61c@|fca80e@|fcb60e@@|fcc40e@|fcd22a@|fcd238@|fcd246@|fcd254@|fce062%
+000000 |fce062*|fce054@|fcd246@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@@|ee9a0e@|fcb62a@|b67e1c%|9a620e%%%%%%%%%|a8620e%|a8701c%|eeb62a@|fca80e@@|fcb60e@@|fcb61c@|eeb62a@|eeb638@|e0b654@
+000000    |e0b646*|eeb62a@|fcb61c@|fcc40e@@|fcb60e@|fca81c@|ee9a1c#|fcb61c@|d28c2a%|a8700e%|9a620e%%|a8620e%|9a620e%%%|a8701c%|c48c1c%|fcc438%|fca80e@@@@|fcb60e@|fcc42a@|fcd238@|fce046@|fcd254@|fce062+
+000000   |fcd254%|fcd246@|fcd238@|fcd22a@|fcc42a@|eea81c@|fca80e@|fcb60e@@|ee9a1c@|fca81c%|fca80e@|eea82a@|ee9a1c@|e09a1c@@@|eea81c@|fcb62a@|fc9a0e@|fcb60e@|fca81c#@|fcc40e@|fcd21c@|fcc42a@|eeb62a@|d2a846%
+000000   |fce062=|fcc454-|000000 |eec446+|fcc438@|fcd22a@|fcc41c@|fcb60e@|eea80e@|fcb60e@@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@|fcc40e@|eea80e@|fca80e@|fcc40e@|fcc41c@|fcb62a%|fcb638*|fcc438@|fcd246@|fce054@|eed262*
+000000     |fcd254*|fce046@|fcd246@|fcc438@|eeb638+|fcb62a@|fcd21c@|fcc41c@|eea80e@|fcb60e@|fcc40e@|fcb60e@|fca80e@|fcc40e@@|eea80e@|fcc41c@|fcd21c@|eeb61c@|eea82a@|fcd22a@|fce038@|fcc446@
+000000     |fce062*|fcd254=|000000  |eec446%|fce038@|fcd238@|eeb62a@|e0a838@|fcd22a@@|fcb62a@|eeb62a@|fcd22a@@|eeb62a@@|fcd238@@|e0b646+|d2b646+|eec446#|fce054@|fcd262*
+000000         |fce062@|fcd254@|eec446=|000000 |eec454*|fce054@|fcd246@|eec446@|e0b646@|fcd246@|fce054@|e0b654+|e0c454#|eec454#|fce062@|eed262=
+000000             |a8c454-|e0d254@|a8b646=|000000  |8cc438@|b6c446%
+000000          |70c438-%@@|70b638@|62b62a@%|70b638@|70c438@|54a82a#|000000 |70b638=*#|7ec438#*|7ed246=
+000000         |8cd246%|7ed238@@@@|7ec438@|70c438@@|62b62a%%|62a82a%|62b62a%|70c438@|7ec438@|7ed238@@@|7ed246@
+000000          |7ec438*%|70c438@@|70b638@%|62b638+|7ec438#|70b62a@|70b638%@|70b62a@@|70b638@%=
+000000                 |7ec438@|62a82a%
+`,
+        plano: `
+                %=   *
+           -@%#+@@*#%@*  +*
+        #+--@@##%@##@%*#%@*
+        #@%**%%*#%*#%#*%@#-*@@*
+     @@#=#%%**%**#**#+#%**%@%= -=+
+     =#%%%**#**#+*+****+###*#%@@@=
+  %@@%%#*****+-::::::-+#+*##%##*
+   #######**-::::::::::-#***#%%@@@@=
+ @@@@%%##**+::::::::::::=#**#####
+  =####****+::::::::::::=#*##%%@@@#
+ *@@@%%#***#-::::::::::-#*#######
+    =###%#*+#+-::::::-=*****#%@@@+
+   #@@%#**##+***++++*#*#+*#%%#*
+   =- =%%%#*##+*#*#**#**%%#+%@@*
+     *@@%=#%%*#%#*%#*%%**%@%
+     *=  #@@#*%@##@@##@@=-*@*
+         @%- +@%#*%@=+*@=
+             :%:  **
+          :+++++++*- :==+=-
+         *##****+++=+******
+          =+*++=-=+++++++-
+                 *=
+`
+      },
+      {
+        color: `
+000000                 |fce062@|000000    |fce062+
+000000            |fce062@|fcd254@|eec454@|e0b646%|fcc446@|fce046@|fcc446@|e0b654#|eec446@|fce046@|fcd254@|000000   |fce062+
+000000        |fce070*|fcd254@|e0b646%|d2a838=|eec446@|fce038@|fcc438@|eeb62a@|fcc42a@|fcd22a@|fcc42a@|eeb62a@|fcc42a@|fcd22a@|fcc42a@|d2b646*|fcc438@|fce046@|fcd254@
+000000         |fcd246@|fcd238@|fcc42a@|e0a81c@|fcc41c@|fcd21c@|fcb60e@@|fcc40e@|fcb60e@|fca80e@|fcc40e@@|eea81c@|fcb61c@|fcd22a@@|eec446*|eeb638=|fcd246%|fce054@@
+000000     |fcd254%|fce046@|fcd246@|fcc438%|eeb638#|fcc42a@|fcc41c@|fcb60e@|ee9a0e@|fcb60e@@|ee9a0e@|fcb60e@|fca80e@@|fcb60e@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|eea81c@|fcc41c@|fcd22a@|fcd238@|fcc438@
+000000  |fce062+|fcd254+|fcc446+|eeb646=|e0b638@|fcb62a@|fcc41c@|fcc40e@|fcb60e@|eea81c%|fcb60e@|fca80e@|eea82a@|fcb61c@|e09a1c@@%|eea81c@|eea82a@|eea80e@|fca80e@|eea81c#|fca80e@|fcb60e@@@|eea81c@|fcc42a%|fcd238@|fcd246@|fce046@|fce054@
+000000  |eed262=|fcd254@|fcd246@|fcd238@|fcd21c@|fcc40e@|fca80e@|eea80e@|fca80e@@|fcb62a%|d29a2a@|a8701c%|9a620e%%%%|a8620e%|a8700e%|b67e1c%|d29a2a@|fcb61c@|fca81c%|ee9a0e@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|eeb638@|e0c454=
+000000  |fcc454=|eec446%|eeb638@|eeb62a@|fcb61c@|fcb60e@@|fca80e@@|fcb62a@|b6701c%|9a620e%%%%%%%%%%|a8701c%|fcb62a@|fc9a0e@@|fca80e@@|fcb60e@|fcc41c@|fcc42a@|fcd238@|fcd246@|fce054@|fce070=
+000000 |fce062#|fcd254@|fcd238@|fcd22a@|fcd21c@|fcc40e@@|fcb60e@|fca80e@|fca81c@|d28c1c%|a8620e%|9a620e%%%%%%%%%%|a8620e%|b67e1c%|fcb61c@|fca80e@|fcb60e@@@|fcc41c@|fcc438@|eec446@|eec454+
+000000  |e0c454#|eec446@|fcc438@|fcb61c@|fcb60e@@|fca80e@@|fca81c@|d29a2a%|9a620e%%%%|8c620e%%%%|9a620e%%%%|c48c1c%|fcb61c@|fca80e@|fcb60e@|fcc40e@@|fcc42a@|fcd238@|fcd246@|fce054%|fce062+
+000000 |fce062%|fce054@|fcd246@|fcd238@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fc9a0e@|fcb62a@|b67e1c%|9a620e%%%%%%%%%|a8620e%|a8701c%|eeb62a@|fca80e@@|fcb60e@@|fcb61c@|eeb62a@|eeb638@|eec446%|fcd254=
+000000    |e0b646%|fcc42a@|fcc41c@|fcc40e@@|fca80e@|ee9a1c@|fca81c%|fcb61c@|c48c2a%|a8700e%|9a620e%%|a8620e%|9a620e%%%|a8701c%|c48c1c%|fcb638%|fca80e@@|eea80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcd246@|fcd254@
+000000  |fce062+|fce054@|fcd246@|fcd238@|fcc42a%|eeb62a@|eea80e@|fcb60e@@|fca80e@|ee9a1c%|fcb60e@|fca80e@|eea82a@|e09a1c@@@@|eea81c@|eea82a@|fca80e@|fcb60e@|eea81c%|fcb60e@|fcc40e@|fcc41c@|fcb61c@|e0a82a@|e0b646*|fcd254+|fce062+
+000000      |fcc438%|fcd22a@@|fcc41c@|eea81c@|fcb61c@|fcc40e@|fca80e@|ee9a0e@|fcb60e@|fca80e@@|fcb60e@|ee9a0e@|fcb60e@@|ee9a0e@|fcb60e@|fcc40e@|fcb61c@|eeb62a%|fcc42a%|fcd238@|fce046@|fcd254@
+000000     |fce054@|fce046@|fcd246@|eec438+|eeb638*|fcc42a@|fcd21c@|fcc41c@|eea81c@|fcc40e@@|fca80e@|fcb60e@|fcc40e@|fcb60e@@|fcd21c@|fcc41c@|e0a81c@|fcc42a@|fcd22a@|fcd238@|eec446+|000000  |fce062+
+000000         |fcd246@|fce038@|fcc438@|e0a838%|fcb62a@|fcd22a@|fcc42a@|eeb62a@|fcc42a@|fcd22a@|fcc42a@|eeb62a@|fcc438@|fce038@|fcc446@|d2a838+|eeb646%|fcd254@|fce054@
+000000        |fce062#@|eec454+|000000  |fcd246@|fce046@|eec446@|e0c446@|eec446@|fce054@|fcc446@|e0b646*|eec454@|fcd254@|fce062@
+000000             |e0d262%|c4c454*|000000   |c4d246@|7ea838#
+000000          |70c438-%@@|70b638@|62b62a@%|70b638@|70c438@|54a82a#|000000 |70b638=*#|7ec438#*|7ed246=
+000000         |8cd246%|7ed238@@@@|7ec438@|70c438@@|62b62a%%|62a82a%|62b62a%|70c438@|7ec438@|7ed238@@@|7ed246@
+000000          |7ec438*%|70c438@@|70b638@%|62b638+|7ec438#|70b62a@|70b638%@|70b62a%@|70b638@%=
+000000                 |7ec438@|62a82a%
+`,
+        plano: `
+                 @    +
+            @@#*%@%*#@@   +
+        +@*-#@%##@##%@#=#@@
+         %@#*%%#*%#*%%*#@%+-#@@
+     %@%*+#%#+##+#**#**%#*#%@%
+  =+=-*#%%#*#**#+++***#+*##**#%@@@
+  -%@@%#*****+-::::::-+#*+*#%%##-
+  =######**#-::::::::::-#****##%%@@=
+ #@%%%%##**+::::::::::::=#*######=
+  *#####***+::::::::::::=#*##%%%%%+
+ %@@%%##****-::::::::::-#***####*=
+    *#%%%**+#+-::::::-=*****%%@%%
+  +@@%##*##*+#**++++****+#%%#*===
+      #%%#**%*+#**#+##+#%#*#%@%
+     @@%=+%@#*#%*#%##%%*#@%=  =
+         %@%*#@%##@##%@#-*@@
+        *@=  %@###@%=#%@
+             #=   #=
+          :++++++++- :==+=-
+         *******+++=+******
+          =+*++=-=+++++++-
+                 *=
+`
+      },
+      {
+        color: `
+000000                 |fce062##
+000000            |eec462+|fce054@|eec446@@|e0b646%|fcd246@|fce046@|e0b646#|e0c454#|fcc446@|fce054@|fcd254#
+000000         |fce062@|fcd254@|e0b646%|e0b638%|fcd238@@|fcb62a@|eeb62a@|fcd22a@@|eeb62a@@|fcd22a@|fcd238@|e0b638#+|fcd246@|fce054@|fcd254%
+000000      |fcd262=|000000  |fcc446%|fcd238@|fcd22a@|eeb61c@|fcb61c@|fcd21c@|fcc40e@|eea80e@|fcc40e@@|eea80e@|fcb60e@|fcd20e@|fcb61c@|eea81c@|fcc42a@|fcd22a@|fcc438@|000000 |eec446=|fcd246#|fce054@|fce062%
+000000      |fcd246@|fce046@|fcd238@|eeb62a%@|fcc41c@|fcc40e@|eea80e@|fca80e@|fcb60e@|ee9a0e@|fca80e@@|ee9a0e@|fcb60e@|fca80e@|eea80e@|fcc40e@@|eeb61c@|fcb62a%|fcc42a@|fcd238@@|fcc446#
+000000  |fce070+|fce062%|fcd246#|fcc446*|e0b638%|eeb62a@|fcc41c@|fcc40e@|fcb60e@|eea81c@|fca81c%|fcb60e@|ee9a1c@|fcb61c@|e09a1c@@@|eea81c@|fca81c@|ee9a1c@|fca80e@|fca81c%|eea80e@|fcb60e@|fcc40e@|fcb60e@|eeb61c@|eeb62a%|fcc438#|fcd246@|fcd254@|fce054@|fce070*
+000000   |eec454@|fcc446@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@|eea81c@|fca80e@|fcb61c@|d29a2a@|a8701c%|9a620e%%%%|a8620e%|a8700e%|b67e1c%|d29a2a@|fcb62a@|fca80e@|eea80e@@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcc438@|eec446%
+000000 |fce062*|fcd254#|fcd246%|fcc438@|fcb62a@|fcb61c@|fca80e@@@@|fcb62a@|b6701c%|9a620e%%%%%%%%%%|a8701c%|fcb62a@|fca80e@@@@|fcb60e@|fcb62a@|fcc438@|fcd246%|fcd254%|fce062#
+000000  |fcd254@|fcd246@|fcc42a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@|fca81c@|c48c1c%|a8620e%|9a620e%%%%%%%%%%|a8620e%|b67e1c%|fca81c@|fca80e@|fcb60e@@|fcc40e@|fcc41c@|fcc42a@|fcc438@|fcd254#=
+000000  |eec454@|fcc446@|fcc438@|fcc41c@|fcc40e@|fcb60e@@|fca80e@|fca81c@|d29a2a%|9a620e%%%%|8c620e%%%%|9a620e%%%%|c48c1c%|fcb61c@|fca80e@|fcb60e@@|fcc40e@|fcc42a@|fcc438@|fcc446@|fcd254+
+000000 |fce062*|fcd254%|fcd246%|fcc438@|fcc42a@|fcb61c@|fca80e@@@@|eeb62a@|b67e1c%|9a620e%%%%%%%%%|a8620e%|a8701c%|eeb62a@|fca80e@@@|fcb60e@|fcb61c@|fcc42a@|fcc438@|fcd246%|fce054#|fce062+
+000000   |eec454+|fcc438@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fca80e@|ee9a1c@|fca80e@|fcb62a@|c49a2a%|a8700e%|9a620e%%|a8620e%|9a620e%%%|b6701c%|c48c2a%|fcb62a@|fca80e@|eea80e@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcc446@|e0c454@
+000000  |fce062%|fce054@|fcd246@|fcc438#|eeb638#|eeb61c@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fca81c#|fca80e@|eea81c@|fca81c@|e09a1c@@@@|eea81c@@|fca80e@|fca81c#|eea81c@|fcb60e@|fcc40e@|fcb61c@|eea81c@|e0b638@|fcd246*|fcd254#|fce062%
+000000     |eec446*|fcd238@|fcd22a@|fcc42a@|fcb62a@|eea81c@|fcb60e@|fcc40e@|eea80e@|fca80e@|fcb60e@|ee9a0e@|fca80e@@|ee9a0e@|fcb60e@|fca80e@|eea80e@|fcc40e@@|eeb61c@|fcb62a@|fcc42a@|fcd238@|fcd246@|e0c454*
+000000    |fce062#|fce054@|fcd246@|fcc446*|eeb646-|fcc42a@|fcd22a@|fcd21c@|eeb61c@|fcb60e@|fcc40e@@|eea80e@|fcc40e@@|eea80e@|fcc40e@|fcd21c@|fcb61c@|eeb61c@|fcd22a@@|fcc438@|000000 |eec446=|fcd254*|fce062%
+000000        |fcd246@|fce046@|fcd238@|eeb638%|e0b638%|fcd22a@@|fcb62a@|eeb62a@|fcd22a@@|eeb62a@@|fcd238@@|e0b638%%|fcd246@|fce054@|fcd254*
+000000        |fce062%|fcd254+|000000  |eec454#|fce054@|fcd246@|eec446@|e0b646#|fcd246@|fce046@|b6b638@|eec454@%|fce054@|eec454=
+000000             |e0d254#|000000   |fce070=|a8d246@|62a82a#
+000000          |70c438-%@@|70b638@|62b62a@%|70b638@|70c438@|54a82a#|000000 |70b638=*#|7ec438#*|7ed246=
+000000         |8cd246%|7ed238@@@@|7ec438@|70c438@@|62b62a%%|62a82a%|62b62a%|70c438@|7ec438@|7ed238@@@|7ed246@
+000000          |7ec438*%|70c438@@|70b638@%|62b638+|7ec438#|70b62a@|70b638%@|70b62a@@|70b638@%=
+000000                 |7ec438@|62a82a%
+`,
+        plano: `
+                 ##
+            =@%#*@@+*#@*
+         @%*+%@##%%##@@*=%@#
+      =  #@%*#%#*%%*#%#*%@% -#@#
+      %@%**%%**#**#*#**%%**%@@*
+  +%#+**#%#**#*#+++******#%#***%@@+
+   #%%%%#***#+-::::::-+#***#%%%%*
+ *#####****#-::::::::::-#****#####*
+  %%%%%##**+::::::::::::=**###%%%#=
+  #%%%###*#+::::::::::::=#*###%%%+
+ *#%%##****#-::::::::::-#****#####=
+   =%%%%#***#+-::::::-=#***#%%%%#
+  #@%*+*#%#*+#**++++**#+*#%#***##
+     +%@%#*#%**#**#*#**%%*#%@%+
+    #@%+-#%%**%#*%%*#%#*%@% -*%
+        %@%**%@##%@##@@+*%@+
+        %+  *@%#+@@*##@-
+             *   =#-
+          :+++++++*- :==+=-
+         *#*****+++=+******
+          =+*++=-=+++++++-
+                 *=
+`
+      },
+      {
+        color: `
+000000                  |fce062@|eed262=
+000000             |fcd254@|fce054@|eec446@|e0c446@|eec446@|fce046@|fcc446@|d2b654=|eec454#|fcd254@|fce054@
+000000         |fcd254%|fce054@|eec446@|d2a838%|fcc438@|fce038@|fcc42a@|eeb62a@|fcc42a@|fcd22a@|fcc42a@|eeb638@|fcc42a@|fce038@|fcc438@|000000 |eec446*|fcd246@|fce054@
+000000      |fce062#|fcd254+|000000  |fcd238@|fcd22a@|fcc42a@|eea81c@|fcc41c@|fcc40e@|fca80e@|fcb60e@|fcc40e@|fcb60e@@|fcd20e@|fcc41c@|e0a81c@|fcb61c@|fcd22a@|fcd238@|eec446#|000000 |eec446=|fcd254*|fce062%
+000000      |eec454%|fcd246@|fcd238@|fcc42a@|eea82a@|fcb61c@|fcc40e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fcb60e@|fcc40e@|fcc41c@|eeb62a%|fcc42a%|fcd22a@|fcd238@|fcd246@|eec454+
+000000   |fce062@|fce054@|fcd246@|fcc438#|e0b62a@|eeb61c@|fcc40e@@|fca80e@|eea81c%|fcb60e@|fca80e@|fcb62a@|ee9a1c@|e09a1c%@|eea81c@|fca81c@|eea82a@|fca80e@|fcb60e@|eea81c%|fca80e@|fcc40e@@|fcb61c@|eeb62a@|eeb638*|fcc446*|fcd246#|fce054#|fce062*
+000000    |e0b646@|fcc438@|fcc42a@|fcc41c@|fcc40e@|fca80e@|eea81c@|fca80e%|fcb61c@|d29a2a@|a8701c%|9a620e%%%%|a8620e%|a8700e%|b67e1c%|e09a2a@|fcb638#|fca80e@@|eea80e@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcd246@|fcd254*
+000000 |fce062@|fce054@|fcd246@|fcd238@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fc9a0e@|fcb62a@|b6701c%|9a620e%%%%%%%%%%|a8701c%|eeb638@|fca80e@@|fcb60e@@@|eeb61c@|eeb638@|eec446#|fcc454=
+000000  |eec454%|eec446@|fcc438@|fcc41c@|fcb60e@@@|fca80e@|fca81c@|c48c1c%|a8620e%|9a620e%%%%%%%%%%|a8620e%|b67e1c%|fca81c@|fca80e@|fcb60e@@|fcc40e@|fcc41c@|fcd22a@|fcd238@|fcd254@|fce062#
+000000 |fce062*|fcd254@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@|fca81c@|d28c1c%|9a620e%%%%|8c620e%%%%|9a620e%%%%|c48c1c%|fcb61c@|fca80e@@|fcb60e@@|fcb62a@|fcc438@|eec446@
+000000  |fcd254+|eec446#|eeb638@|eeb62a@|fcb61c@|fcb60e@|fca80e@@@|eeb62a@|b67e1c%|9a620e%%%%%%%%%|a8620e%|a8701c%|fcb62a@|fca80e@@@|fcb60e@|fcc41c@|fcc42a@|fcd238@|fcd246@|fce054@|fce070+
+000000   |fcd254@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|eea80e@|fca80e@@|fcb62a%|d29a2a%|a8700e%|9a620e%%|a8620e%|9a620e%%%|b6701c%|c48c2a%|fcb61c@|fca81c%|eea81c@|fca80e@|fcc40e@|fcc41c@|fcc42a@|fcc438@|e0b646@|e0b654+
+000000  |fce062*|fcd254#|fcd246*|eec438+|eeb638%|fcb61c@|fcc40e@@|fcb60e@|eea81c%|fcb60e%|fca80e@|eea82a@|fca81c@|e09a1c%@@@|eea82a@|eea81c@|fcb60e@|eea81c#|fca80e@|fcc40e@|fcb60e@|eea81c@|eea82a@|fcc438%|fcd246@|fce054@|fce062@
+000000     |fcd246@|fcd238@|fcd22a@|fcc42a@|eeb62a%|fcb61c@|fcc40e@|fcb60e@|ee9a0e@|fcb60e@@|ee9a0e@|fcb60e@|fca80e@@|fcb60e@|ee9a0e@|fca80e@|fcc40e@|fcb60e@|eea81c@|fcc41c@|fcd22a@|fcd238@|eec446@
+000000    |fce062%|fce054#|fcc446+|000000 |eec446*|fcd22a@@|fcc41c@|e0a81c@|fcc40e@@|fcb60e@@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|eea81c@|fcc41c@|fcd22a@|fcc42a@|e0b646+|eeb638=|fcd246#|fce054@|fce062#
+000000       |eec454+|fce046@|fcd246@|fcc438%|d2a838+|fcc438@|fcd22a@|fcc42a@|eeb62a@|fcc42a@|fcd22a@|fcc42a@|eeb62a@|fcc42a@|fce038@|fcc438@|d2a838%|eec438@|fce046@|fcd254@
+000000       |fce070+|fce062+|000000   |fce054@|fce046@|eec446@|e0b646#|eec446@|fce054@|e0c446@|d2b646@|eec454@|fce054@|fcd254@|000000   |fce062=
+000000            |fce062*|b6c454=|000000   |fce070#|7ec438@|62a82a#
+000000          |70c438-%@@|70b638@|62b62a@%|70b638@|70c438@|54a82a#|000000 |70b638=*#|7ec438#*|7ed246=
+000000         |8cd246%|7ed238@@@@|7ec438@|70c438@@|62b62a%%|62a82a%|62b62a%|70c438@|7ec438@|7ed238@@@|7ed246@
+000000          |7ec438*%|70c438@@|70b638@%|62b638+|7ec438#|70b62a@|70b638%@|70b62a@@|70b638@%=
+000000                 |7ec438@|62a82a%
+`,
+        plano: `
+                  @-
+             @@##%@%-+@@
+         %@#*#@%##@##%@% +@@
+      #+  %@#*%%*#%#*%%*#@@+ -*%
+      *@@#*#%#+#**#*##+#%#*#%@@=
+   @@%***#%*+#*#*++****#+*%%#*=+*#*
+    #%%%%***#+-::::::-+*****#%@@%+
+ %@@%%#****#-::::::::::-#**#*###*=
+  #%#####**=::::::::::::=**##%%%@@#
+ *@%%%%##**+::::::::::::=#*######
+  =*###****#-::::::::::-#***##%%@@=
+   %%@%%*****+-::::::-=#***%%%##-
+  **+=*#%%#+****++++**#+*%#**#@@@
+     %@%%*#%#+##+#**#+*%#*#@@#
+    %#= +%@#*#%#*%#*%%*#@%=-#@#
+       =@@#-#@%##@%#%@#+#@@
+       ++   @@#*#@###@@   =
+            *:   **-
+          :+++++++*- :==+=-
+         *#*****+++=+******
+          =+*++=-=+++++++-
+                 *=
+`
+      },
+      {
+        color: `
+000000              |fce062+|000000   |fcd262+|fce062@
+000000           |e0c454=|000000 |eec454+|fce054@|fcd246@|eec446@|e0b646@|fcd246@|fce046@|eec446*|e0b654=|eec446#|fce054@|fcd262%
+000000          |fce054@|fcd246@|eeb638@|e0b638@|fcd238@|fcd22a@|fcb62a@|eeb62a@|fcd22a@@|eeb62a@@|fcd238@@|eec446*|000000 |fcc446*|fce054@|fce062@
+000000      |fce062#|fce054%|fcc446*|e0b646-|eec446@|fcd22a@@|eeb61c@|fcb60e@|fcd20e@|fcb60e@|fca80e@|fcc40e@@|eea80e@|fcc40e@|fcd21c@|fcb61c@|e0a82a@|fcc42a@|fcd238@@|000000   |fce062+|fce070=
+000000       |fcc446@|fcd238@|fcd22a@|eeb61c@|eea80e@|fcc40e@@|ee9a0e@|fcb60e@@|ee9a0e@|fcb60e@|fca80e@@|fcb60e@|fca80e@|eea80e@|fcc40e@@|fcb62a@|eeb638#|fcc42a@|fcd238@|fce046@|fcd254@
+000000   |fcd262%|fce054@|fcd246@|fcd238@|fcb62a@|eea81c@|fcb60e@|fcc40e@|fcb60e@|ee9a1c@|fcb61c%|fca80e@|eea81c@@|e09a1c%@|e0a81c@|fca81c@|fca82a@|ee9a0e@|fcb60e@|fca80e%|eea81c@|fcb60e@|fcc40e@|fcc41c@|fcb62a@|e0b638#|000000 |eec446=|fcd254=
+000000    |e0b646@|eeb638@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|eea81c#|fcb61c@|d29a2a%|a8701c%|9a620e%%%%|a8620e%|a8700e%|b67e1c%|e09a1c@|fcb638#|fca80e@@@|eea80e@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcd246@|fcd254@|fcd262+
+000000 |fce062#|fce054@|fcd246@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@|ee9a0e@@|fcb62a@|b6701c%|9a620e%%%%%%%%%%|a8701c%|eeb62a@|fca80e@@|fcb60e@@@|fcb61c@|eeb638@|e0b646%
+000000  |e0c454*|eec446@|eeb62a@|fcb61c@|fcb60e@@|fca80e@@|fca81c@|c48c1c%|a8620e%|9a620e%%%%%%%%%%|a8620e%|b67e1c%|fca81c@|fca80e@|fcb60e@@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fcd246@|fcd254@
+000000 |fce062@|fcd246@@|fcd22a@|fcd21c@|fcc40e@|fcb60e@@|fca80e@|fca81c@|c48c1c%|9a620e%%%%|8c620e%%%%|9a620e%%%%|c48c1c%|fcb61c@|fca80e@@|fcb60e@@|fcb62a@|eeb638@|e0c446@
+000000   |e0b654%|eeb638@|eeb62a@|fcb61c@|fcb60e@@|fca80e@@|eeb62a@|b67e1c%|9a620e%%%%%%%%%|a8620e%|a8701c%|fcb62a@|ee9a0e@|fca80e@@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcd246@|fce054@
+000000  |fce054#|fcd246@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@|eea80e@|fca80e@@|fcc438#|d29a1c%|a8700e%|9a620e%%|a8620e%|9a620e%%%|b6701c%|c48c1c%|fcb61c@|eea81c#|fca81c@|fcb60e@|fcc40e@|fcc41c@|fcb62a@|eeb62a@|e0b646@
+000000     |eeb646+|eeb62a@|fcc41c@|fcc40e@@|fca81c@|fca80e%|fcb60e@|fc9a0e@|fcb62a@|fca81c@|d29a1c%|e09a1c@%|eea81c@|e09a1c@|fca81c@|fcb61c%|ee9a1c@|fcb60e@@|fca80e@|eea81c@|fcc42a@|fcd238@|fcd246@|fcd254@|eed262%
+000000    |fcd254%|fce046@|fcd238@|fcc42a@|fcb62a#%|fcc40e@@|fca80e@|eea80e@|fcb60e@|fca80e@@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fcb60e@|fcc40e@|eea80e@|fcb60e@|fcd21c@|fcd22a@|fcc438@|e0b646=
+000000    |fce062+|fcd254=|000000  |fcc438@|fcd22a@@|eeb61c@|eea81c@|fcc40e@@|eea80e@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcd20e@|fcb60e@|eea81c@|fcd21c@|fcd22a@|eeb638@|e0b638+|fcc446%|fcd254@|fce054@
+000000       |fcd254@|fce046@|fcd246@|eeb646=*|fcd238@|fcd22a@|fcb62a@|eeb62a@|fcd22a@@|eeb62a@@|fcd238@@|e0b638@|eeb638@|fcd246@|fce046@|eec454+
+000000       |fce062=|000000   |fcd254%|fce054@|fcc446@|e0b646%*|fce046@|fcd246@|c4b638@|eec454@|fcd246@|fce054@|eec454=|000000  |fce062+
+000000            |eed262=|000000   |eed262*|eed270=|70c438@|62a82a#
+000000          |70c438-%@@|70b638@|62b62a%%|70b638@|70c438@|54a82a#|000000 |70b638=*#|7ec438#*|7ed246=
+000000         |8cd246%|7ed238@@@@|7ec438@|70c438@@|62b62a%%|62a82a%|62b62a%|70c438@|7ec438@|7ed238@@@|7ed246@
+000000          |7ec438*%|70c438@@|70b638@%|62b638+|7ec438#|70b62a@|70b638%@|70b62a%%|70b638@%=
+000000                 |7ec438@|62a82a%
+`,
+        plano: `
+              +   =%
+           - =@%##%@+-+@#
+          @%#*%@##%%*#@@= +@@
+      #%+:#%%*#%#*%#*#%**%@%   ==
+       #@%**##+*#+#**#**%%#+#%@%
+   #@@%#*###+****+++**+#**#%%#+ --
+    *##%%#*+#+-::::::-+******#%@@@+
+ #@@@%##*++#-::::::::::-***#####*
+  +####****=::::::::::::=***#%%%@@@
+ @@@%%%##**=::::::::::::=#***####
+   *#####***-::::::::::-****#%%@@@
+  #@@%%#*****+:::::::-=#+*#%##**
+     =#%%#*+#+**+++*+**+##**#%@@#
+    #@@%**#%**#**#+**+##**%%#-
+    +-  %@%**%%*#%*#%#*%%#=#@@
+       %@%-+%@#*%%##@%*#%@=
+       =   #@%*=@@*#%@-  =
+            -   *-*-
+          :++++++++- :==+=-
+         *******+++=++*****
+          =+*++=:=+++++++-
+                 *=
+`
+      },
+      {
+        color: `
+000000              |fce062==|000000   |fce062%|fcd262+
+000000          |fce070=|eed262*|e0b654+|000000 |fcd246@|fce054@|eec446@|eec454@|eec446@|fce046@|fcd246@|000000 |e0c454=|fcd254%|fce062@
+000000          |fcd254@|fce046@|fcc438@|e0b638@|fcb62a@|fcd22a@|fcc42a@|eeb62a@|fcc42a@|fcd22a@|fcc42a@|e0b638@|fcc438@|fce038@|fcc446@|000000  |fcd254#|fce062@|fcd262=
+000000       |fce054@|fcd246@|eeb638#|e0b638*|fcc42a@|fcd22a@|fcb61c@|eea80e@|fcc40e@@|eea80e@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcd21c@|fcc41c@|e0a82a@|fcb62a@|fcd238@@|fcc446%
+000000    |fcd254=|000000  |eeb646*|fcc438@|fcd22a@|fcc41c@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcb60e@|ee9a0e@|fca80e@|fcb60e@|ee9a0e@|fcb60e@@|eea80e@|fcb60e@|fcd20e@|fcc41c@|eeb638%|fcc438*@|fcd246@|fce054@|fcd262%
+000000    |fcd254@|fcd246@|fcd238@|fcc42a@|eeb61c@|eea81c@|fcb60e@@|eea80e@|fca81c#|fcb60e@|eea81c@@|e09a1c@@|eea81c@@|fcb61c@|e09a0e@|fcb60e@@|eea81c@|fcb61c@|fcc40e@|fcd21c@|fcc42a@|eec438@
+000000 |fce070=|fcd254+|fcd246+|eeb646#|e0b62a@|eeb61c@|fcb61c@|fcc40e@|fcb60e@|fcb61c@|eea81c#|fcb61c@|d29a2a@|a8701c%|9a620e%%%%|a8620e%|a8700e%|b67e1c%|e09a1c@|fcb62a%|fca81c%|fca80e@@@@|fcb61c@|fcc42a@|fcd238@|fcd246@|fce054@|fce062@
+000000  |fcd254@|fcd246@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|ee9a0e@|fcb62a@|b6701c%|9a620e%%%%%%%%%%|a8701c%|eeb62a@|fca80e@@|fcb60e@@|fcc40e@|fcc41c@|fcc438@|eec446@
+000000  |eec454#|eec446@|eeb638@|fcb61c@|fcb60e@|fca80e@@@|fca81c@|d28c1c%|a8620e%|9a620e%%%%%%%%%%|a8620e%|b67e1c%|fca81c@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd22a@|fcd246@|fcd254@|fce062%
+000000 |fce062@|fcd254@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@@|fca80e@|fca81c@|c48c1c%|9a620e%%%%|8c620e%%%%|9a620e%%%%|c48c1c%|fcb61c@|fca80e@@|fcb60e@@|fcb61c@|fcc438@|eec446@|eec454+
+000000   |e0c446@|eec438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|eeb62a@|b67e1c%|9a620e%%%%%%%%%|a8620e%|a8701c%|eeb62a@|ee9a0e@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd22a@|fcd238@|fcd246@|fcd262*
+000000 |fce070=|fce054@|fce046@|fcd238@|fcc438@|fcb61c@|fcb60e@|fca80e@@@@|fcb638%|d29a1c%|a8700e%|9a620e%%|a8620e%|9a620e%%%|b6701c%|c48c1c%|fcb62a@|eea81c#|fcb60e@@@|fcb61c@|eeb61c@|e0b62a@|e0b646%|fcd254+|fce062=
+000000     |eec438#|fcc42a@|fcd21c@|fcc40e@|fcb60e@|eea81c@|fca80e@@|ee9a0e@|fcb62a@|fca81c@|e09a1c@@@|eea81c@|e09a1c@|fcb61c@|fca82a#|ee9a0e@|fcb60e@@|eea80e@|fcb61c@|fcc42a@|fcd238@|fcd246@|eec446@|e0c462=
+000000   |fcd262+|fce054@|fcd246@|fcd238@|fcc438#|eeb638%|fcc41c@|fcc40e@|fcb60e@|eea80e@|fca80e@|fcb60e@|ee9a0e@|fca80e@@|ee9a0e@|fcb60e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcc40e@|fcd21c@|fcc42a@|eeb638#|000000 |fcc454=|fce062+
+000000       |fcc446%|fcd238@|fcd22a@|fcc42a@|e0a82a@|fcc41c@|fcd20e@|fcb60e@|eea80e@|fcc40e@|fcb60e@|eea80e@|fcc40e@@|eea80e@|fcb61c@|fcd21c@|fcc42a@|e0a838%|eeb638@|fcd246@|fce054@|fcd254#
+000000      |fcd262#|fce054@|fcd246@|eec446+|000000 |fcc438@|fce038@|fcc42a@|eeb62a@|fcb62a@|fcd22a@|fcc42a@|eeb62a@|fcc42a@|fcd238@|fcc42a@|e0b638@|fcc438@|fce046@|fcd246@|000000   |fce070=
+000000          |eec462=|fce054@|fcd246@|e0c446%|d2b646=|fcc446@|fce046@|eec446@@|e0b646@|fce054@|fcd254@|000000 |e0b654=|fcd254+|fce062#
+000000           |fce070=|000000   |b6c454=|eee062#|000000 |7ec438@|62a82a#
+000000          |70c438-%@@|70b638@|62b62a@%|70b638@|70c438@|54a82a#|000000 |70b638=*#|7ec438#*|7ed246=
+000000         |8cd246%|7ed238@@@@|7ec438@|70c438@@|62b62a%%|62a82a%|62b62a%|70c438@|7ec438@|7ed238@@@|7ed246@
+000000          |7ec438*%|70c438@@|70b638@%|62b638+|7ec438#|70b62a@|70b638%@|70b62a@@|70b638@%=
+000000                 |7ec438@|62a82a%
+`,
+        plano: `
+              -=   #+
+          =+= %@###@% -#@
+          %@%*#@%#%@#*%@%  *@=
+       @%++%@#*%%*#%*#%%*#@@#
+    =  +%@%*#%**#**#*##*#%%*+%@@#
+    %@@%#*##*+#**++**#+##*#%%%#
+ =++**#####+#+-:::::--+**#***#%%@@@
+  %%@%%##*+#-::::::::::-#**######
+  *####****+::::::::::::=***##%%%@#
+ %@@%%%##**+::::::::::::=#***####=
+   ######***-::::::::::-#**#%%%@%*
+ =@@@%#***#**+-::::::-=#+#####**==
+     *%%%#**#+#*+++*+#+*##*#%@@%-
+   =@@%+*#%#**#**#*#**%#*%@%* -+
+       #@@#*#%#*%#*%%*#@%*#%@#
+      *@@= %@%##@%#%@#*%@%   =
+          -@@*-%@###@% -=#
+           =   -# *-
+          :+++++++*- :==+=-
+         *##****+++=+******
+          =+*++=-=+++++++-
+                 *=
+`
+      }
+    ]
   },
   {
-    cols: 30, alto: 18,
-    color: `
-000000         |fce062+|000000   |fce062*|000000 |e0c454=|fcd254+|fce062@|000000   |fce062=
-000000         |fcd246@@|e0b638*|eeb646#|fce046@|eec438@|eeb638@|fcd238@@|e0b646#|fcc438@|fce046@|fcd254%|000000  |fce062+
-000000      |fce054@|fcd246@|fcc438*|eeb638@|fcd21c@|fcc41c@|eea81c@|fcc41c@@|fcb60e@|fcd21c@|fcb61c@@|fcd21c@|fcc42a@|eeb638*|fcc438@|fce046@|fcd254@
-000000   |fce062=|fce054#|fcd246+|eec446=|fcc438@|fcd21c@|fcc40e@|eea80e@|fcb60e@|fca80e@@|fcb60e@|fca80e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@|eea80e@|fcc40e@|fcc41c@|fcc438%|eec446=|fcd254*|fce062*
-000000    |eec446#|fcc438@|fcd22a@|fcc41c@|fcb61c@@|fca80e@|eea81c@|fca81c@|d29a1c%|d28c1c%%|e09a1c@@|fcb62a@|fca80e@@|fca81c@|fcb61c@|fcc41c@|fcd22a@|fcc446@
-000000 |fce062*|fcd254@|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@@@|e0a82a@|b67e1c%|9a620e%%%%%|a8620e%|a8700e%|d29a2a%|fcb61c@|fca80e@@|fcb60e@|fcb61c@|fcc42a@|fcd246@|fcd254@|fce070+
-000000  |eec454*|eec438@|fcb62a@|fcb61c@|fcb60e@|fca80e@@|fcb62a@|a8700e%|9a620e%%%%%%%%|a8620e%|c48c1c%|fca81c@|fca80e@|fcb60e@@|fcb61c@|eec438@|eec446@|e0c462=
-000000 |fce054%|fcd246@|fcd238@|fcc42a@|fcc40e@|fcb60e@|fca80e@|fc9a0e@|eea82a@|a8620e%|9a620e%%%|8c620e%%%|9a620e%%%|b67e1c%|fcb61c@|fca80e@|fcb60e@@|fcc41c@|fcd22a@|fcd246@|fce054%|fce070=
-000000  |eec454%|fcc438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fcb61c@|c48c1c%|9a620e%%%%%%%|a8620e%|a8701c%|e0a82a@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcc438@|fcc446@|eec454%
-000000 |fce062+|fce054*|fcd246*|eeb638@|eeb61c@|fcb60e@@@|fca81c%|fcb61c%|e09a1c@|c48c1c%|a8701c%|a8620e%%|9a620e%|b67e1c%|c48c2a%|fca81c@#|fcb60e@@@|fcb61c@|eeb62a@|eec438%|fcd254#|fce062*
-000000   |fcd254#|fcd246@|fcd238@|fcc42a@|eeb61c@|fcb61c@|fcc40e@|fca80e@|fca81c@|fca80e@|eea80e@|fcb61c@|fca81c@|fcb61c@|fca80e@|fcb60e@|ee9a0e@|fcb60e@@|eeb61c@|fcc42a%|fcd238@|fcd246@|fcd254@
-000000   |fce062=|000000  |fcc446#|fcd238@|fcc42a@|eea81c@|fcb61c@|fcc40e@|fca80e@|fcb60e@@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcc41c@|eea81c@|fcb62a@|fcd238@|fcd246@
-000000      |fce062#|eec446+|000000 |fcc446@|fcd238@|fcb62a@|eeb62a@|fcd22a@|fcc42a@|eeb61c@|fcd21c@|fcc41c@|e0b638@|fcd238@|fcd246@|e0c454=|000000 |fcd254*|fce062*
-000000         |fce062@|fcd254+|000000 |eec454*|fce054@|eec446@|e0c446@|fcd238@|fcd246@|000000  |fce062*
-000000           |70b638=+|a8c446#|000000 |7ec438%|9ab638%|fce062#
-000000        |7ec438+@@@|70c438@@@|62b62a@|62a838#|62b62a*|70b638@|70c438@|7ec438@|7ed238@|8cd246*
-000000        |8cd246#|7ed238@|7ec438@|70c438@|70b62a@|70b638@#|70c42a@|62b638%|70c438@@@@|7ec438#
-000000              |7ec446+|62b62a%
+    cols: 30, alto: 19,
+    marcos: [
+      {
+        color: `
+000000            |fce062++|000000  |fcd262*|fce062*
+000000         |fce062@|eec454@|e0b646*|fcc446@|fce046@|eec446@@|fce046@|fcd246@|000000 |eec446*|fce054@|fcd262+
+000000      |fce062*|eec446+|000000 |fcc446@|fcd238@|eeb62a@|fcb61c@|fcd21c@|fcb61c@@|fcd21c@|fcb61c@|eeb62a@|fcd22a@|fcd238@|000000 |fcc446*|fce054@|fce062@
+000000      |eec446#|fcd238@|fcc42a@|eea81c@|fcb60e@|fcc40e@|eea80e@|fcb60e@|fca80e@@|fcb60e@|eea80e@|fcc40e@|fcb60e@|eea81c@|fcc41c@|fcd22a@|fcc438@|000000 |eec446=|fcd254+|fce062+
+000000   |eed262*|fcd246@|fcd238@|fcc42a@|eeb61c@|fcb61c@|fcc40e@|eea80e@|fca80e@@|fca81c@@@@|fca80e@@|ee9a0e@|fcb60e@@|eeb61c@|fcc41c@|fcd22a@|fcd238@|fcd246@
+000000 |fce062+|fcd254*|fcd246*|eeb638@|eeb62a@|fcb61c@|fcb60e@@|fca81c%|fcb61c@|d29a2a%|b67e1c%|a8620e%|9a620e%%|a8700e%|b67e1c%|d29a2a@|fcb61c@|fca81c#|fcb60e@@@|fcb61c@|eeb62a@|fcc438#|fcd254#|fce062#
+000000  |eec454@|fcd238@|fcc42a@|fcc41c@|fcb60e@|fca80e@|fc9a0e@|fcb62a@|b67e1c%|9a620e%%%%%%%%|b6701c%|eea82a@|fc9a0e@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcc438@|fcc446@
+000000 |fce054#|fcd246@|fcc438@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|d29a2a%|a8620e%|9a620e%%%|8c620e%|9a620e%%%%%|c48c1c%|fca80e@@|fcb60e@|fcc40e@|fcc42a@|fcc438@|fcd246@|fce054#
+000000  |eec454%|eec438@|fcb62a@|fcb60e@@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@@|fcb62a@|eec438@|eec454#
+000000 |fce062*|fcd254@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@@|fca81c@|d29a2a@|9a620e%%%%%%%|a8620e%|d29a2a@|fcb61c@|fca80e@@|fcb60e@|fcc41c@|fcd22a@|fcd246@|fcd254@
+000000    |eeb638%|fcc42a@|fcc41c@|fcc40e@|fca80e@%@|eea82a@|e09a1c@|c48c1c%%%%|e09a1c@|eea82a@|fca80e@%|fca81c@|fcc40e@|fcc41c@|fcc42a@|eeb638@|d2b654+
+000000   |fcd254@|fcd246@|fcd238%|fcb638#|fcb61c@|fcc40e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@@@@@|fcb60e@|eea80e@|fcb60e@|fcc41c@|fcb62a@|eeb638#|fcd246#|fce054@|fcd262%
+000000     |eec454+|fcd238@@|fcc42a%|eeb61c@|fcc41c@|fcc40e@|eea80e@|fcc40e@|fcb60e@@|fcc40e@|eea80e@|fcc41c@|fcd21c@|eeb62a@@|fcd238@|fcd246@
+000000     |fce062@|fcd254*|000000 |eec446=|fcd238@@|e0b638@|fcc42a@|fcd22a@|fcc42a@|fcb62a@|fcd238@|fcc438@|e0b638@|fcd246@@
+000000        |fce062#|fce054@|eec446=|000000 |fcd254@|fce054@|e0c454#|b6c446@|eed254@|fcd254#|000000  |fce062+
+000000          |70b638+*|7eb638##|70b646=|70c438@|54a82a=
+000000        |7ec438%@@@|70c438@@|70b638@|62b62a%|62a838#|62b62a%|70b638@|7ec438@|7ed238@@|8cd246+
+000000        |8cd246#|7ec438@|70c438@@|70b638@|62b638%|70b638#|70b62a@|70b638@|70c438@@@@|7ec438+
+000000              |7ec438#|62a82a%
 `,
-    plano: `
-         +   * =+%   =
-         @@+*@##@%+%@#  =
-      @@+#%%*%%*%##@%+%@%
-   =*+=%%#*#**#*#*#**%%*=+*
-    *%%%###**++=++#*#*#%%%
- +@@%%#****-::::::-+#**##%@@+
-  +####**#-:::::::::=**#####-
- #@%%%#***::::::::::-#*##%%%%=
-  #%%%##*#=::::::::-***#%%%%#
- +**#####**+=-:::-+#+######**
-   #@@%##%**#*#*#*#*####%@%
-   =  *@%*#%*##*%*#%*#@%
-      #= %@##@%#@%#%@- **
-         @= +@##%@  *
-           :-+ **#
-        -*****++=-+**#+
-        ****++=+++***+
-              -+
+        plano: `
+            =+  +*
+         @%+%@##@% +@+
+      *= %@##@##@##@% +@@
+      *@%*#%*##*#*%#*%@% -++
+   +@@%##%**********###%%@%
+ +*+#####+#+-:::--+#+#####*##
+  %%%%##**-::::::::-***#%%%#
+ #%%%##**+::::::::::=**##%%%#
+  #####***::::::::::+**####*
+ *@@%%#***+::::::::+#**#%%@@
+    #%%%****+====+****%%%#-
+   @@#*#%#*#******#*#%#+*%%
+     =@@#*%#*%##%*#%*#@@
+     @* -@@##@##@%#%@
+        *%- %@+*%#  +
+          --+=:+:
+        +*****++-++**#=
+        ***++==+++*+*=
+              +=
 `
+      },
+      {
+        color: `
+000000             |fce062%|000000   |fce062%
+000000         |fce062%|fcd254@|e0c446@|e0b646%|fce046@|fcc438@|eec446@|fcc438@|fce046@|eec446+|000000 |fcd254%|fce062@
+000000      |fce062*|fcd254%|e0b646+|eeb638%|fcd238@|fcc42a@|eeb61c@|fcd21c@|fcc41c@|eeb61c@|fcd21c@|fcc41c@|e0b62a@|fcc42a@|fcd238@|eec446#|000000 |fcd246#|fce054@
+000000    |fcd262=|000000  |fcd238@|fcd22a@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcb60e@@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|eea81c@|fcb61c@|fcd22a@|fcd238@|eec446+
+000000    |fcc446@|fcd238@|fcd22a@|fcb61c@@|fcc40e@|fca80e@|ee9a0e@|fcb60e@|eea81c@|fca81c@|eea81c@|fcb61c@|ee9a0e@|fcb60e@|ee9a0e@|fcb60e@|fcc40e@|fcb61c@|fcb62a%|fcc42a@|fcd238@|fcd246@|fcd254*
+000000 |fce062+|fce054@|fcd246%|fcc438@|eeb61c@|fcb61c@|fcb60e@@|fca81c%|fcb62a%|d29a1c@|b67e1c%|a8620e%|9a620e%%|a8700e%|b67e1c%|d29a2a@|fcb61c@|fca81c#|fca80e@|fcb60e@|fcc40e@|fcb61c@|eeb62a@|eeb646*|fcd254==
+000000  |e0c454%|eec438@|fcc42a@|fcc41c@|fcb60e@@|fca80e@|eea82a@|b67e1c%|9a620e%%%%%%%%|b6701c%|eea82a@|fc9a0e@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fcd246@|fcd254*
+fce070=|fcd254@|fcd246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|d29a2a%|a8620e%|9a620e%%%|8c620e%|9a620e%%%%%|c48c1c%|fca80e@@|fcb60e@@|fcc42a@|fcc438@|fcd254%=
+000000  |e0c454@|eec438@|fcb62a@|fcb60e@@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@@|fcc42a@|fcc438@|fcd246%|fce062+
+000000 |fce062%|fcd254@|fcd246@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fca81c@|d29a2a@|9a620e%%%%%%%|a8620e%|d29a2a@|fcb61c@|fca80e@@|fcb60e@|fcc41c@|fcd238@|fcd246@|fcd254%
+000000   |eec446=|fcc438@|fcd22a@|fcc41c@|fcb60e@|eea80e@|fca80e@@|eea82a%|e09a1c@|c48c1c%%%%|e09a1c@|eea82a@|fcb60e@|fca81c#|fcb60e@|fcc40e@|fcc41c@|eeb62a@|e0b638@|eec454=
+000000  |fce062*|fce054@|fcd246#|fcc438*|eeb638%|fcc41c@|fcc40e@|fca80e@|eea80e@|fcb60e@|ee9a0e@|fca80e@|fc9a0e@|fca80e@|fc9a0e@|fca80e@|fcb60e@|eea80e@|fcc40e@|fcc41c@|eeb62a@|fcc438#|fcd246@|fcd254@|eed262#
+000000     |fcd246@|fce038@|fcc438@|eeb638#|fcb61c@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@@|eea80e@|fcc41c@@|e0a82a@|fcc42a@|fcd238@|fcd246%
+000000     |fce062*|000000  |fcc446@|fce038@|fcc438@|e0b638@|fcd238@|fcd22a@|eeb62a@|fcc42a@|fcd238@|e0b638@|eec438@|fce046@|fcd246@|000000 |eec454=|fce062*
+000000        |fce062@|fcd254+|000000  |fce054@|fcc446%|e0c454%|b6c446@|fce054@|000000  |eed254=|fce062+
+000000          |70b638+*|8cc446@|62b638+|70b646=|70c438@|70a82a=
+000000        |7ec438%@@@|70c438@@|70b638@|62b62a%|62a838#|62b62a%|70b638@|7ec438@|7ed238@@|8cd246+
+000000        |8cd246#|7ec438@|70c438@@|70b638@|62b638%|70b638#|70b62a@|70b638@|70c438@@@@|7ec438+
+000000              |7ec438#|62a82a%
+`,
+        plano: `
+             %   %
+         %@#*@%#%@= #@
+      *#=*@%*%%#%%*%@+ *@
+    =  %@#*%*##*%*#%*#@@=
+    %@%####*#***#*#+####%@@*
+ +%%%####**+-:::-=+#+*####+==
+  *#%%##**-::::::::-***#%%%@*
+=@@@%%#**+::::::::::=**###%#=
+  #####***::::::::::+**###%#+
+ %@@%##***+::::::::+#**#%@@%
+   -%%%#****+====+*#+#%%#*-
+  +@#+*%%**#+#*#**#*%%#*@@*
+     %@%+#%##%*%%*%%*%@#
+     *  %@%*%@#%@##@% -*
+        @+  @#*#@  =+
+          --*-:+:
+        +*****++-++**#=
+        ****+==+++*+*=
+              +=
+`
+      },
+      {
+        color: `
+000000             |fcd262*|fce062*|000000  |fcd262+|fce062+
+000000         |eed262=|fce054@|eec446@|e0b646%|fcd246@@|e0b646@|eec446@|fce046@|fcd246@|000000 |eec446=|fce062@
+000000       |fce054@|eec446@|d2a838#|fcc438@|fcd22a@|eeb62a@|fcc41c@|fcd21c@|eeb61c@|fcc41c@|fcd21c@|eeb62a@@|fcd238@|fcd246@|000000 |eec446=|fce054*|fce062*
+000000    |fce062*|fcd254+|000000 |fcc446%|fcd22a@|fcc41c@|eea80e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|eea80e@|fcb60e@@|fca80e@|fcc40e@|fcb61c@|eeb62a@|fcc42a@|fcd238@|fcd246@
+000000    |e0c446#|fcd238@|fcd22a@|fcc41c@|fcb61c@|fcb60e@@|ee9a0e@|fcb60e@|eea80e@|fca81c@|eea81c@|fcb61c@|ee9a0e@|fcb60e@|eea81c@|fca80e@|fcc40e@|fcb60e@|eeb62a@|fcc42a#|fcd238@|fcd246@|fce054@
+000000  |fcd254@|fcd246@|fcd238@|fcb62a@|fcb60e@@@|fca80e@|fcb62a%|e09a1c@|b67e1c%|a8700e%|9a620e%%|a8700e%|b67e1c%|d29a2a@|fca81c@%|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcb62a@|e0b646%
+000000  |e0c454#|eeb638@|fcb62a@|fcb61c@|fcb60e@@|fca80e@|eeb62a@|b6701c%|9a620e%%%%%%%%|a8701c%|fcb62a@|fc9a0e@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fcd246@|fce054@|fce062=
+fce070=|fce054@|fcd246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|d29a2a%|a8620e%|9a620e%%%|8c620e%|9a620e%%%%%|c48c1c%|fca80e@@|fcb60e@@|fcb61c@|eec438@|eec454#
+000000  |eec446@|fcc438@|fcc42a@|fcc40e@|fcb60e@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@@|fcc42a@|fcd238@|fcd246@|fce062#
+000000 |fce062#|fcd254%|fcd238%|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fcb61c%|d29a2a@|9a620e%%%%%%%|a8620e%|d29a2a@|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fcc446@|eec454*
+000000   |fcd246%|fcd238@|fcd22a@|fcc41c@|fca80e@@@@|fca82a@|e09a1c@|c48c1c%%%%|e09a1c@|eea81c@|fcb61c%|fca81c#|fcb60e@|fcc40e@|fcb61c@|eeb62a@|eeb638%|fcd246*|fce062+
+000000  |fce062*|fcd254*|fcc446+|eeb646*|fcc42a@|fcc41c@|fcc40e@|eea80e@|fcb60e@@|ee9a0e@|fcb60e@|ee9a0e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@|fcc40e@|fcb61c@|fcb62a%|fcd238@|fcd246@@
+000000    |fcd254+|fce046@|fcd238@|fcc438#|eeb638%|fcc41c@@|eea80e@|fcc40e@@|eea80e@|fcc40e@|fcb60e@@|fcd21c@|fcb61c@|eeb62a@|fcd22a@|fcd238@
+000000    |fce062=|000000  |eec454=|fcd246@|fcd238@|e0b638@|eeb638@|fcd238@|fcc42a@|eeb62a@|fcd238@|fcc438@|e0b638@|fcd238@|fce046@|e0b654+|e0b646=|fcd254#|fce062#
+000000       |fce062+|fce054*|000000  |fcd254%|fce054@|eec454#|e0b654*|eed254@|fcd254@|000000 |e0c454=|fce062*
+000000          |70b638+|8cb638#|7eb638#|62b638+|70b646=|70c438@|62a82a=
+000000        |7ec438%@@@|70c438@@|70b638@|62b62a%|62a838#|62b62a%|70b638@|7ec438@|7ed238@@|8cd246+
+000000        |8cd246#|7ec438@|70c438@@|70b638@|62b638%|70b638#|70b62a@|70b638@|70c438@@@@|7ec438+
+000000              |7ec438#|62a82a%
+`,
+        plano: `
+             +*  =+
+         -@%*%@##@% -@
+       @#+%@##@##@##@% -*+
+    *= #@%*%#*%*##*%#*%@%
+    +%@%###+#***#+#**%##*%@@
+  @@%####**+-:::-=+***#%%#*
+  +#####**-::::::::-#**#%%@@@=
+=%@%%%#**+::::::::::=**####*
+  %%%###**::::::::::+**##%%%#
+ #%####***+::::::::+#*#%%%%+
+   #%%%*****+====+**+#%#**++
+  **==%%%*##+#+#+#**%#*%@%
+    +@@**%%*%%*%##%##@@
+    =  -@@##@%#@%#%@=-*#
+       +*  #@*+%% =*
+          -+=-:*:
+        +*****++-++**#=
+        ****+==+++*+*=
+              +=
+`
+      },
+      {
+        color: `
+000000              |fce062@|000000   |fce062*
+000000          |fcd254@|fcd246@|eec446@|eeb638@|fce046@|fcc438@|eec446@|fcd246@|fce046@|000000  |fcd254+|fce062*
+000000       |fce054@|fcd246@|e0b638@|eeb638@|fcd22a@|fcc42a@|eeb61c@|fcd21c@|fcb61c@@|fcd21c@|fcc42a@|e0b638@|fcd238@|fcd246@|eec454+|000000 |fcd254=|fce062*
+000000    |fce062#|fce054#|fcc446+|eec446+|fcd22a@|fcd21c@|fcb60e@@|fcc40e@|eea80e@|fcb60e@|fca80e@|fcb60e@|fcc40e@|eea80e@|fcc40e@|fcc41c@|eeb62a@|fcc42a%|fcd238@|fcd246@|fcd254*
+000000     |eec438@|fcd22a@|fcc41c@|fcb61c@|fcb60e@@|ee9a0e@|fcb61c@|fca80e@|fca81c@|eea81c@|fcb61c@|ee9a1c@|fca80e@|fcb60e@|eea80e@|fcc40e@@|eeb61c@|eeb638#|fcc438#|fcd246@|fce054@|fce062+
+000000  |fcd254@|fcd246@|fcd238@|fcc42a@|fcb60e@|fca80e@@@|fcb62a#|e09a1c@|b67e1c%|a8700e%|9a620e%%|a8700e%|b67e1c%|e09a2a@|fca81c@|fca80e@|eea80e@|fca80e@|fcc40e@|fcc41c@|fcc42a@|eec438@
+000000 |fcd254=|fcc446*|eeb638@|fcb62a@|fcb61c@|fcb60e@|fca80e@@|fcb62a@|b6701c%|9a620e%%%%%%%%|b6701c%|fcb62a@|fc9a0e@|fca80e@|fcb60e@@|fcc42a@|fcd238@|fcd246@|fcd254@|fce070=
+000000 |fcd254*|fcd246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@@|d29a2a%|a8620e%|9a620e%%%|8c620e%|9a620e%%%%%|c48c1c%|fca80e@@|fcb60e@@|fcb61c@|eec438@|eec454#
+000000 |fcd262=|fcd246@|fcd238@|fcc42a@|fcc40e@|fcb60e@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@|fcc40e@|fcc42a@|fcd238@|fcd246@|fce062%
+000000 |fce062=|fcd246+|eec446%|eeb62a@|fcb61c@|fcb60e@@|fca80e@|fca82a%|d29a1c@|9a620e%%%%%%%|a8620e%|d29a1c@|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|eeb646@
+000000  |fcd254+|fcd246@|fcd238@|fcc42a@|fcb61c@|fca80e@@@|eea81c%|fca81c@|d29a1c%|c48c1c%%%%|e09a2a@|eea81c@|fcb61c#|fca80e%|fcb60e@@|fcb61c@|eeb62a@|fcd246%|fce054%|fce062#
+000000     |fcc438#|fcc42a@|fcd21c@|fcb61c@|eea81c@|fcb60e@|fca80e@@@|fc9a0e@|fca80e@|ee9a0e@|fcb60e@|ee9a0e@|fcb60e@|fcc40e@|fcb61c@|fcc42a@|fcd238@|fcd246@|eec446@
+000000    |fce054@|fce046@|fcd238%|eeb638+|fcc42a@|fcd21c@|fcb61c@|eea80e@|fcc40e@|fcb60e@@|fcc40e@|eea80e@|fcc40e@|fcc41c@|eea81c@|fcc42a@|fcd238@|fcc438@|000000  |fce062+
+000000       |fcd254@|fce046@|fcc438@|e0a838#|fcc438@|fcd22a@|eeb62a@|fcc42a@|fcd238@|eeb62a@|eeb638@|fcd238@|fcc446@|d2a838=|eec446#|fce054@|fcd262=
+000000       |fce062#|000000   |fce054@|fcd246%|e0c454#|eec454*|fce054@|d2c454+|e0c454+|eed254+|fce062#
+000000          |70b638+|8cc446%|62b62a*|62b638+|70b646=|7ec438@|54a82a=
+000000        |7ec438%@@@|70c438@@|70b638@|62b62a%|62a838#|62b62a%|70b638@|7ec438@|7ed238@@|8cd246+
+000000        |8cd246#|7ec438@|70c438@@|70b638@|62b638%|70b638#|70b62a@|70b638@|70c438@@@@|7ec438+
+000000              |7ec438#|62a82a%
+`,
+        plano: `
+              @   *
+          @%##@##%@  +*
+       @%*#@##%##@#*%@= -+
+    ##==%%*#%*#*##*%%#*@@+
+     #%%###+#***#**#*#%#**%@+
+  %@%%#***++-:::--+****%%%#
+ -+####**#-::::::::-#***#%%@@=
+ +%%%##**+::::::::::=**####*
+ =%%%%#**+::::::::::+**#%%%@#
+ =+*####**+::::::::+#*#%%##
+  +@@%#***+*+====+*+*##*##%*
+     *%%#*#****#+#+#%##%@#
+    @@#=#%#*%##%*#%*#@#  +
+       %@%+%@##@##@%:*@-
+       *   @#*+@===#
+          -+--:*:
+        +*****++-++***=
+        +**++==+++*++-
+              +=
+`
+      },
+      {
+        color: `
+000000              |fce062*#
+000000          |eed254*|fce054@|eec446@|e0b646@|fcd238@@|e0b646%|eec446@|fce046@|fcd246%|000000  |fce062*
+000000       |fcd254*|fce046@|eec438@|e0a82a@|fcd22a@@|eeb61c@|fcc41c@@|eeb61c@|fcc41c@|fcd22a@|e0b62a@|fcc438@|fce046@|fcd246@
+000000    |fcd262=|fce054@|fcd246%|eeb638+|fcc438@|fcd21c@|fcb61c@|eea80e@|fcc40e@|fca80e@|fcb60e@@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcd21c@|fcc42a@|eeb638#|fcd238@|fcd246@|fcd254@
+000000  |fce062=|fcd254=|000000 |e0b646%|fcc42a@|fcd21c@|fcb60e@|eea81c@|fcb60e@|fca80e@|fca81c@|fca80e@|eea81c@|fca81c@@@|fca80e@|fcb60e@|eea81c@|fcb60e@|fcc40e@|fcc41c@|eeb638@|eec438+|fcd246*|fce054#|fce062*
+000000  |eed262+|fcd246@|fcd238@|fcd22a@|fcc40e@|fca80e@@@|fcb62a%|e09a2a@|b67e1c%|a8700e%|9a620e%%|a8700e%|b67e1c%|e09a1c@|fcb62a%|fca80e@@@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcd254*
+000000 |fce054#|fcd246%|fcc438@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fcb62a@|b6701c%|9a620e%%%%%%%%|b6701c%|eeb62a@|fca80e@@@|fcb60e@|fcb62a@|fcc438@|fcd246%|fce054#|fce070=
+000000  |eec446@|fcc438@|fcc41c@|fcb60e@@|fca80e@@|d29a2a%|a8620e%|9a620e%%%|8c620e%|9a620e%%%%%|c48c1c%|fca81c@|fca80e@|fcb60e@@|fcc41c@|fcc438@|eec446@
+000000 |fce054#|fcd246@|fcd238@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fc9a0e@|e09a2a@|a8620e%|9a620e%%%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fcd254@|fce062*
+000000   |e0b646@|eeb62a@|fcb61c@|fcb60e@@|fca80e@|fca81c@|e09a1c@|9a620e%%%%%%%|a8620e%|d29a1c@|fca81c@|fca80e@|fcb60e@@|fcb61c@|eeb62a@|e0b646@|e0c454-
+000000  |fce054@|fcd246@|fcd238@|fcc42a@|eeb61c@|fca80e@|fcb60e@|fca80e@|fca81c#@|d29a2a@|c48c1c%%%%|d29a2a@|fca81c@#|fca80e@|fcb60e@@|eeb61c@|fcc42a@|fcd246@|fcd254@|fcd262#
+000000    |eec446=|fcc438@|fcd22a@|fcc41c@|fcb61c@@|fcb60e@|ee9a0e@|fca80e@@@@@|fcb60e@|ee9a0e@|fcc40e@|fcb61c@|eeb61c@|fcc41c@|fcd238@|fcc438@|e0b654-
+000000   |fcd262=|fce054@|fcd246%|fcc438+|eec438*|fcd22a@|fcd21c@|eeb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@@|eea80e@|fcc40e@|fcb61c@|eeb61c@|fcd22a@|fcd238@|eec446+=|fcd254*|fce062#
+000000       |fce046@|fcd246@|eeb638*%|fcd238@|fcc42a@|eeb62a@|fcd22a@@|eeb638@|fcc438@|fce038@|e0b638#|e0b646#|fcd246@|fce054@
+000000       |fce062=|000000  |fcd254#|fce054@|eec454#|e0b654+|fcd254@|eed246@|a8a846#|eec454*|fce062%|fcd262=
+000000          |8cc446*|7eb638#|62b62a*|62b638+|7eb646=|7ec438@|54a82a=
+000000        |7ec438%@@@|70c438@@|70b638@|62b62a%|62a838#|62b62a%|70b638@|7ec438@|7ed238@@|8cd246+
+000000        |8cd246#|7ec438@|70c438@@|70b638@|62b638%|70b638#|70b62a@|70b638@|70c438@@@@|7ec438+
+000000              |7ec438#|62a82a%
+`,
+        plano: `
+              *#
+          +@%#@@*%@#  *
+       *@#*%%*%%*%%*#@%
+    =@#=#@#*%*##*%*#%#+%@@
+  == *%%#*#**#**#**#*#%%#=+**
+  =%@%#****+--::--+****#%%%*
+ *#%###**#-::::::::-#**###%##=
+  %%%##**+::::::::::=**##%%%
+ #@@%%#***::::::::::+**#%%@@*
+   #####**+::::::::+#*#####-
+  %@@%#*#*+*+====+*+####%@@*
+    -%@%###*#****#*%##%@%-
+   =@%=+%%*#%*%%*%#*%@=-*#
+       @@+*@%#%@#%@*+@@
+       =  #@*-@%=+#-
+          ==---*:
+        +*****++-++**#=
+        ****+==+++*+*=
+              +=
+`
+      },
+      {
+        color: `
+000000           |fce062=|000000   |fce062@|000000   |fce062=
+000000        |fcd262+|e0b654=|000000 |fcd246@@|eec446@|eec438@|fce046@|eec438@|e0c446%|fcd246@|fce054@
+000000        |fce046@|fcd238@|e0b62a@|fcc42a@|fcd22a@|fcb61c@@|fcd21c@|fcb61c@@|fcd22a@|fcb62a@|e0b638#|fcd238@|fce046@|eec454=
+000000     |fcd254@|fcd246@|fcc438#|eeb638%|fcc41c@@|eea80e@|fcb60e@@|fca80e@|fcb60e@|eea80e@|fcc40e@|fcb60e@|eea80e@|fcc41c@@|eeb638#|fcc438*|fcd246@|fce054@|fcd262#
+000000  |fce062+|fce054#|fcd246*|eeb638*|eeb62a@|fcc41c@|fcc40e@|eea80e@|fcb61c@|fca80e@|ee9a1c@|fcb60e@|eea81c@|fca81c@@|fcb61c@|ee9a0e@|fcb60e@|fcb61c@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|eeb646+|000000 |fcd254=|fce062=
+000000   |eec446@|fcc438@|fcd22a@|fcc40e@|fcb60e@|fca80e@@|fca81c@|d29a2a@|b67e1c%|a8700e%|9a620e%%|a8700e%|b67e1c%|e09a1c@|fcb62a#|fca80e@@@|fcb60e@|fcc41c@|fcd22a@|fcd238@|fcd246@|fcd262=
+000000 |fce054@|fcd246@|fcd238@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fcb62a@|b6701c%|9a620e%%%%%%%%|b6701c%|eeb62a@|fca80e@@|fcb60e@@|fcb62a@|eeb638@|fcd246*|fcd254=
+000000  |e0c446@|eec438@|fcb61c@|fcb60e@@|fca80e@@|d29a2a%|a8620e%|9a620e%%%|8c620e%|9a620e%%%%%|c48c1c%|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fcd246@|fcd254*
+000000 |fcd254@|fcd246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fc9a0e@|e0a82a@|a8620e%|9a620e%%%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@|fcc40e@|fcc42a@|fcd238@|fcd254@
+000000   |eeb646@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fca81c@|e09a1c@|9a620e%%%%%%%|a8620e%|d29a1c@|fcb62a%|fca80e@|fcb60e@@|fcb61c@|eeb62a@|eec446@|fcd254+
+000000  |fce054@|fcd246@|fcd238%|fcb62a@|fcb61c@|fcb60e@@|fca80e@|fca81c#@|d29a2a@|c48c1c%%%%|d29a1c%|fca81c@#|fca80e@|fcb60e@|fca80e@|fcb61c@|fcd22a@|fcd238@|fcd254@|eed262=
+000000    |fcd246#|fcd238@|fcd22a@|fcc41c@|fcb61c@|fcb60e@@|ee9a0e@|fcb60e@|fc9a0e@|fca80e@|fc9a0e@|fca80e@@@|fcc40e@|eea80e@|fcb61c@|fcd21c@|fcd22a@|eeb646%
+000000   |fce062*|fce054#|fcc446+|000000 |fcc438@|fcd22a@|fcc41c@|eea81c@|fcc40e@@|eea80e@|fcc40e@|fcb60e@@|fcd21c@|eeb61c@|fcb61c@|fcd22a@|fcc438@|e0b638=|fcd246*|fce054@|fce062+
+000000      |fcd254%|fce046@|fcc438#|e0b646=|fcc438@|fcd238@|fcb62a@|eeb62a@|fcd238@|fcc42a@|eeb638@|fcd238@@|d2a846#|eec446@|fce054@|fcd262*
+000000          |fce054@|fcd254%|e0c454*+|fce054@|b6c438@|c4b646%|eec454*|fce062@
+000000          |8cc446*|70b638*|62b62a*|62b638+|9ac454*|70c438@|54a82a=
+000000        |7ec438%@@@|70c438@@|70b638@|62b62a%|62a838#|62b62a%|70b638@|7ec438@|7ed238@@|8cd246+
+000000        |8cd246#|7ec438@|70c438@@|70b638@|62b638%|70b638#|70b62a@|70b638@|70c438@@@@|7ec438+
+000000              |7ec438#|62a82a%
+`,
+        plano: `
+           =   @   =
+        =- @%##@#*%@
+        @%*#@##@##@#+%@=
+     @@**%%*##*#*##*%%*+@@*
+  +#++#%%*##+#***#+#**%%#= -=
+   #%%%#***+-:::--+****#%%@@=
+ %@%%##**#-::::::::-***####+=
+  #####**+::::::::::=**##%%%*
+ @@%%%#**+::::::::::+**#%%%%
+   ##%##**+::::::::+**#####=
+  @@##*##*+*+====+*+##*#%@@=
+    *@%####+#******#*#%%*
+   *#= %@%*%#*%##%*#@%-*@+
+      %@*-%@##@##@%+#@+
+          @#+=@**+@
+          =---=+:
+        +*****++-++***=
+        +**++==+++*+*-
+              +=
+`
+      },
+      {
+        color: `
+000000            |fce062=|000000  |fcd262#|fce062#
+000000        |fce070*|eec454#|d2b646=|fcc446%|fce046@|eec446@|eeb646@|fcd238@@|e0b646*|eec446%|fce054@|fcd254#
+000000        |fcd246@|fce046@|fcc438@|eeb62a@|fcd22a@|fcc41c@|eeb61c@|fcd21c@|fcc41c@|eeb62a@|fcd22a@@|e0b638#|fcc438#|fce046@|fcd254@
+000000     |fcd254*|fce046@|fcc438@|eeb62a%|fcb61c@|fcd21c@|fcb60e@@|fcc40e@|eea80e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|eea80e@|fcc41c@|fcd21c@|fcc438@|eeb638+|fcc438#|fcd254@|fce062@
+000000   |fce054@|fcd246%|fcc438#|eeb62a@|fcb61c@|fcc40e@|fcb60e@|eea80e@|fcb60e@|ee9a0e@|fcb61c@|ee9a1c@|fca81c@|eea81c@|fcb60e@|ee9a0e@|fcb60e@@|fca81c@|fcc41c@|fcd21c@|fcd22a@|fcc438%
+000000   |e0b646#|eec438@|fcc42a@|fcc41c@|fcb60e@|fca80e@%|fca81c@|d29a2a@|b67e1c%|a8700e%|9a620e%%|a8700e%|b67e1c%|e09a1c@|fcb62a%|fca80e@@@@|fcb61c@|fcc42a@|fcd238@|fcd246@|fce062%
+000000 |fce062%|fcd246@|fcd238@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fc9a0e@|fcb62a@|b6701c%|9a620e%%%%%%%%|b6701c%|eea82a@|fca80e@@|fcb60e@@|fcb61c@|eeb638@|eec446+
+000000  |eec446@|eec438@|fcb61c@|fcb60e@@|fca80e@@|d29a2a%|a8620e%|9a620e%%%|8c620e%|9a620e%%%%%|c48c1c%|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fcd246@|fce054@|fce070=
+000000 |fce054%|fcd246@|fcd238@|fcc42a@|fcb60e@@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@|fcc41c@|fcc42a@|fcc438@|eec454%
+000000  |eec454+|fcc446@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fc9a0e@|fca81c@|d29a2a@|9a620e%%%%%%%|a8700e%|d29a2a@|fcb62a%|fca80e@@|fcb60e@|fcb61c@|fcc42a@|fcc446@|fce054#|fce070+
+000000 |fce070=|fce054#|fcd246#|fcc438*|eeb62a@|fcb61c@|fcb60e@@|fca80e%|fcb61c%|eea81c@|e09a1c@|c48c1c%%%%|d29a1c@|fcb62a@|fca81c@|fca80e@@@|fcc41c@|fcd22a@|fcd238@|eec446@
+000000   |fcd254=|fcd246@|fcd238@|fcc42a@|fcb62a%|fcb61c@|fcc40e@|fca80e@|eea80e@|fcb60e@|ee9a0e@|fcb60e@|ee9a0e@|fcb60e@|ee9a0e@|fcb60e@@|eea80e@|fcc40e@|fcd21c@|fcc42a@|e0b646+|000000 |fce062=
+000000   |fce062+|fcd254=|000000 |eec446+|fcd238@|fcd22a@|eeb61c@@|fcc40e@|fcb60e@@|fcc40e@|eea80e@|fcc40e@@|eea81c@|fcc41c@|fcd22a@|eeb638%|eec438*|fcd246@|fce054@
+000000      |fce054@|fcd246@|eec446=*|fcd238@|fcd22a@|eeb62a@|fcc42a@|fcd22a@|eeb62a@|fcc438@|fce038@|eeb638@|e0b638@|fcd246@|fce054@
+000000         |fcd254#|fce054@|eec454*|000000 |fcd254@|fce054@|a8b638@|d2c454#|fce054@|fcd262+
+000000          |70b638+*|62b62a*|7eb638*|8cb646+|70c438@|54a82a=
+000000        |7ec438%@@@|70c438@@|70b638@|62b62a%|62a838#|62b62a%|70b638@|7ec438@|7ed238@@|8cd246+
+000000        |8cd246#|7ec438@|70c438@@|70b638@|62b638%|70b638#|70b62a@|70b638@|70c438@@@@|7ec438+
+000000              |7ec438#|62a82a%
+`,
+        plano: `
+            =  *#
+        +*-#@##@@=#@*
+        %@##@%#@%#@%+*@@
+     *@%*#%##%*%*#%*%@%=*@@
+   @%*##%#*#+#*#*#+##*%%%#
+   *#%%#**#+--::--+**#**#%@@%
+ %@@%%#**#-::::::::-**#####=
+  #####**+::::::::::=**#%%@@%=
+ %@%%##***::::::::::+*##%%%*
+  +%%%%#**+::::::::+#*####%#+
+ =#*+####+**+====+#*#**%@@%
+   -@@%##%**#+#+#*##*%%#= =
+   += =%@##%##%*%%*%%*+@@
+      @%-+@%#%@#%@##@@
+         *@+ %@**%+
+          -=-=-*:
+        ******++-++**#=
+        ****++=+++***=
+              +=
+`
+      },
+      {
+        color: `
+000000            |fce062#|000000   |fce062@
+000000        |fce062=|fcd262%|e0b646#*|fce046@|fcd246@|eec446@|fcc438@|fce046@|eec446%|e0b646*|fcd246@|fce054@
+000000      |fcd262=|000000 |eec454=|fcd246@|fcd238@|eeb62a@|fcc41c@|fcd21c@|eeb61c@|fcc41c@|fcd21c@|eeb62a@|fcc42a@|fcd22a@|eec438@|eeb638=|fcd246@|fce054@|eed262=
+000000      |fcd246@|fcd238@|fcb62a@|eea81c@|fcc41c@|fcb60e@|eea80e@|fcc40e@|fca80e@|fcb60e@@|fca80e@|fcc40e@|fcb60e@|fcb61c@|fcd21c@|fcd22a@|eec446*|eec438=|fcd246*|fce054%|fce070=
+000000   |fcd254@|fcd246@|fcd238@|fcb62a%|eeb61c@|fcc40e@|fcb60e@|ee9a0e@|fcb60e@|fc9a0e@|fca81c@|eea81c@|fca81c@|eea81c@|fca80e@|ee9a0e@|fca80e@|fcb60e@|fcb61c@@|fcc41c@|fcd22a@|fcd238@|fcc446+
+000000  |fcd254=|eeb646*|e0b638@|fcb62a@|fcc41c@|fcc40e@|fca80e@|fca81c%|fcb61c@|d29a2a%|b67e1c%|a8700e%|9a620e%%|a8700e%|b67e1c%|e09a1c@|fcb62a@|fca81c#|fcb60e@@@|eeb61c@|fcc42a@|fcd238@|fcd246@|fce054@
+000000 |fce062+|fcd246@|fcd238@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fc9a0e@|fcb62a@|b6701c%|9a620e%%%%%%%%|b6701c%|eea82a@|fc9a0e@|fca80e@|fcb60e@|fcc40e@|fcc42a@|eec438@|eec454*
+000000 |fcd254=|eec446@|fcc438@|fcc41c@|fcb60e@@|fca80e@@|d29a2a%|a8620e%|9a620e%%%|8c620e%|9a620e%%%%%|c48c1c%|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fcd246@|fcd254@
+000000 |fce054+|fcd246%|fcc438@|fcc42a@|fcb60e@@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@@|fcb62a@|eec438@|e0c454#
+000000  |fcd254@|fcd238@|fcd22a@|fcc41c@|fcb60e@|fca80e@|ee9a0e@|fca81c@|d29a2a@|9a620e%%%%%%%|a8620e%|d29a2a@|fcb61c@|fca80e@@|fcb60e@|fcb61c@|fcc42a@|fcd246@|fcd254@|fce070=
+000000  |fcd254=|fcc446=|eeb638#|eeb62a@|fcc41c@|fcc40e@|fcb60e@|fca81c%|fca80e@|eea81c@|e09a1c@|c48c1c%%%%|e09a1c@|eea82a@|fca80e@@|fca81c@|fcb60e@|fcc41c@|fcd22a@|fcc438@|e0b646%
+000000   |fcd254%|fcd246@|fcd238@|fcc42a%|fcb62a@|fcc40e@@|eea80e@|fca80e@@|ee9a0e@|fca80e@|fc9a0e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@|fcc40e@|fcc41c@|eeb638@|fcc446+|fcd254*|fce062#
+000000      |fcc446@|fcd238@|fcc42a@|eea81c@|fcc41c@|fcc40e@|eea80e@|fcc40e@@|fca80e@|fcc40e@|fcb60e@|fcb61c@|fcd21c@|fcc42a@|e0b638%|fcc438@|fce046@|fcd254%
+000000     |fce062%|fce054@|fcc446+|000000 |fcc438@|fce038@|fcc42a@|e0b62a@|fcd238@|fcc42a@|eeb638@|fcd238@@|e0b638@|eec438@|fce046@|fcd254%
+000000         |fce054@|fcd254#|e0b654=|000000 |fce054@|eec454#|c4c446@|d2c446%|fce062@
+000000          |70b638+*|62b62a*|9ab646%|70b646=|70c438@|54a82a=
+000000        |7ec438%@@@|70c438@@|70b638@|62b62a%|62a838#|62b62a%|70b638@|7ec438@|7ed238@@|8cd246+
+000000        |8cd246#|7ec438@|70c438@@|70b638@|62b638%|70b638#|70b62a@|70b638@|70c438@@@@|7ec438+
+000000              |7ec438#|62a82a%
+`,
+        plano: `
+            *   @
+        =#*=@%#%@*=@@
+      = -@%*%%*%%*%@#-%@-
+      %@#*%#*%*##*%**%%+-*%=
+   @@%*#%#*#*#******###%@%=
+  -=##%##+#+-:::--+#+##*##%@@
+ +%%%%#**#-::::::::-***####+
+ =%%###**+::::::::::=**#%%%@@
+ +#%###***::::::::::+**####+
+  %%%%#***+::::::::+#**##%@@=
+  ==+##%#+**+====+**#*#%%%*
+   %@%###%***+**#+#**%%*=+#
+      %@%*#%*#%*%##@#+%@#
+     #@+ %@#*@%#%@*#@#
+         @*- @*#*@
+          ---+:+:
+        +*****++-++***=
+        +**++==+++*+*-
+              +=
+`
+      }
+    ]
   },
   {
     cols: 26, alto: 16,
-    color: `
-000000        |fce062=|000000  |fce062*|e0c454-+|fce054%|fcd262+|000000  |fce062+
-000000        |fcd246@|fcc438@|e0b638#|fcd238@|fcc438@|eeb638@|fcd238@|fcc438@|eeb638@|fcd246@@|000000 |fcd254=|fce062*
-000000     |fcd254*|fcd246@|fcc438%|eeb62a@|fcc41c@|fcb60e@@|fcc40e@|fcb60e@|fcc40e@|eea80e@|fcc40e@|fcb61c@|eeb62a%|fcd22a@|fcd238@|eec454=
-000000   |fcd254%|fcd246@|fcd238%|fcb62a@|fcc41c@|fcb60e@|eea80e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@@@@|fcb60e@|fcb61c@|fcc42a%|fcd246@|fcd254@
-000000 |fce062+|fcd246*|fcc438#|eeb62a@|fcb61c@|fcb60e@@|fca81c%@|c48c1c%|a8701c%|9a620e%%|b6701c%|c47e1c%|e09a1c@|fca81c%|fca80e@|fcb60e@|fcb61c@|eeb62a@|eec438%|fcd254+|fce062=
-000000  |eec454@|fcc438@|fcc41c@|fcb60e@@|fc9a0e@|eea82a@|a8700e%|9a620e%%%%%%%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc42a@|eec446@|e0c454=
-000000 |fcd254@|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@@|d28c1c%|9a620e%%%|8c620e%%|9a620e%%%|a8620e%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd238@|fcd254@|fce062=
-000000  |eec446@|fcc438@|fcc41c@|fcb60e@|fca80e@|fc9a0e@|eea82a@|a8701c%|9a620e%%%%%%|a8620e%|d28c1c%|fca81c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcc438@|eec454@
-000000 |fce062+|fcd254*|fcc438#|eeb62a@|fcb61c@|fcb60e@@|fca80e%|fca81c@|d28c1c%|b67e1c%|a8701c%%%|c48c1c%|e09a1c@|fcb61c%|fca80e@|fcb60e@@|fcb62a@|eeb638@|fcd246*|fce054*
-000000  |fce062+|fcd246@|fcd238@|fcc42a%|eeb62a@|fcc41c@|fcb60e@|eea80e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@@@@|fcc40e@|fcb61c@|fcc42a%|fcd238%|fcd254@|fcd262*
-000000     |fcd254%|fcd246@|eeb638@|eeb62a@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|fcb60e@|fcc40e@|eea80e@|fcc41c@|fcc42a@|eeb62a%|fcd238@|fcd246@
-000000        |fce046@|fcc438@|e0b646#|fcd238@|fcc438@|eeb62a@|fcd22a@|fcc438@|eeb646#|fce046@|fcd254*
-000000           |fce054%|000000 |a8c446@|eed246@|fcd254%
-000000        |70c438%@@@|70b638@@|62a838+|70b638+#|70c438#|7ed238#|8cd246=
-000000       |7ed238@@|7ec438@|70c438@|70b62a@|70b638%|62b62a@%|70c438@@|7ec438@@
-000000            |7ec446=|62b62a%
+    marcos: [
+      {
+        color: `
+000000           |fce062#|000000  |fce062%
+000000        |fce054@|eec446@|eeb638@|fce038@|fcc438@|eec438@|fce038@|eeb638@|eec438#|fce046@|fcd254*
+000000     |fcd262@|fcd246@|eeb638#|fcc42a@|fcd21c@|eea81c@|fcc40e@|fcb60e@@|fcc40e@|eea81c@|fcc41c@|fcc42a@|eeb62a#|fcd238@|fcd246@
+000000   |fcd254@|fcd246%|fcc438*|fcb62a@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fc9a0e@|fca80e@@@@@@|fcc40e@|fcb61c@|fcc42a#|fcd238@|fcd246@|fcd254%
+000000 |fce062=|fcd246=|eeb646%|eeb62a@|fcc41c@|fcc40e@|fcb60e@|fca81c%|eea81c@|d28c1c%|b67e1c%|a8701c%%|c47e1c%|d28c1c%|eea81c@|fca81c%|fca80e@|fcb60e@@|fcb61c@|eeb638%|fcd246+|fce054+
+000000 |eed262=|fcc446@|fcc438@|fcc41c@|fcb60e@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%|a8620e%|e09a1c@|fca80e@@|fcb60e@|fcc41c@|fcc42a@|fcc446@|fcd254=
+000000 |fcd254@|fcd238@|fcc42a@|fcc40e@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%|8c620e%|9a620e%%%%|a8701c%|fca81c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|fcd254@
+000000  |eec446@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|d29a1c@|a8620e%|9a620e%%%%%%|a8620e%|d29a1c%|fca80e@@|fcb60e@|fcc41c@|fcc438@|eec446@
+000000 |fce062*|fcd246*|fcc438#|eeb62a@|fcb60e@@|fca80e@|fca81c%|eea81c@|c47e1c%|a8701c%|a8620e%%|a8701c%|c48c1c%|ee9a1c@|fca81c%|fcb60e@@|fcb61c@|eeb62a@|eec446@|fce054+
+000000  |fcd262+|fcd246@|fcd238@|fcc42a%|fcb61c@|fcb60e@@|eea80e@|fca80e@@|fcb60e@|fca80e@@@@|fcb60e@|fcc40e@|fcb62a@|fcc42a%|fcd246@|fcd254@
+000000     |fcd246@|fcd238@|fcb62a%|fcb61c@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcc40e@|eea80e@|fcd21c@|fcb61c@|eeb62a@|fcd238@|fcd246@
+000000    |fce062+|fcd254+|000000 |fcc446*|fce046@|eec438@|eeb638@|fcd238@|fcc438@|eec438@|fce038@|eeb638@|eec446@|fce046@|eed254=
+000000       |fce062+|000000   |fce062@|e0c462=|8cb638@|eed254%
+000000       |7ec438=|70c438%@|70b638@@@|70b62a@|000000 |70b638+#|70c438#|7ed238*
+000000       |7ed238@@|7ec438@|70c438@|70b62a@|62b638%|62b62a%|70b638@|70c438@@|7ec438@@
+000000            |7ec438*|62a82a%
 `,
-    plano: `
-        =  *-=#+  +
-        @%+@%#@##@% =*
-     *@##%##%*%*%#*%@-
-   %@####*#*#*****##*%@
- +**####**=-::-=+**###*+=
-  #%%##**-:::::::=**#%%%=
- %%%%#**+:::::::::#*#%%%@=
-  %%%##**-:::::::+**#%%%#
- ++*####+*==---=+**####++
-  +@@##%#*#+#***#*%#*%@*
-     #@##%##%*%*%%*%@
-        @#+@%#@#*@+
-           % *%#
-        +*++++:-=++-
-       #***+++++***
-            :+
+        plano: `
+           #  %
+        @##@##@#*@*
+     %%+#%*%##%*%#+%@
+   %#+#%#*#****#**%#*%@%
+ ==*####**==--=+***###*++
+ -%%%#***::::::::+**#%%%-
+ @%%%#**-::::::::-**#%%%%
+  #%##**+::::::::+**#%%%
+ +**###***=-::-=**#####+
+  =@%####*#*##*#*#%#*@%
+     %@##%*###%*%##%@
+    += +@##@##@##@=
+       =   %-*#
+       :++++++ -=+=
+       ****++++****
+            ==
 `
+      },
+      {
+        color: `
+000000           |fce062%|fcd254-|000000 |fcd254=|fce062#
+000000        |fcd254@|fcd246@|e0b638@|fcd238@|fcc438@|eeb638@|fcd238@|fcc438@|e0b646+|fcd246@|fcd254@
+000000     |fcd262+|fcd246@|eec438@|eeb62a@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|eeb61c@|fcc41c@|fcd22a@|eeb638%|fcc438#|fcd246@|fcd254#
+000000   |fcd262@|fcd246@|fcd238#|fcb62a@|fcc41c@|fcb60e@|eea80e@|fcb60e@|ee9a0e@|fca80e@@@@|fcb60e@|eea80e@|fcc40e@|fcc41c@|fcb62a%|fcc438#|fcd246@|fcd254@
+000000 |fce062+|fcd254#|fcc438#|eeb62a@|fcb61c@|fcb60e@@|fca81c%@|c48c1c%|b67e1c%|a8701c%%|c47e1c%|d28c1c%|eea82a@|fca80e%@|fcb60e@|fcc40e@|fcc42a@|eeb638@|eec446=
+000000  |eec446@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%|a8620e%|e09a1c@|fca80e@@|fcb60e@|fcc40e@|fcc42a@|fcd246@|fcd254*
+fce062=|fcd254@|fcd238@|fcc42a@|fcc40e@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%|8c620e%|9a620e%%%%|a8701c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc42a@|fcd246@|fce054#
+000000 |fcd262=|fcd246@|fcc438@|fcc41c@|fcb60e@|fca80e@@|e09a1c@|a8620e%|9a620e%%%%%%|a8620e%|d29a2a%|fca80e@@|fcb60e@|fcc41c@|fcc438@|eec446@
+000000  |fcd254=|eec438%|fcb62a@|fcc40e@|fcb60e@|fca80e@%|eea81c@|c48c1c%|a8701c%|a8620e%%|a8701c%|c48c1c%|eea81c@|fca81c#|fcb60e@@|fcb61c@|eeb62a@|fcd246%|fce054#
+000000  |fcd262%|fcd246@|fcd238%|fcb62a%|fcb61c@|fcc40e@|fca80e@@@@@|fcb60e@|eea80e@|fcb60e@|ee9a0e@|fcb60e@@|fcb62a@|fcd22a@|fcd246@|eed254@
+000000    |fcd254#|fcd238@@|eeb62a%|fcc41c@|fcc40e@|eea80e@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcd21c@|eeb61c@|fcc42a@|fcd238@|fcd254*
+000000    |fce062+|000000  |fcd246@|fcd238@|e0b638%|fcc438@|fcd238@|eeb638@|fcc438@|fcd238@|e0b638@|fcd246@@|000000  |fce062+
+000000       |fce062+|000000  |fcd254#*|e0c462=|9ac438@|eed254#
+000000       |7ec438=|70c438%@|70b638@@@|70b62a@|000000 |70b638+#|70c438#|7ed238*
+000000       |7ed238@@|7ec438@|70c438@|70b62a@|62b638%|62b62a%|70b638@|70c438@@|7ec438@@
+000000            |7ec438*|62a82a%
+`,
+        plano: `
+           #- =#
+        @%*%%#@%=%@
+     =@##%##%*%*%%**@#
+   %@##%#*#+#***#*%%**%@
+ +**####**==--=+***#%##-
+  ####***::::::::+**#%%%*
+=%%%%#**-::::::::-**##%%*
+ =%%%#**+::::::::+**####
+  =*###***=-::-=*+######
+  #@#*#%*****#*#*###%@%
+    *@%*%%*%*%##%*#@*
+    +  %@*%@#%%*%@  +
+       +  #+-**
+       :++++++ -=+=
+       ****++++****
+            ==
+`
+      },
+      {
+        color: `
+000000           |fcd254=|fce054#|000000  |fce062#
+000000        |fcd254#|fcd246@|eeb638@|fcc438@|fcd238@|eeb638@|fcc438@|fcd238@|e0b646*|fcc446*|fce054@
+000000      |fcd246@|fcc438@|e0b62a@|fcc41c@@|fcb60e@|fcc40e@|eea80e@|fcc40e@|fcb61c@@|fcd22a@|fcc438@+|fcd246@|fcd254@
+000000   |fcd262+|fcd246@|fcd238@|fcc42a%|fcc41c@|fcc40e@|eea80e@|fcb60e@|fc9a0e@|fcb60e@|ee9a0e@|fca80e@|ee9a0e@|fcb60e@|eea80e@|fcb60e@|fcc41c@|fcc42a@|fcc438*|fcd246*|fce054%|fce062=
+000000 |fce062+|fcd254@|fcd238%|fcb62a@|fcb61c@|fcb60e@@|fca81c%@|c48c1c%|b67e1c%|a8701c%%|c47e1c%|d28c1c%|eea82a@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcc438@|eec454+
+000000  |eec446@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|e0a82a@|a8700e%|9a620e%%%%%%|a8620e%|e09a1c@|fca80e@@|fcb60e@|fcc41c@|fcc42a@|fcd238@|fcd254@|fce062=
+000000 |fcd254#|fcd246@|fcc42a@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%|8c620e%|9a620e%%%%|a8701c%|fcb61c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|fcc446@|fcd254=
+000000 |fcd254#|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@@|e09a1c@|a8620e%|9a620e%%%%%%|a8620e%|d29a2a%|fca80e@@|fcb60e@|fcb61c@|fcc438@|eec446@
+000000   |eec438@|fcc42a@|fcc40e@|fcb60e@|fca80e@|fca81c@|e09a2a@|c48c1c%|a8701c%|a8620e%%|a8701c%|c48c1c%|eea81c@|fca81c%|fca80e@|fcb60e@|fcb61c@|fcc42a@|fcd246@|fcd254@
+000000  |fce054%|fcd246%|fcc438*|fcb62a@|fcc41c@|fcc40e@|eea80e@|fcb60e@|fc9a0e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|eea80e@|fcb60e@|fcb61c@|fcc41c@|fcd22a@|fcd238@|eec454*
+000000    |fcd254@|fcd238@|fcc438#|eeb62a@|fcc41c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcb60e@|fcc40e@|fcc41c@|eeb61c@|fcd22a@|fcd238@
+000000      |eec454=|fce046@|fcc438@|e0b638%|fcd238@|fcc438@|eeb638@|fcd238@|fcc438@|eeb638@|fcd246@|fcd254#|000000 |fcd254+|fce062=
+000000          |fce054@|e0c454=|000000 |c4d246@|e0c454=
+000000       |7ec438=|70c438%@|70b638@@@|70b62a@|000000 |70b638+#|70c438#|7ed238*
+000000       |7ed238@@|7ec438@|70c438@|70b62a@|62b638%|62b62a@|70b638@|70c438@@|7ec438@@
+000000            |7ec438*|62a82a%
+`,
+        plano: `
+           =#  #
+        *@##@#%@=+@
+      @%*%%*%*%##@#=%@
+   =@%*#%*#*#*#*#*#%#+*#=
+ =%%####*#==--=+***#%%#=
+  #####**::::::::+**#%%%%=
+ #%%%#**-::::::::-#*##%%=
+ #%%%#**+::::::::+*####%
+   #%%#***=-::-=***###@%
+  ##+#%#*#*#*#*#*###%%+
+    @@*#%##%*%*%%*%@
+      =@%+@%#@%#@* ==
+          @- %-
+       :++++++ -=+=
+       #***++++****
+            =+
+`
+      },
+      {
+        color: `
+000000            |fce062@|000000  |fcd254=|fce062=
+000000      |fce062=|e0b654=|e0c454=|fce046@|fcc438@|eeb638@|fcd238@|fcc438@|eec438@|fce038@|fcc446%|e0b646-|fcd254%|fce062%
+000000      |fcd254%|fcd238@|eeb62a@|fcb61c@|fcc41c@|eea80e@|fcc40e@|fcb60e@@|fcc41c@|eea81c@|fcd22a@|fcd238@|eec446+|fcd246*|fce054@|fcd262+
+000000    |fcd246@|fcd238@|fcc42a@|fcb61c@|fcc40e@|fca80e@@@@@@|ee9a0e@|fcb60e@@|fcb61c@|fcc41c@|fcc42a@|eec446#|fcc446=|fcd254+|fce062+
+000000  |fcd254@|fcd246@|fcc42a@|fcb61c@|fcb60e@@|fca80e@|fcb61c@|c48c1c%|b67e1c%|a8701c%%|c47e1c%|d28c1c%|eea82a%|fca80e@@@|fcc40e@|fcc41c@|fcc438@|fcd246#
+000000 |fcd254+|eec446@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|e0a82a@|a8700e%|9a620e%%%%%%|a8620e%|e09a2a@|fca80e@@|fcb60e@|fcc41c@|fcc42a@|fcd246@|fcd254@|fce062=
+000000 |fcd254*|fcc446@|fcc42a@|fcb60e@@|fca80e@|fca81c@|b67e1c%|9a620e%%%|8c620e%|9a620e%%%%|a8701c%|fcb61c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|eec446@
+000000 |fcd254%|fcd246@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|e09a1c@|a8620e%|9a620e%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@|fcb61c@|fcc438@|fcd246@|fce062*
+000000  |eec454=|fcc438@|fcc42a@|fcc40e@|fcb60e@|fca80e@@|e0a82a@|c48c1c%|a8701c%|a8620e%%|a8701c%|c48c1c%|eea82a@|fca81c@|fca80e@@|fcb61c@|fcc42a@|fcd246@|fcd254@
+000000  |fce054*|fcd246+|eec438*|fcc42a@|fcc41c@|fcb60e@|eea81c@|fcb60e@|ee9a0e@|fcb60e@|fca80e@|fcb60e@|fca80e@@@|fcb60e@|fcb61c@|fcc41c@|fcd22a@|fcc438@
+000000   |fcd262+|fcd254@|fcd238%|eec438*|fcc42a@|fcd21c@|eea80e@|fcc40e@|fcb60e@@|fcc40e@|eea80e@|fcc41c@|fcb61c@@|fcd22a@|fcc446%|000000 |fcd254+|fce062=
+000000      |fcd254@|fcd246@|eeb638#|eec438@|fcd238@|fcc438@@|fcd238@|eeb638@|fcc438@|fce046@|e0b646++|fce054#
+000000         |fcd262+|fcd254#|e0c454=|000000 |e0d254@
+000000       |7ec438=|70c438%@|70b638@@@|70b62a@|000000 |70b638+#|70c438#|7ed238*
+000000       |7ed238@@|7ec438@|70c438@|70b62a@|62b638%|62b62a@|70b638@|70c438@@|7ec438@@
+000000            |7ec438*|62a82a%
+`,
+        plano: `
+            @  ==
+      =--@%#@%#@#-%#
+      #@##%*%##%*%%=*@+
+    %@%#%***#*#*###%%*=++
+  @@%###*#==--=+****%%%*
+ +%####**-:::::::+**#%%@@=
+ +%%##*#-::::::::-####%%
+ %@%%##*+:::::::-+*###%%+
+  -%%%#*#*=-::-=**###%@@
+  *++%%#*#+#*#***##%@%
+   =@%+%%#%##%*%##@# ==
+      @@+#@%#@#%@==#
+         +#- %
+       :+*++++ -=+=
+       #***++++****
+            =+
+`
+      },
+      {
+        color: `
+000000         |fce062=|000000  |fcd254*#|000000  |fce062*
+000000       |eec454*|000000 |fcd246@@|eeb638@|fcd238@@|e0b638@|fcd238@|fcd246@|000000 |fcd246+|fce054@
+000000    |fce062=|000000 |eec454=|fcd238@|fcc42a@|eeb61c@|fcd21c@|fcb60e@@@@|fcc41c@|eeb61c@|fcc42a@|fcd22a@|fcc446#=|fcd254#|fce062#
+000000    |eec446#|fcd238@|fcc42a@|fcb61c@@|fcb60e@|eea80e@|fca80e@@@@@|fcb60e@@|fcb61c@|fcc41c@|fcd22a@|fcc438%
+000000  |fcd254@|fcd246@|fcd22a@|fcb61c@|fcb60e@@|fca80e@|fca82a@|c48c1c%|b67e1c%|a8701c%%|c47e1c%|d28c1c%|fca82a@|fca80e@@@|fcb60e@|fcc41c@|fcd238@|fcd246@|fcd254=
+000000 |fce054#|fcd246@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|e0a82a@|a8700e%|9a620e%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@|fcb61c@|fcc42a@|fcd246%|fce054#|fce062=
+000000 |e0c454=|eec446@|fcc42a@|fcb60e@@|fca80e@|fcb61c@|b67e1c%|9a620e%%%|8c620e%|9a620e%%%%|a8701c%|fcb61c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|eec446@
+000000 |fcd254%|fcd246@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|e09a2a@|a8620e%|9a620e%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@|fcc41c@|fcc438@|fcd246@|fcd262#
+000000  |fcd254#|fcd238@|fcc42a@|fcc41c@|fca80e@@@|e0a82a%|c48c1c%|a8701c%|a8620e%%|a8701c%|c48c1c%|e0a82a@|fca80e@@|fcb60e@|fcc41c@|fcd22a@|fcd246@|eed254%
+000000  |fcd254=|000000 |fcc438#|fcc42a@|fcc41c@|fcb61c@|fcb60e@@|ee9a0e@|fca80e@@@|fcb60e@|ee9a0e@|fcb60e@|fcb61c@@|fcc41c@|fcc42a@|eeb646%
+000000   |fcd262%|fcd246@|fcc438*|eec438#|fcd22a@|fcc41c@|eea81c@|fcc40e@|fcb60e@@@@|fcc41c@|eea81c@|fcc41c@|fcd22a@|eec446*|fcc446=|fce054#
+000000      |fce054@|fcd246%|e0b646=|fcd238@@|eeb638@|fcd238@@|eeb638@|fcd238@|fcd246@|d2a846=|fcd246#|fce062%
+000000         |fce062%|e0c454+|000000 |fcd262+|b6c446@|9ab646=|000000 |fce062=
+000000       |7ec438=|70c438%@|70b638@@@|70b62a@|000000 |70b638+#|70c438#|7ed238*
+000000       |7ed238@@|7ec438@|70c438@|70b62a@|62b638%|62b62a@|70b638@|70c438@@|7ec438@@
+000000            |7ec438*|62a82a%
+`,
+        plano: `
+         =  **  *
+       + @@#%%#%@ =@
+    = -@%*%####%*%@*-*#
+    *%%###*#****###%%#
+  @@%###**==--=+****#%%@=
+ #%%##***::::::::+**##%%#=
+ -####*#-::::::::-#*####
+ %%%##**+::::::::+**##%%*
+  *%%#****=-::-=***##%%#
+  - *%%###+#**#*###%%#
+   %%+*%%*%####%*%%+=#
+      @#-%@#%%#@%-*%
+         %= +#: =
+       :++++++ -=+=
+       #***++++****
+            =+
+`
+      },
+      {
+        color: `
+000000          |fcd262=|000000  |fce062@|000000  |fce062=
+000000       |fcd254%|e0b646*|eec446%|fce046@|eec438@|fcc438@|fcd238@|eeb638@|fcc438@|fce046@|eec446+|000000 |fce054*|fce062=
+000000    |fce062+|fcd254+|000000 |fcd238@|fcd22a@|eeb61c@|fcc41c@|fcc40e@|fcb60e@|fcc40e@|eea80e@|fcc41c@|fcb61c@|eeb62a@|fcd22a@|fcd238@|000000 |fcd246=|fce062*
+000000    |eec446=|fcc438@|fcd22a@|fcb61c@@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@@@@|fcc40e@|fcb61c@|fcc41c@|fcd22a@|fcd238@|fcc454=
+000000  |eec454*|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@@|eea82a%|d28c1c%|b67e1c%|a8701c%%|c47e1c%|d28c1c%|fcb61c@|fca80e%@@|fcb60e@|fcc42a@|fcd238@|fcd246@|fce054#
+000000 |fcd254%|fcd246@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@|fcb61c@|fcc42a@|fcc446%|fcd254+
+000000 |eec454=|eec446@|fcc42a@|fcb60e@@|fca80e@|fcb61c@|b67e1c%|9a620e%%%|8c620e%|9a620e%%%%|a8701c%|fcb61c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|fcc446@|fcd254=
+000000 |fce054*|fcd246%|fcc42a@|fcb61c@|fcb60e@|fca80e@@|d29a2a@|a8620e%|9a620e%%%%%%|a8620e%|d29a1c@|fca80e@@|fcb60e@|fcc41c@|fcd238@|fcd246@|fce062*
+000000  |fcd254@|fcd238@|fcc42a@|fcb60e@|fca80e@@@|eea82a@|c47e1c%|a8701c%|a8620e%%|a8701c%|c48c1c%|e0a82a%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc42a@|fcc446@|e0c454+
+000000    |fcc438@|fcd22a@|fcc41c@|fcb61c@|fcb60e@|fca80e@@@|fcb60e@|fca80e@|fcb60e@|ee9a0e@|fcb60e@|fca80e@|fcb60e@|fcc41c@|fcc42a@|eeb646*|fcd254=|fce062=
+000000   |fce062%|fcd246*|eec446=|fcc438@|fcd22a@|fcb61c@@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcc41c@|eeb61c@|fcd22a@|fcc438@|eeb638+|fcd246#|fce054@
+000000     |fcd254#|fce054@|fcc438+|e0b646+|fcd238@|fcc438@|eeb638@|fcd238@|fcc438@|eec438@|fce046@|eec446%|e0b646#|fce054@|fcd262*
+000000         |fce054#|d2c454=|000000 |fce062%|8cc438@|b6b654+|fce062=
+000000       |7ec438=|70c438%@|70b638@@@|70b62a@|000000 |70b638+#|70c438#|7ed238*
+000000       |7ed238@@|7ec438@|70c438@|70b62a@|62b638%|62b62a@|70b638@|70c438@@|7ec438@@
+000000            |7ec438*|62a82a%
+`,
+        plano: `
+          =  @  =
+       #+*@##@#%@= *=
+    += %@*%##%*%##@% =*
+    =%%###*#*#***%#%%%=
+  +%%%#***==--=+#*###%@@#
+ %@%##***::::::::+**####+
+ =%###*#-::::::::-#*##%%=
+ *#%##**+::::::::+**#%%@*
+  @@%#****=-::-=+#*#%%%=
+    %%%##***#*#+#*#%#+==
+   #*-%@##%*%##%*%%=*%
+     #@==@%#@##@*+@+
+         #- %*-=
+       :+*++++ -=+=
+       #***++++****
+            =+
+`
+      },
+      {
+        color: `
+000000          |fce062*|000000  |fce054%|fcd254+
+000000       |fce062@|eec446@|e0b638#|fcd246@|fcc438@|eeb638@|fcd238@|fcc438@|eeb646@|fcd246@@|000000 |fcd254=|fce062*
+000000     |fce054#|eec446=%|fcd22a@|fcb61c@@|fcc40e@|fca80e@|fcc40e@|fcb60e@|fcc41c@@|eeb62a@|fcc42a@|fcd238@|eec454=|000000 |fcd254=
+000000  |fce062=|fcd254+|eec446=|eec438@|fcc42a@|fcc41c@|eea80e@|fcb60e@|ee9a0e@|fca80e@|fc9a0e@|fcb60e@|ee9a0e@|fcb60e@|eea80e@|fcb60e@|fcb61c@@|fcc42a@|fcd238@|fcd246%
+000000   |eec446@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|eea82a@|d28c1c%|b67e1c%|a8701c%%|c47e1c%|d28c1c%|fca81c@#|fca80e@|fcb60e@@|fcb62a@|fcd238@|fcd246@|fcd254@
+000000 |fcd254%|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@@|e0a82a@|a8620e%|9a620e%%%%%%|a8620e%|d29a2a@|fca80e@@|fcb60e@|fcb61c@|fcb62a@|eec446%
+000000 |fcd254*|fcc446@|fcc42a@|fcb61c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%|8c620e%|9a620e%%%%|a8701c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc42a@|fcd246@|fce054#
+000000 |fcd254=|eec446%|fcc42a@|fcb61c@|fcb60e@|fca80e@@|d29a2a@|a8620e%|9a620e%%%%%%|a8620e%|d29a1c@|fca80e@@|fcb60e@|fcc41c@|fcd238@|fcd246@|fce062+
+000000 |fce062+|fcd254@|fcd238@|fcc42a@|fcb60e@@|fca80e@|fca81c%|eea82a@|c47e1c%|a8701c%|a8620e%%|a8701c%|c48c1c%|e09a2a@|fcb61c@|fca80e@|fcb60e@|fcc41c@|fcc42a@|eeb638@|e0b654=
+000000   |fcd246+|fcd238@|fcd22a@|fcc41c@|fcb61c@|fcb60e@|eea80e@|fca80e@@|fcb60e@|fca80e@|fcb60e@|fc9a0e@|fcb60e@|eea80e@|fcc40e@|fcc41c@|eeb62a@|fcc446*|fce054*|fce062=
+000000   |fce054+|fcc446=|eec446+|fcd238@|fcd22a@|eeb61c@|fcc41c@|fcc40e@|fca80e@|fcc40e@|eea80e@|fcc40e@|fcb60e@|fcb61c@|fcd22a@|eeb638@|fcc438#|fcd246@|fcd262%
+000000     |fce054@|fcd246#|000000 |fcc446%|fcd238@|eeb638@|fcc438@|fcd238@|eeb638@|fcc438@|fcd246@|e0b646#|eec446@|fce054@
+000000        |fce062#|eed254=|000000 |eed254=|fce062#|8cc438@|b6b646=|fce062*
+000000       |7ec438=|70c438%@|70b638@@@|70b62a@|000000 |70b638+#|70c438#|7ed238*
+000000       |7ed238@@|7ec438@|70c438@|70b62a@|62b638%|62b62a@|70b638@|70c438@@|7ec438@@
+000000            |7ec438*|62a82a%
+`,
+        plano: `
+          *  %+
+       %#+@%#@%#@% -*
+     #=#@##%*%#%%*%@= =
+  =+-#%%*#*#*#*#*%##%@#
+   %%%#*#*+=--=+#+####%@@
+ %@%%#***::::::::+**####
+ *%%##*#-::::::::-#*#%%%*
+ =#####*+::::::::+**#%%@+
+ +@@%##***=-::-=*#*#%%#-
+   +@%###*#*#*#*#*%%#+*=
+   +-=%%*%%*%*%##@#+@%
+     @* #@##@#%@+%@
+        *= -#*-*
+       :+*++++ -=+=
+       #***++++****
+            =+
+`
+      },
+      {
+        color: `
+000000          |fce062+|fcd254=|000000 |eec454=|fce062@
+000000       |fcd262*|fcd254@|e0b646%|fcc438@|fcd238@|eeb638@|fcc438@|fcd238@|e0b638%|fcc446@|fce046@|000000  |fce062=
+000000     |fce054@|fcc446#|e0b638#|fcd22a@|fcc41c@|eea81c@|fcc40e@|fcb60e@|fcc40e@|fcb60e@|fcb61c@|fcd21c@|eeb62a@|fcc42a%|fcd238@|fcd246@
+000000   |fce054#|fcd246*|eeb638#|fcc42a@|fcc41c@|fca80e@|fcb60e@|fca80e@@@@|ee9a0e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcb62a@|fcc42a%|fcd238@|fcd246@|fcd262=
+000000   |e0b646@|fcc42a@|fcc41c@|fcb60e@|fca80e@|fcb61c%|eea81c@|d28c1c%|b67e1c%|a8701c%%|c47e1c%|d28c1c%|fca81c@#|fca80e@|fcb60e@@|eeb61c@|fcc438%|fcd246%|fce054%
+000000 |fcd254#|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@@|e0a81c@|a8620e%|9a620e%%%%%%|a8620e%|e09a2a@|fca80e@@|fcb60e@|fcc41c@|fcc42a@|eec446@
+000000 |fcd254#|fcd246@|fcc42a@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%|8c620e%|9a620e%%%%|a8701c%|fca81c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd238@|fcd254@
+000000  |eec446@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|d29a2a@|a8620e%|9a620e%%%%%%|a8620e%|d29a1c@|fca80e@@|fcb60e@|fcc41c@|fcd238@|fcd254@
+000000 |fce062*|fcd254%|fcd238%|fcb62a@|fcb60e@@|fca80e@|fca81c%|eea81c@|c47e1c%|a8701c%|a8620e%%|a8701c%|c48c1c%|e09a1c@|fcb61c%|fca80e@|fcb60e@|fcc41c@|fcb62a@|e0b638@|eec454=
+000000   |fcd246@|fcd238@|fcc42a@|fcb61c@|fcb60e@@|ee9a0e@|fcb60e@|eea80e@|fcb60e@|fca80e@@@|fcb60e@|fca80e@|fcc40e@|fcb61c@|eeb62a%|fcd246#|fce054@|fcd262=
+000000     |fcc446%|fcd238@|fcc42a@|eeb61c@|fcc41c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|eea80e@|fcc41c@|fcc42a@|eeb62a%|fcc438@|fcd246@|fcd262=
+000000    |fcd262=|fce054%|fcc446=|000000 |fcd246@|fcd238@|e0b638@|fcd238@|fcc438@|eeb638@|fcd238@|fcc438@|e0b638%|fcd246@|fcd254@
+000000        |fce062*|000000  |fce062%|eed254=|9ac438@|c4c454+|fce062=
+000000       |7ec438=|70c438%@|70b638@@@|70b62a@|000000 |70b638+#|70c438#|7ed238*
+000000       |7ed238@@|7ec438@|70c438@|70b62a@|62b638%|62b62a@|70b638@|70c438@@|7ec438@@
+000000            |7ec438*|62a82a%
+`,
+        plano: `
+          += -@
+       *@*%@#%@*%@  =
+     @*+%%*%#%##@##@%
+   #+*%%*#***#*#*#%##@@=
+   #%%#***+=--=+*+######%
+ *@%%#***::::::::+**#%%#
+ #%%%#**-::::::::-#*#%%@%
+  #####*+::::::::+**#%%%
+ *%#####+*=-::-=**##%##-
+   %@%###*#*#*#*#*%##*%=
+     #@%*%##%*%*%%*%@=
+    -#- @%#@%#@%*@%
+        *  %=*==
+       :+*++++ -=+=
+       #***++++****
+            =+
+`
+      }
+    ]
   },
   {
-    cols: 21, alto: 13,
-    color: `
-000000      |fce062=|fcd254=|000000 |fce054+|eec454+|eec446*|fce054@|000000  |fce062*
-000000    |fce062=|fcd254+|eec446+|fcd238@|fcb62a@|fcc42a@@|fcb61c@|fcd22a@|eeb62a@|fcd22a@|fcc438%+|fce054@|fcd262=
-000000   |fce054*|fcc446+|fcc438@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@@|fcb60e@|fca80e@|fcb60e@|fcc41c@|fcc438#|fcd246+|fce062=
-000000 |fce062=|fcd246+|eec438@|fcc42a@|fcb60e@@|fcb61c@|e09a1c@|c48c1c%|b67e1c%%|c47e1c%|d29a1c@|fca81c@|fca80e@|fcb60e@|fcc41c@|eec438@|fcc446+
-000000  |fcc446@|fcc42a@|fcb60e@|fca80e@@|d28c1c%|9a620e%%%%%%|a8701c%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|eec454#
-000000 |fcd254#|fcc438@|fcc41c@|fcb60e@|fca80e@@|b67e1c%|9a620e%%%|8c620e%|9a620e%%%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd246@
-000000 |fcd254#|fcd246@|fcc42a@|fcb60e@@|fca80e@|eea82a%|b67e1c%|9a620e%%%%|a8701c%|e09a2a@|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@
-000000  |fcd254+|fcd238@|fcc42a@|fcb61c@@|fcb60e@|fca80e@@|eea80e@|ee9a0e@@|fcb61c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|fcd238@|fcd254%
-000000    |fcd254+|fcd246@|eeb62a@|fcc41c@@|fcb61c@|fcc40e@|fcb60e@@|fcb61c@|fcc41c@|eeb62a@|fcd238@|fcd254@
-000000      |fcd254+|fce046@|e0b646=|fcd246@|fcc438@|eec438@|fcd238@|eeb646#|fcd246*|fcd254*
-000000        |70b638+|9ac446#|7eb638+@|e0d254#
-000000      |7ed238@@|7ec438@|70c438@|70b638@|62b62a@|70b638%|70c438@|7ec438@|7ed238@|8cd246+
-000000        |70b638-|000000  |62b62a%|000000 |62b638=|70b638-
+    cols: 22, alto: 14,
+    marcos: [
+      {
+        color: `
+000000         |fce054%|eec454==|fce054@
+000000      |fcd254+|fcd246@|e0b638@|fcd238@|fcc42a@@|fcd22a@|e0b638@|fcd238@|fcd246#|000000 |fce054+
+000000    |fcd254+|fcd238@|fcb62a@|fcb61c@|fcc40e@|fcb60e@@@@@|fcb61c@@|fcd22a@|fcd246%|000000 |fce054=
+000000   |fcd246@|fcc42a@|fcb61c@@|fca80e@|fca81c@|e09a1c@|e09a0e@|e09a1c@@|fca81c@|fca80e@|fcb60e@|fcb61c@|fcc41c@|fcc438@|fcd246*
+000000 |fcd254@|fcd238@|fcc42a@|fcb60e@@|fca80e@|e09a2a@|a8701c%|9a620e%%%|a8620e%|a8701c%|e09a2a@|fca80e@@|fcb60e@|fcc41c@|fcd238@|fcd254@
+000000 |fcd254%|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|a8700e%|9a620e%%%%%%%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd254#
+000000 |eec454+|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%%%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcc446@|eec454=
+000000 |fce054+|fcd246*|fcb62a@|fcb61c@|fcb60e@|fca80e@|fca81c@|d28c1c%|b67e1c%|b6701c%|a8701c%|b67e1c%|d28c1c%|fcb61c@|fca80e@|fcb60e@|fcc41c@|eeb638@|fcc446*
+000000  |fcd254%|fcd246%|fcc438#|fcc41c@|fcc40e@|fca80e@|fcb60e@|ee9a0e@|fca80e@@@|fcb60e@|fca80e@|fcc40e@|fcc42a@|fcc438#|fcd246#|fcd262*
+000000    |fcd246@|fcd238%|eeb638#|fcd22a@|fcb61c@|fcc41c@@@@|fcb61c@|fcd22a@|eeb638#|fcd246#|fcd254@
+000000      |fcd254@|fcd246#|e0b646=|fcd246@|eec446@|d2c438@|fce054@|e0b646-|fcd254*|fce062=
+000000       |70b638+#|8cb638%|70b638+|62b62a@|000000  |70b638-
+000000      |7ed238@@|7ec438@|70c438@|70b638@|62b62a%|70b638@|70c438@|7ec438@|7ed238@
+000000          |7ec438+|62a82a%|000000 |70b638=
 `,
-    plano: `
-      == +=+@  *
-    ===@#%%#%#@#=%=
-   +=%%*#*#**#*#%*+=
- ==#####+=-==+**#%#=
-  %%#**+::::::-**#%%*
- #%%###-:::::::**##%%
- #%%##**=::::-+*###%%
-  +%%###*****#*##%%#
-    +@##%#%###%#%@
-      =%-%%#@+**
-        -+-+*
-      ****+++***=
-        :  + ::
+        plano: `
+         %--@
+      =@#@%%@*@* +
+    =@##%#######@# =
+   %%####++++#*##%%+
+ %%%##*+-::::-+*##%%%
+ %%%#*#-:::::::**#%%#
+ =%%#**=::::::-**#%%-
+ ++###*#+=---+#####*
+  %%*#%*#*##*#*%#*#+
+    @#*%#%##%#@*#%
+      @#-@##@-+=
+       -=*-+  :
+      ****+++***
+          -= :
 `
+      },
+      {
+        color: `
+000000         |fce054*|fcd254+|000000 |fce054#
+000000       |fcd246@|eec438@|fcc42a@|fcd22a@|eeb62a@|fcd22a@|eeb638@|fcc438@|fcd246@
+000000     |fcd246@|fcc42a@|fcb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@@|fcc41c@|eeb61c@|fcd22a@|fcd246@
+000000   |eec446@|fcc42a@|fcc41c@|fcb60e@@|fca81c@|ee9a1c@|e09a1c@@@|fcb61c@|fca80e@|fcb60e@|fcb61c@|fcc41c@|fcd238@|fcd246%
+000000 |fcd254#|fcd246@|fcc42a@|fcb60e@|fca80e@@|e09a2a@|a8701c%|9a620e%%%|a8620e%|a8701c%|e09a2a@|fca80e@@|fcb60e@|fcc41c@|fcd238@|fcd254@
+fce062=|fcd254@|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|a8700e%|9a620e%%%%%%%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd254*
+000000 |fcd254*|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%%%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|eec438@|eed254=
+000000  |fcc446+|fcc42a@|fcc41c@|fcb60e@|fca80e@|fca81c@|d28c1c%|b67e1c%|b6701c%|a8701c%|b67e1c%|d28c1c%|fcb61c@|fca80e@|fcb60e@|fcb61c@|eec438@|fcd254#|fce062=
+000000  |fce054#|fcd246*|fcc438%|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb62a@|fcd238#|fcd246@|eed262+
+000000   |fcd262*|fcd246@|fcc438*@|fcd22a@|eeb61c@|fcc41c@|fcb61c@|fcc41c@|fcb61c@|fcc42a@@|eeb638#|fcd246@|fcd254#
+000000      |fce054@|eec446+*|fce046@|eec446@|e0c446@|fcd254%|e0b646+|fce054#
+000000       |70b638+#|7eb638%|70b638+|70b62a@|000000  |70b638-
+000000      |7ed238@@|7ec438@|70c438@|70b638@|62b62a%|70b638@|70c438@|7ec438@|7ed238@
+000000          |7ec438+|62a82a%|000000 |70b638=
+`,
+        plano: `
+         *+ #
+       @#%%#@#%@
+     @%#%*#*##%#%@
+   %%%##**+++#*##%%%
+ *%%##*+-::::-+*###%%
+=%%%#**::::::::*###%+
+ +%%#**=::::::-**#%%=
+  =#%#**+=---+#####*=
+  #**%#*#**#*#*%#*@=
+   +@+#%#%#%#%%*@*
+      @=+@#%%=#
+       -=+-+  :
+      ****+++***
+          -= :
+`
+      },
+      {
+        color: `
+000000          |fce054%|000000 |fcd254=|fce062*
+000000     |fcd254+|000000 |fcd246@|fcc438@|eeb62a@|fcd22a@|eeb62a@|fcd22a@|fcc438@|eec438#|fce046@
+000000   |fce054+|000000 |fcd246%|fcd22a@|eeb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcb62a@|fcc42a%|fcd238@|fcd254+
+000000   |eec446%|fcc42a@|fcc41c@|fcb60e@@|eea81c@@|e09a1c@%@|fcb61c@|fca80e@|fcb60e@@|fcc41c@|fcd238@|fcd246@|fce062=
+000000 |eed262=|fcc446@|fcc42a@|fcb60e@|fca80e@@|e09a1c@|a8701c%|9a620e%%%|a8620e%|a8701c%|e09a1c@|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd254%|fce062=
+fce062=|fcd254@|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|a8700e%|9a620e%%%%%%%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|eec454+
+000000 |fcd254%|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%%%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcc438@|fcd254+
+000000  |eec446*|fcc42a@|fcc41c@|fcb60e@|fca80e@|fca81c@|d28c1c%|b67e1c%|b6701c%|a8701c%|b67e1c%|d29a1c%|fcb61c%|fca80e@|fcb60e@|fcb61c@|fcc438@|fcd246%
+000000  |fce054*|fcc446+|fcc438@|fcc41c@|fcb60e@@|fca80e@@@|fcb60e@|fca80e@@|fcb60e@|fcc41c@|fcc42a%|fcd238@|fcd246@
+000000   |fcd254%|fcd246#|eec446+|fcd238@|fcc41c@|eeb61c@|fcd21c@|fcb61c@|fcd21c@|eeb61c@|fcd22a@|fcb62a@|fcc438@|fcd246@
+000000     |fcd262+|fcd254#|000000 |fcd254%|fcd246@|eec446%|fcd246@|eec446*#|fce054%
+000000       |70b638+|8cc438%|70b638#+@|000000  |70b638-
+000000      |7ed238@@|7ec438@|70c438@|70b638@|62b62a%|70b638@|70c438@|7ec438@|7ed238@
+000000          |7ec438+|62a82a%|000000 |70b638=
+`,
+        plano: `
+          % =*
+     + @%#@#@%*@
+   + #%#%*%*%*%##@=
+   #%%##**+++#*###%@=
+ -%%##*+-::::-+*###%#=
+=%%%#**-:::::::*###%=
+ %%%#**=::::::-*##%%+
+  +%%#**+=---+**##%%
+  +=#%###**#**#%#%%
+   %#=%%#%#@#%##@
+     +# %%#@+*%
+       -+=-+  :
+      ****+++***
+          -= :
+`
+      },
+      {
+        color: `
+000000          |fce054@|000000  |fce062#
+000000     |fce062*|e0c446+|eec446%|fcd238@|eeb62a@|fcd22a@|fcc42a@@|fcd238@|e0b638*|fcd246@|fcd254#
+000000   |fce062*|fcd246+|fcc446*|fcd22a@|fcb61c@|fcb60e@@@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcc42a@#|fcd238@|fcd254%
+000000  |fcd254+|eec438#|fcc42a@|fcc41c@|fcb60e@%|fca81c@|eea81c@|e09a1c@%|ee9a1c@|fca80e@@|fcb60e@@|fcb61c@|fcd238%|fcd246@|fcd254#
+000000  |eec446@|fcc42a@|fcb60e@|fca80e@@|e09a1c@|a8701c%|9a620e%%%|a8620e%|a8701c%|e09a1c@|fca80e@@|fcb60e@|fcb61c@|fcc438@|fcd254*
+000000 |fcd254@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|a8700e%|9a620e%%%%%%%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|eec454+
+000000 |fcd254@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%%%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcc438@|fcd254#
+000000  |fcd246#|fcc42a@|fcc41c@|fcb60e@|fca80e@|fca81c@|d28c1c%|b67e1c%|b6701c%|a8701c%|b67e1c%|d29a1c%|fcb61c%|fca80e@|fcb60e@|fcb61c@|fcd238@|fcd254@
+000000   |eec446+|fcc42a@|fcc41c@|fcb61c@|fcb60e@|fca80e@@@@@@|fcb60e@|fcb61c@|fcc42a@|fcd238@|fcc446@
+000000   |fce054#|fcd246+|eec446*|fcd22a@|fcb62a@|fcb61c@|fcc41c@|fcb61c@|fcc41c@|fcb61c@|fcd22a@|eeb62a@|fcc438@|fcd246@
+000000     |fce062#|fcd246+|000000 |fcd246@|eec446@%|fcd246@|e0b646*|fcd254%|fcd262*
+000000       |70b638+|8cc438%|62b62a#|70b638+@|000000  |70b638-
+000000      |7ed238@@|7ec438@|70c438@|70b638@|62b62a%|70b638@|70c438@|7ec438@|7ed238@
+000000          |7ec438+|62a82a%|000000 |70b638=
+`,
+        plano: `
+          @  #
+     *=#@#@#%%=@#
+   *=+@####*%*%#*@%
+  +*#%##**++*#*####@#
+  #%##*+-::::-+*####+
+ %%%#**-:::::::**##%=
+ %%%#**=::::::-###%%*
+  #%%#**+=---+**##%@
+   =%%##*#*##*###@%
+   #=+@##%#%#@#%@
+     #= @%*@+#*
+       -*=-+  :
+      ****+++***
+          -= :
+`
+      },
+      {
+        color: `
+000000        |fce062=|e0c454=|fcd254**|000000 |fce054+
+000000     |fce062+|fcc454%|e0b646#|fcd238@|fcc438@|fcc42a@@|eeb638@|fcd238@|eeb638#|fcd246*|fce054@
+000000   |fcd262+|fcd246#|eec438*|fcc42a@|fcc41c@|fcb60e@@@@@@|fcb61c@|fcc42a@|fcc438#|fcd238%|fcd254@
+000000  |fce054#|fcc438#|eeb62a@|fcc41c@|fcb60e@@|fca80e@|eea81c@|e08c1c%|e09a1c@|ee9a1c@|fca80e@%|fcb60e@@|fcb61c@|fcc438#|fcd246%|fcd254#
+000000 |fcd254=|eec446@|fcc42a@|fcb60e@@|fca80e@|e09a1c@|a8701c%|9a620e%%%|a8620e%|a8701c%|e09a1c@|fca80e@@|fcb60e@|fcc41c@|eec438@|fcd254=
+000000 |fcd254%|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|a8700e%|9a620e%%%%%%%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd254*
+000000 |fcd254%|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%%%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd238@|fcd254#
+000000  |fcd246@|fcc42a@|fcc41c@|fcb60e@|fca80e@|fca81c%|d28c1c%|b67e1c%|b6701c%|a8701c%|b67e1c%|d29a1c@|fca81c%|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@
+000000   |fcc446*|fcd22a@|fcc41c@|fcb61c@|fcb60e@|eea80e@|fcb60e@|fca80e@@|fcb60e@|eea80e@|fcc40e@|fcb61c@|fcc42a@|fcd238@|eec446*
+000000   |fce054+|000000 |fcc446%|fcd22a@|eeb62a@|fcc41c@|fcb61c@|fcc41c@@|fcb61c@|fcc42a@|eeb62a@|fcd238@|fcd246#
+000000     |fce054*|000000 |fcd254+|fce046@|eec446%|fcd246@|e0c446@%|fce054@
+000000       |7ec438*|7eb638#|62b62a#|7eb638*|70b638@|000000  |70b638-
+000000      |7ed238@@|7ec438@|70c438@|70b638@|62b62a@|70b638@|70c438@|7ec438@|7ed238@
+000000          |7ec438+|62a82a%|000000 |70b638=
+`,
+        plano: `
+        =-** +
+     +#+@#%%#@+*@
+   +*+%%#######%*%@
+  #*#%#***++***####%#
+ -%%##*+-::::-**##%%=
+ #%%#*#-:::::::**#%%*
+ %%%###=::::::=###%%#
+  @%%##*+=--=+*##%%%
+   *@%##*#**#*%#%@+
+   + #@#%#%%#%#@*
+     * =@#%%*@
+       =+==+  :
+      #***+++***
+          -= :
+`
+      },
+      {
+        color: `
+000000        |fce062*|eec454==|fce054@|000000  |fce062=
+000000      |fcd254@|e0b638#|fcd238@|fcc438@|fcc42a@|fcd22a@|eeb638@|fcd238@|fcc446%|eec438=|fce054%
+000000    |fcd246@|fcc438*|fcc42a@|fcc41c@|fca80e@|fcc40e@|fca80e@|fcb60e@@@|fcb61c@|fcd21c@|fcc438%*|fcd246@|fcd262+
+000000  |fcd254@|fcd238%|fcb62a@|fcb61c@|fcb60e@|fca81c@|fca80e@|ee9a1c@|d28c0e%|e09a1c@|ee9a1c@|fca81c@|fcb60e%@|fcc40e@|fcb61c@|fcc438%|fcd246*|fce054*
+000000 |fce054+|fcc446@|fcc42a@|fcb60e@@|fca80e@|e09a1c@|a8701c%|9a620e%%%|a8620e%|a8701c%|e09a1c@|fca80e@@|fcb60e@|fcc41c@|eec438@|eec454=
+000000 |eec454#|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|a8700e%|9a620e%%%%%%%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254%
+000000 |fcd254#|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%%%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd238@|fcd254#
+000000 |fce062+|fcd246@|fcd22a@|fcb61c@|fcb60e@|fca80e@|fca81c%|d28c1c%|b67e1c%|a8701c%%|b67e1c%|d29a1c@|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|eec454@
+000000   |fcd246%|fcd22a@|fcc41c@|fcb61c@|fcb60e@|eea80e@|fca80e@@@|fcb60e@|fca80e@|fcb60e@|fcb61c@|fcc41c@|fcc438@|eec446=
+000000     |fcd238@|fcc42a@|eeb62a@|fcd21c@|fcb61c@|fcc41c@|fcb61c@|fcc41c@|fcc42a@|fcb62a@|fcd238@|eec446=|fcd254=|fce062=
+000000     |fcd254=|000000 |fcd254@|fcd246@|e0b646#|fce046@|c4b638@|eec446%|fce054@
+000000       |8cc446*|70b638#|62b62a#|8cb646#|70b62a@|000000  |70b638-
+000000      |7ed238@@|7ec438@|70c438@|70b638@|62b62a%|70b638@|70c438@|7ec438@|7ed238@
+000000          |7ec438+|62a82a%|000000 |70b638=
+`,
+        plano: `
+        *--@  =
+      @+%%#@#@#-%
+    %+#%*%*####%#+%+
+  %####*#*++***#%##**
+ +%###*+-::::-+**#%%-
+ *%%#*#-:::::::**#%%#
+ #%%###=::::::-#*#%%#
+ +@%##**+=--=+*##%%%
+   %%%##*##*#*##%%-
+     @%#%#%#%##@--=
+     = %@+@##@
+       ====+  :
+      #***+++***
+          -= :
+`
+      },
+      {
+        color: `
+000000        |fce062+|eed254=|e0c454=|fce054%|000000  |fce062+
+000000      |fcd254@|eec446@|fcc438@|fcd238@|eeb62a@|fcd22a@|eeb62a@|fcc438@|fcd246@|000000 |fcd254*|fce062+
+000000    |fcd254@|fcd238%|eeb62a@|fcc41c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc40e@|eea81c@|fcc41c@|fcc438@+|fcd246#|fce062#
+000000  |fcd254@|fcd238@|fcc42a@|fcb61c@|fcb60e@|fca80e@|fcb61c@|e09a1c@|e08c0e%|e09a1c@|ee9a0e@|eea81c@|fcb60e@@|fcc40e@|fcc41c@|eec438@|fcc446+|fce054=
+000000 |fcd254#|fcd238@|fcc42a@|fcb60e@@|fca80e@|e09a1c@|a8701c%|9a620e%%%|a8620e%|a8701c%|e09a2a@|fca80e@@|fcb60e@|fcc41c@|fcc438@|fcd254=
+000000 |eec454#|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb61c@|a8700e%|9a620e%%%%%%%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd254@
+000000 |fcd254+|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%%%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|fcd262#
+000000 |fcd262*|fcd246@|fcc42a@|fcb61c@|fcb60e@|fca80e@|fca81c%|d28c1c%|b67e1c%|b6701c%|a8701c%|b67e1c%|d29a1c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|e0c446%
+000000  |fcd254=|fcd246@|fcd22a@|fcb62a@|fcb60e@@|fca80e@@|fcb60e@|fca80e@@@|fcb60e@@|fcc41c@|eec438@|fcc446=|fce062=
+000000    |fcd254+|fcd238@|fcc42a%|fcb62a@|fcc41c@|eeb61c@|fcd21c@|eeb61c@|fcd21c@|eeb61c@|fcc42a@|fcd238@|eeb646=|fcd254*
+000000    |fce062=|000000  |fce054@|eec446%#|fce046@|c4c446@|fcd246@|fcd254#|000000 |fce054+
+000000       |8cc438*|70b638##|8cb646#|62b62a@|000000  |70b638-
+000000      |7ed238@@|7ec438@|70c438@|70b638@|62b62a%|70b638@|70c438@|7ec438@|7ed238@
+000000          |7ec438+|62a82a%|000000 |70b638=
+`,
+        plano: `
+        ==-%  +
+      @##@#@#%@ *+
+    @##%*%*%*%*%%=**
+  %@%##*#+++**##%%#==
+ #%###*+-::::-+**#%%=
+ *%####::::::::**#%%%
+ +%###*=::::::-**#%%*
+ *%%##**+=---+#*#%%*
+  -@%###**#*####%#-=
+    +@##%#%#%#%%-+
+    =  @*+@#%# +
+       ====+  :
+      ****+++***
+          -= :
+`
+      },
+      {
+        color: `
+000000         |fce054*|e0c454=|fcd254+|fce054#
+000000      |fcd254%|fcc446@|eeb638@|fcd238@|eeb62a@|fcc42a@@|eec438@|fcd246@|eec446=|fcd246=|fce062*
+000000    |fcd254%|fcd238@|eeb62a@|fcc41c@|fcb60e@@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb61c@|fcc41c@|fcd238@|eec446*|fcd246+|fce054*
+000000  |fcd254#|fcd246@|fcc42a@|fcb61c@|fcb60e@|fca80e@|fcb61c@|e09a1c%|e09a0e%|e09a1c%|ee9a0e%|fca81c@|fca80e@|fcb60e@|fcb61c@|fcc41c@|fcc438@|eec446=
+000000 |fcd254%|fcd238@|fcc42a@|fcb60e@@|fca80e@|e09a2a%|a8701c%|9a620e%%%|a8620e%|a8701c%|e09a2a@|fca80e@@|fcb60e@|fcc41c@|fcd238@|fcd254*
+000000 |fcd254%|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb61c@|a8700e%|9a620e%%%%%%%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd254%
+000000 |fcd254=|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|9a620e%%%%%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcc446@|fcd262=
+000000 |fce054*|fcd246#|fcc42a@|fcb61c@|fcb60e@|fca80e@|fca81c%|d28c1c%|b67e1c%|b6701c%|a8701c%|b67e1c%|d29a1c%|fcb61c@|fca80e@|fcb60e@|fcc41c@|fcc438@|eec446#
+000000  |fcd254#|fcd246@|fcc42a%|fcb62a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@@|fcb60e@|fca80e@|fcb60e@|fcc42a@|eec438%|fcd246+|fce062+
+000000    |fcd246@|fcd238@|eeb62a#|fcc42a@|fcc41c@|fcb61c@|fcc41c@|fcb61c@|fcd21c@|eeb61c@|fcd22a@|eec438@|fcc438+|fce054%
+000000      |fcd254+|fce046@|e0b646*|fcd246@@|d2b646@|fce054@|eec454==|fce062*
+000000       |70b638+#|7eb638%*|62b62a%|000000  |70b638-
+000000      |7ed238@@|7ec438@|70c438@|70b638%|62b62a%|70b638%|70c438@|7ec438@|7ed238@
+000000          |7ec438+|62a82a%|000000 |70b638=
+`,
+        plano: `
+         *-=*
+      ##*%#%##%--*
+    #%*#*#*#*#*#%==*
+  *%#*#**++++***###-
+ #%##**+:::::-+**##%*
+ *###**::::::::***#%#
+ =###**-::::::-**###=
+ **##***=----=**###+
+  *%###**+*****##*=+
+    %%+##*#*%*%#=#
+      =%=#%*%--+
+       -=+-+  :
+      ***++=++**
+          -= :
+`
+      }
+    ]
   },
   {
     cols: 18, alto: 11,
-    color: `
-000000     |fce062+|000000  |fcd254*|eec446#|fcd254%|000000 |fce054#
-000000    |fcd246#|eeb638%|fcc41c@|eeb61c@|fcc41c@|fcb61c@@|fcc41c@|fcc42a@|fcd238#|fcd246@
-000000  |fcd254*|fcd238@|fcc42a@|fcb61c@|fca80e@@|ee9a0e@@|eea80e@|fca80e@|fcb60e@|fcb61c@|fcc438%|fcd246%
-000000 |fcd254%|fcc438@|fcb61c@|fcb60e@|fca80e@|c48c1c%|9a620e%%%%|b67e1c%|eea81c@|fcb60e@|fcb61c@|fcc438@|fcd254@
-000000 |fcd246%|fcc42a@|fcb60e@|fca80e@|eea81c@|9a620e%%%%%%|d29a1c%|fca80e@|fcb60e@|fcc42a@|fcc446@|fcd262=
-000000 |fcd254%|fcc438@|fcb61c@|fcb60e@|fca80e@|d29a1c%|a8701c%|9a620e%%|a8620e%|c48c1c%|fca81c@|fcb60e@@|fcc42a@|fcd246@|fcd262=
-000000  |fcd246@|fcd22a%|fcc42a@|fcb60e@|fca80e@|fcb60e@|fca80e@@@@|fcb60e@|fcc41c@|fcc42a%|fcd246@
-000000    |fcd246#|eeb638%|fcd22a@|eeb62a@|fcc41c@|fcb61c@|fcc41c@|fcc42a@|fcc438@+|fcd254*
-000000       |d2c446+|eed254*|c4c446@|fcd254@
-000000     |7ed238%|7ec438@|70c438@|70b638@|62b62a%|70b638*|70c438@|7ec438@|8cd246=
-000000      |70c438=|70b638==%=+
+    marcos: [
+      {
+        color: `
+000000       |fcd254*|fcc446**|fcd254#|000000 |fce062=
+000000    |fcd246*|eec438%|fcd22a@|fcb61c@|fcc41c@@|fcb61c@|fcc42a@|fcc438@|fcd238*|fcd254#
+000000  |fcd254#|fcd238#|fcc42a@|fcb60e@|fca80e@@@@@@|fcb60e@|fcc41c@|fcc42a%|fcd246@|fcd262=
+000000 |fcd254%|fcc438@|fcb61c@|fcb60e@|fca81c@|c48c1c%|9a620e%%%|a8700e%|c48c1c%|fca81c@|fcb60e@@|fcc42a@|fcd246@
+000000 |fcd246@|fcc42a@|fcb60e@|fca80e@|e09a1c@|9a620e%%%%%%|e09a1c%|fca80e@|fcb60e@|fcc42a@|fcd246%
+000000 |fcd254%|fcc438@|fcb61c@|fcb60e@|fca81c@|c48c1c%|9a620e%%%%|c48c1c%|fca81c@|fcb60e@|fcb61c@|fcc438@|fcd254#
+000000  |fcd246%|fcc42a%|fcb61c@|fcb60e@|fca80e@@@@@@|fcb60e@|fcc41c@|fcd238%|fcd246%
+000000   |fcd254@|fcd238#|fcc438@|fcc41c@|fcb61c@|fcc41c@@|fcb61c@|fcc42a@|eec438@|fcd246*|fcd254+
+000000     |fce054*|000000 |eed254#|eec454*|b6c438@|fce054+
+000000     |7ec438%|70c438@@|70b638%|62b62a%|70b638*|70c438@|7ed238%
+000000      |70c438=|70b638=|70c438+|62b638#|70b638=+
 `,
-    plano: `
-     +  **% *
-    #*%#%##%#*%
-  *%##**++**####
- #%##*=::::-**#%%
- #%#**::::::+*##%-
- #%##*+-:::=*###%-
-  %###******###%
-    **%#%##%%+*
-       =+#@
-     +**++-**-
-      -::+:-
+        plano: `
+       +++* =
+    +*%######+*
+  **##******###%-
+ ###**=::::=**###
+ ##**+::::::+**##
+ ###**=::::=**##*
+  ###*******####
+   %*#%*###%#++
+     * *+*=
+     ++++=-+*
+      -:-=:-
 `
+      },
+      {
+        color: `
+000000      |eec454=|eec446+|fcd254#|eec446+|fce054%
+000000    |fcd246#|eeb638#|fcd22a@|fcb61c@|fcc41c@|fcb61c@|fcc41c@|fcc42a@|fcd238@|fcc438+|fcd254#
+000000  |fcd254#|fcd238@|fcc42a@|fcc41c@|fca80e@|fcb60e@|fca80e@@@@|fcb60e@|fcc41c@|fcc42a%|fcd246%|fcd262+
+000000 |fcd254@|fcc438@|fcb61c@|fcb60e@|fca81c@|c48c1c%|9a620e%%%|a8700e%|c48c1c%|fca81c@|fcb60e@@|fcc42a@|fcd246%
+000000 |fcd246@|fcc42a@|fcb60e@|fca80e@|e09a1c@|9a620e%%%%%%|e09a1c@|fca80e@|fcb60e@|fcc42a@|fcd246@
+000000 |fcd254%|fcc438@|fcb61c@|fcb60e@|fca81c@|c48c1c%|9a620e%%%%|c48c1c%|fca81c@|fcb60e@|fcb61c@|fcc438@|fcd254#
+000000  |fcd246%|fcc42a%|fcb61c@|fcb60e@|fca80e@@|eea80e@@|fca80e@@|fcb60e@|fcc41c@|fcd238@|eec454@
+000000   |fcd254%|fcc438*@|fcc41c@@|fcb61c@|fcc41c@|eeb61c@|fcd22a@|eeb638%|fcd246%|fcd262=
+000000     |fce054+|000000 |eed254@|e0c454*|c4c446@
+000000     |7ec438%|70c438@@|70b638@|62b62a%|70b638*|70c438@|7ed238@
+000000      |70c438+|70b638=|70c438+|62b638#|70b638++
+`,
+        plano: `
+      ==#=%
+    #*@#%#%%%=#
+  *%%%*#***##%#%+
+ %%###=:::-=*##%#
+ %%#**::::::+*#%%
+ #%##*=::::=###%*
+  %####***#*#%%%
+   %+%%%#%#@*%-
+     + %+#
+     ***++=**
+      -:-=--
+`
+      },
+      {
+        color: `
+000000      |fcd254+|e0b646=|fce054@|e0c446=|fce054#
+000000    |fcd254%|eeb638#|fcd22a@|fcb61c@|fcc41c@|fcb61c@|fcc41c@|eeb62a@|fcd238@|eec446+|fcd254*
+000000  |eed254*|fcc438@|fcc42a@|fcc41c@|fca80e@|fcb60e@|fca80e@|eea80e@|fca80e@|fcb60e@@|fcc41c@|fcc42a@|fcd238#|fcd254*
+000000 |fcd254%|fcc438@|fcb61c@|fca80e@|fca81c@|c48c1c%|9a620e%%%|a8700e%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246#|fce062=
+000000 |fcd246@|fcc42a@|fcb60e@|fca80e@|e09a1c@|9a620e%%%%%%|e09a1c@|fca80e@|fcb60e@|fcc42a@|fcd246@
+000000 |fcd246#|fcc438@|fcc41c@|fcb60e@|fca81c@|c48c1c%|9a620e%%%%|c48c1c%|fca81c@|fca80e@|fcb61c@|fcc438@|eed254#
+000000 |fcd262=|fcd246#|fcc42a@|fcb61c@|fcb60e@@|fca80e@|eea80e@@|fca80e@@|fcb60e@|fcc41c@|fcc438@|eec454#
+000000   |fcd246#|fcc446*|fcd22a@|fcb61c@|fcc41c@|fcb61c@|fcc41c@|fcb61c@|fcc42a@|eeb638%|fcd246@
+000000       |eed254@|e0c454+|d2d246@|000000 |fcd254=
+000000     |7ec438%|70c438@@|70b638@|62b62a%|70b638*|70c438@|7ed238@
+000000      |70c438+|70b638=|70c438+|62b638#|70b638++
+`,
+        plano: `
+      =-@-#
+    %*%#%#%#@=*
+  +%%%*#***##%%#*
+ #%###=:::-=*#%%#=
+ %%#**::::::+*#%%
+ *%%#*=::::=###%*
+ =#####***#*#%%*
+   #+@#%#%#%*@
+       %=% =
+     ***++=**
+      -:-=--
+`
+      },
+      {
+        color: `
+000000      |fce054+|e0c446+|fcd254%|eec446+|fcd254+=
+000000    |fcd254#|fcc438%|fcc42a@|fcc41c@@|fcb61c@|fcc41c@|eeb62a@|fcd238@|fcc446*|fcd246=
+000000  |eec454=|fcc438@|fcc42a@|fcb61c@|fca80e@|fcb60e@|eea80e@@|fca80e@|fcb60e@@|fcc41c@|fcc42a@|fcd238*|fcd254*
+000000 |eec454#|fcc438@|fcb61c@|fca80e@|fca81c@|c48c1c%|9a620e%%%|a8700e%|c48c1c%|fca81c@|fca80e@|fcc40e@|fcc42a@|fcd246*
+000000 |fcd246@|fcc42a@|fcb60e@|fca80e@|e09a1c@|9a620e%%%%%%|e09a1c@|fca80e@|fcb60e@|fcc42a@|fcd246@
+000000 |fcd246*|fcc438@|fcc41c@|fca80e@|fca81c@|c48c1c%|9a620e%%%%|c48c1c%|fca81c@|fca80e@|fcc41c@|fcc438@|eec454*
+000000 |fce062=|fcd246*|fcc42a@|fcc41c@|fcb60e@@|fca80e@|ee9a0e@|eea80e@|fca80e@@|fcb61c@|fcc41c@|fcc438@|eec454*
+000000  |fce062=|fcd246+|fcc446*|fcd22a@|eeb62a@|fcc41c@|fcb61c@|fcc41c@@|fcc42a@|fcc438@|fcd246@
+000000    |fce062=|000000 |eed254+|eec446#|e0c454+|d2d246@|000000 |fce054+
+000000     |7ec438%|70c438@@|70b638@|62b62a%|70b638*|70c438@|7ed238@
+000000      |70c438+|70b638=|70c438+|62b638#|70b638++
+`,
+        plano: `
+      +=%=+=
+    ##%%%#%#@+=
+  =%%###***##%%+*
+ *%#**=:::-=**#%*
+ %%#**::::::+##%%
+ +%%#*=::::=**#%+
+ =+%###***#*#%%+
+  =+*%#%#%#%#@
+    = =*=% +
+     ***++=**
+      -:-=--
+`
+      },
+      {
+        color: `
+000000      |fce062=|eec454+|fcd246#|fcd254*|eec446=|fce054*
+000000    |fcd254+|fcc438@|fcb62a@|fcc41c@|fcb61c@|fcc41c@@|fcb62a@|fcc438@|fcd246%|000000 |fce062=
+000000  |fcd246=|fcc438@|fcc42a@|fcb61c@|fcb60e@@|ee9a0e@|eea80e@|fca80e@|fcb60e@@|fcc41c@|fcc42a@|fcc446*|fce054+
+000000 |fcd254*|fcc438@|fcc41c@|fca80e@|fca81c@|c48c1c%|9a620e%%%|a8700e%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246*
+000000 |fcc446@|fcc42a@|fcc40e@|fca80e@|e09a1c@|9a620e%%%%%%|e09a1c@|fca80e@|fcc40e@|fcc42a@|fcd246@
+000000 |fcd246+|fcc438@|fcc41c@|fca80e@|fca81c@|c48c1c%|9a620e%%%%|c48c1c%|fca81c@|fca80e@|fcc41c@|fcc438@|fcd254*
+000000 |fce062=|fcd246*|fcc42a@|fcc41c@|fcb60e@|fca80e@@|ee9a0e@@|fca80e@|fcb60e@|fcb61c@|fcc41c@|fcc438@|fcd246+
+000000  |fce062=|000000 |fcd246%|fcc42a@|fcb62a@|fcc41c@|fcb61c@|fcc41c@|fcc42a@|fcb62a@|fcc438@|fcd246#
+000000      |fcd254#|e0c446*|eed254*|b6c446@|eec454=|fce054=
+000000     |7ec438%|70c438@@|70b638@|62b62a%|70b638*|70c438@|7ed238@
+000000      |70c438+|70b638=|70c438+|62b638#|70b638++
+`,
+        plano: `
+      ==**-*
+    +%#%##%#%# =
+  =%%###***##%%++
+ +%#**=:::-=**#%*
+ %%##*::::::+##%%
+ +%#**=::::=**%%+
+ =+%%##****##%%=
+  = %%#%##%#%*
+      #++#-=
+     ***++=**
+      -:-=--
+`
+      },
+      {
+        color: `
+000000       |fcd254*|eec446+|fcd254@|000000 |fce054*
+000000     |fcd246@|eeb62a@|fcd21c@|fcb61c@|fcc41c@@|fcc42a@|fcc438%|fcd246@
+000000  |fcd246+|fcc438@|fcc42a@|fcb60e@@|fca80e@|ee9a0e@|fca80e@@@|fcb60e@|fcc41c@|fcc42a@|fcc446#
+000000 |fcd246*|fcc438@|fcc41c@|fca80e@|fca81c@|c48c1c%|9a620e%%%|a8700e%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcc446#
+000000 |fcc446@|fcc42a@|fcb60e@|fca80e@|e09a1c@|9a620e%%%%%%|e09a1c@|fca80e@|fcb60e@|fcc42a@|fcd246%
+000000 |fcd254*|fcc438@|fcb61c@|fca80e@|fca81c@|c48c1c%|9a620e%%%%|c48c1c%|fca81c@|fca80e@|fcc41c@|fcc438@|fcd254*
+000000  |fcc446*|fcc42a@|fcc41c@|fcb60e@|fca80e@|fca81c@|eea80e@|ee9a0e@|fca80e@|fcb60e@@|fcc41c@|fcc438@|fcd246+
+000000  |fce062=|000000 |fcd246@|fcc42a@@|fcc41c@@|fcb61c@|fcd22a@|eeb62a@|fcd238@|eec446+|fcd254=
+000000      |fcd254%|d2b646+|fcd254#|a8b638@|fcd254+
+000000     |7ec438%|70c438@@|70b638@|62b62a%|70b638*|70c438@|7ed238@
+000000      |70c438+|70b638=|70c438+|62b638#|70b638++
+`,
+        plano: `
+       +=% *
+     @#%#%#%*@
+  =%%##***#*#%%*
+ *%%#*=:::-=**#%*
+ %%##*::::::+*#%%
+ +%#**=::::=*#%%*
+  +%%#*#***##%%+
+  = @#%#%#%#%==
+      #=#*=
+     ***++=**
+      -:-=--
+`
+      },
+      {
+        color: `
+000000       |fce054#|e0c446+|fce054@|000000 |fcd254=
+000000   |fce062=|000000 |fcd246@|eeb62a@|fcc41c@|fcb61c@|fcc41c@|fcb61c@|fcc42a@|eeb638#|fcd246@
+000000  |fcd246*|fcc438%|fcc42a@|fcb60e@@|fca80e@|eea80e@|fca80e@@@|fcb60e@|fcc41c@|fcc42a@|fcd246%
+000000 |fcd246#|fcc438@|fcc41c@|fcb60e@|fca81c@|c48c1c%|9a620e%%%|a8700e%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246#
+000000 |fcd246@|fcc42a@|fcb60e@|fca80e@|e09a1c@|9a620e%%%%%%|e09a1c@|fca80e@|fcb60e@|fcc42a@|fcd246@
+000000 |fcd254#|fcc438@|fcb61c@|fca80e@|fca81c@|c48c1c%|9a620e%%%%|c48c1c%|fca81c@|fcb60e@|fcc41c@|fcc438@|fcd254*
+000000  |fcd246#|fcc42a@|fcc41c@|fcb60e@|fca80e@|fcb61c@|eea80e@@|fca80e@|fcb60e@@|fcc41c@|fcc438@|fcd246*
+000000   |fcd254=|fcd238@|fcb62a%|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcc42a@|eeb62a@|fcd238@|eec446=|fce054+
+000000      |fcd254#|c4b646=|fcd254%|a8b638@|fce054*
+000000     |7ec438%|70c438@@|70b638@|62b62a%|70b638*|70c438@|7ed238@
+000000      |70c438+|70b638=|70c438+|62b638#|70b638++
+`,
+        plano: `
+       *=@ =
+   - %#%#%#%*@
+  **###*****##%#
+ *###*=::::=**#%#
+ %%#*+::::::+*#%%
+ *%#**=::::=*##%*
+  *%##*****####*
+   -%*%#%#%#%=+
+      *-#*+
+     **+++=**
+      -:-=--
+`
+      },
+      {
+        color: `
+000000       |fcd254%|eec446+|fcd254#=
+000000    |fcc446=|fcd246@|fcc42a@|fcc41c@|fcb61c@|fcc41c@|eeb61c@|fcd22a@|eeb638%|fcd246%|fcd254+
+000000  |fcd246#|fcc438#|fcc42a@|fcb60e@@|fca80e@@@@@|fcb60e@|fcc41c@|fcc42a@|fcd246@
+000000 |fcd246%|fcc438@|fcc41c@|fcb60e@|fca81c@|c48c1c%|9a620e%%%|a8700e%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246%
+000000 |fcd246@|fcc42a@|fcb60e@|fca80e@|e09a1c@|9a620e%%%%%%|e09a1c@|fca80e@|fcb60e@|fcc42a@|fcd246@
+000000 |fcd254%|fcc438@|fcb61c@|fca80e@|fca81c@|c48c1c%|9a620e%%%%|c48c1c%|fca81c@|fcb60e@|fcc41c@|fcc438@|fcd254*
+000000  |fcd246%|fcc42a@|fcc41c@|fcb60e@|fca80e@@|eea80e@@|fca80e@|fcb60e@@|fcc41c@|fcc438%|fcd246%
+000000   |fcd254#|fcd238@|eeb62a%|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcc42a@@|fcc438@+|fce054*
+000000     |fce062+|eec446+|d2c446+|fcd254#|a8b646@|fce054*
+000000     |7ec438%|70c438@@|70b638@|62b62a%|70b638*|70c438@|7ed238@
+000000      |70c438+|70b638=|70c438+|62b638#|70b638++
+`,
+        plano: `
+       #=#=
+    -%%%#%#%*#+
+  #*%##*****##%%
+ #%##*=:::-=*##%%
+ %%#**::::::+*#%%
+ #%##*=::::=*##%*
+  #%##*#***#####
+   *%*%#%#%%%=*
+     +==#**
+     ***++=**
+      -:-=--
+`
+      }
+    ]
   }
 ]);
 export const GIRASOL_BRILLO = 1.15;
@@ -1527,253 +4339,1933 @@ export const GIRASOL_BRILLO = 1.15;
  *
  * Se elige por el ancho del conjunto ya montado, no por el de la consola, y se
  * centra debajo: es la peana de la escena, no un tercer protagonista.
+ *
+ * Cada tamaño trae 8 fotogramas: son girasoles, así que giran. Es una vuelta
+ * de sector de pétalos, que al acabar deja cada flor como estaba y el bucle
+ * cierra sin costura.
  */
-export const GUIRNALDA = filas([
+export const GUIRNALDA = conMarcos([
   {
     cols: 175, alto: 14,
-    color: `
-000000                                                                                         |fce062**|000000   |fcd254+|fcee62%|000000                    |fce062%|fcd262*|000000 |eec462=|fce054#|fce062@
-000000                                                                                    |fce062%|fce054@|eec454*|e0b654=|e0c454*|fcd246@|fce046@|eec446@@|fcc438@|fce046@@|eec454+|000000               |fcd254@|fce046@|eec446@|e0b646@|fcd238@|fcd22a@|eeb638@|fcc42a@|fce038@|fcc438@|000000  |fce062+|000000 |9ae054*|8cd246*|7ec446*+|000000            |fce054@|fcd254%|000000         |7ec446=|8cd246+|9ae054+
-000000            |7ec446=|7ed246*|8cd246#|9ae054*|000000                                                                    |fcc454%|fcd238@@|fcc42a@|eeb62a@|fcc41c@|fcd21c@|fcb61c@@|fcc41c@|fcd21c@|fcc42a@|d2b638#|fcc446#|fcd246@|fce054@|fce07e=|000000        |fce070=|fce054#|fcd246+|eec454*|fcc42a@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@@|eea81c@|fcc42a@|fcd238@|eed254@|9ad270+|7ed238@|8ce046@|8cd246@|7ed238@|70c438@@|70b646*|000000     |fcd254@|fce038@|fcc438@|eeb62a@|fcd21c@|fcc41c@|eeb62a@|fcc42a@|fce046@|fcd254*|000000   |70c438@@|7ed238@|8ce046@|7ed238@|8cc454+
-000000          |70c438%@|7ed238@|8cd246@|8ce046@|7ed238@|8cc454*|000000                                                |fce062%|fce054%|e0b654=|eec454+|fcd254%|fce062@|000000       |7ec446=*|a8d246%|fce062@|fce054@|fcd238@|fcc446*|fcb638@|fcc40e@@|fca80e@@|fcc40e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcc41c@|fcd22a@@|fcc446%|000000          |fcc438@|fcd22a@|fcc41c@|fcb62a@%|fcb60e@|eea81c@|fca81c@|eea80e@|fcb61c@|ee9a0e@|fcb60e@@|fcb61c@|e0c42a@|fcd246@|eed246@|b6d246@|7ed238@|8cd246@@|70c438@|70b62a%|70b646*|000000  |fce054@|fcd246@|fcc438%|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@@|fcc40e@|fcc438@%|fcd246@|fce054@|a8c446@|70c438@|7ed238@|8cd246@|7ec438@|70c438@|8cc454+|000000   |e0e062*|c4d246@|a8d246@|eed238@|fcd246@|c4b646%|fcd254*|fce062+
-000000        |7eb646*|70b62a%|70c438@|7ec438@|8cd246@@|7ed238@|a8d246@|7ec446#|9ad254+|9ae054@|8cd246@|7ed238@|7ec438%*|000000                  |fce070=|000000                   |fcd254#|fce046@|fcc438@|e0b638@|fcc42a@|fcd22a@|fcb62a@|fcc42a@|fcd22a@|fcc438@|e0c470=|fcd254=|fce062*|000000  |70b638*|70c438@@|7ed238@|8cd246@|d2b646@|fcc438@|fcd22a@|fcd21c@|fcb60e@|fca82a@|fcb62a#|fcb60e@|eea81c@|fca81c@|eea81c@|fca81c@|eeb61c@|e09a0e%|fcb60e@@|fca80e@|eeb61c@|fcc438@|fcd246@|fce046@|fce062@|000000    |fce070=|fce054@|fcd246@|fcc42a@|fcb60e@@|fca80e@|fcb62a@|c48c2a%|a8700e%|a8620e%%|b6700e%|d29a1c%|e0b61c@|fca80e@|fcb60e@|fcc41c@|fcc42a@|eec438@|b6c446@|70b62a%|70c42a@|70c438@|7ed246@|7ec438@|70b638%|000000 |d2c454*|eeb638@|fcc41c@|fcb60e@|fca80e@|eea838%|c48c1c%|b67e1c%%|d28c1c%|fcb62a%|fcb60e@@|fcc41c@|e0b646@|70b62a%|7ec438@|7ed246@|70c438@|70b62a%|70b638#|000000   |fcd246=|eec446%|fcd21c@|fcb61c@|fcb60e@@@|fcd21c@|eec446@|fcd246=|fce062+
-000000        |62b62a%|70c438%@|a8d246@|fce046@|c4c438@|e0c42a@|fcd238@|eeb638@|eec438@|fce046@|8cd246@|8ce046@|7ed238@|70c438@@|70b638%|000000           |fce070+|fce054%|fcd254*|e0b654=|fcd238@|fce038@|d2b638@|c4c438@|e0d246@|d2e054@|8ce046@|8cd246@|8ce046@|7ed238@@|70c438@%|70b646+|000000    |fce070=|fce062%|fcd246#|fcc446*|fcc42a@|fcd21c@|fcb60e@|fca80e@|fcc40e@|fca80e@|fcb60e@@|eea80e@|fcc41c@|fcd238@|fcd246@|000000 |70b646#|70b62a%|70c438@|c4d246@|eee054@|fcd246@|fcd238@|fcc41c@|fcb60e@|fca80e@@|fca81c@|fcb62a@|c48c2a%|a8700e%|a8620e%|a8700e%|a8620e%|b6701c%|e09a1c%|d2b61c@|eea80e@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|fcc438@|eec446@|b6c454@|7ec446*|7ec438*|7ec446#|7ec438#|e0c454@|fcc438@|fcb61c@|fcb60e@|fca80e@|fca800@|d29a2a%|a8620e%%|9a620e%%|a8620e%%|e0a81c@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fcd246@|e0d254@|7ec446@|70c438@@|7ec438@|7ed246@|e0d254@|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca80e@|c48c1c%|a8620e%|9a620e%%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|eed254@|7ec438@|62b62a%|70b62a%|7ec438@|7ed246#*|7ed238+|e0c446@|fcc42a@|fcc40e@|eea80e@|e0a81c@|c48c1c%|c47e1c%|e0a81c@|eeb60e@|fcb60e@|fcc42a@|eec454%
-000000 |8cd254-|000000      |62b638%|8cc438@|e0d246@|e0c42a@|eeb61c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc41c@|eeb61c@|e0c42a@|eed246@|a8d246@|8cd246@|70c438@@|70b638%|000000          |eec454+|fcc438@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcc41c@|fcd22a@|d2c438@|a8c438@|b6c438@|a8d246@|7ed238@|8cd246@|7ed238@|70c438@@|70b638%|000000    |eeb638@|fcc42a@|fcc41c@|fcb60e@|fcb62a@|fcb61c@|ee9a0e@|ee9a1c@|e09a1c%|fca81c@|eea81c@|fcb60e@@@|fcc42a@|fcd238@|fcd246@|d2d254@|7ed246@@|d2c446@|fcc446@|fcc42a@|fcc41c@|fcb60e@@|fca80e@|fcb62a@|b6701c%|a8620e%|9a620e%%%%|a8620e%|a8700e%|e0a82a@|fca80e@@|fcb60e@@|fcc41c@|fcc42a@|fcd238@|eed246@|c4d246@|8cd246@|7ec446#|e0d254@|fcd246@|fcd238@|fcc41c@|fcb60e@|fca80e@@|fcb61c@|c48c2a%|a8700e%|a8620e%%|a8701c%|d28c1c%|fcb638@|fcb60e@@|fcc41c@|fcc42a@|eec438@|e0c462+|000000        |eec446@|fcc42a@|fcc40e@|fcb60e@|fcb638%|d28c1c%|c47e1c%%|e09a1c%|fcb638%|fcb60e@|fcc40e@|fcc41c@|eec438@|b6c454*|000000 |7ed246-=|7ed238=|7ed246+|7ec438+|eed254#|fcd238@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8700e%|fca81c@|fcb60e@|fcc41c@|fcd246@|a8d246@|7ec438#*|7ed246*+
-000000 |7ec446#|7ec438#%@@@@|8cc446@|d2d246@|fcc42a@|fcb60e@|fca80e@|d29a2a%|a8701c%|a8620e%|b6701c%|eea82a@|fcb60e@@|eec438@|9ac438@|70c438@|7ed246@|7ec438@|62b62a%|000000        |fcd254@|fcd238@|fcc41c@@|e0b62a@|fca80e@|e09a1c%%|ee9a0e@|e0b61c@|e0b60e@|fcc40e@|fcd21c@|fcd238@|b6c446@|70c438@@|7ec438@|7ed246@|7ec438@|62b62a%|70b646#|000000 |fce054@|fcd238@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fca81c@|b67e1c%|a8620e%%%%|b67e1c%|fcb638@|fca80e@|fcb60e@@|fcb62a@|eec438@|d2c446@|70b638@|9ac438@|eec446@|fcd238@|fcc42a@|fcc40e@@|fcb60e@|fca80e@|eeb61c@|b67e1c%|a8620e%%|9a620e%%%|a8620e%%|eea82a@|fca80e@@@|fcb60e@|fcc41c@|fcc42a@|fcc446@|fcd254*|fcd262=|000000    |eed270+|fcc438@|fcd21c@|fcc40e@|fcb62a@%|fcb60e@|eea81c@|fca81c@|ee9a0e@|fcb62a@|ee9a0e@|fcb60e@@|fcb61c@|fcc438@|fcd246@|fce062@|000000         |fce062*|fcd246*|fcc446%|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@@|fcc40e@|fcc438@|fcc446#|fcd238%|fce054@|fce070*|000000       |fcd270*|fcd238@|fcc41c@|fcb62a@|fcb61c@|e09a0e%%|fcb61c@|fcb62a@|fcc41c@|fcd22a@|fcd246@|a8d254=|000000 |7ed246=++
-000000         |fcd254*|fcc42a@|fcb60e@|fca80e@|e09a2a%|a8700e%|a8620e%|b6701c%|eea82a@|fca80e@|fcb60e@|fcc438@|a8c446@|70c438@|70b62a%|70c438@|7ec438@|70c438@@|7ec438@|70c438@|7ec438@@|a8d246@|eed254@|fcc438@|fcc41c@|fcb60e@|fca80e@|eea81c@|a8620e%|9a620e%%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcc41c@|fcc438@|e0d254@|8cc438@|70b62a%|62b62a%%|70c438@|7ec438@|70c438@|7ec438@|d2c446@|fcc438@|fcc41c@|fcb60e@@|fca80e@|e0a81c@|a8620e%%|9a620e%%|a8620e%%|e09a2a%|fc9a0e@|fcb60e@|fcc40e@|fcc41c@|fcd22a@|fcd246@|fce062@#|fce054@|fcd246@|fcc438@|fcb61c@|fcb60e@|fca80e@@@|fcb638%|e09a2a%|b67e1c%|a8700e%%|b67e1c%|c48c1c%|eea81c@|fcb638%|fca82a@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcc438@|eec454@|000000      |fce062@|fcd246%|fcc446*|eec446#|fcc42a@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@@|eea81c@|fcc42a@|fcd238@|fcd246@|000000             |fcd254@|fce046@|fcc438@|eeb638@|fcd238@@|e0b638@|fcc446@|fce054@|fcd262=|000000            |fcd254%|fcd22a@|fcb61c@|fcc41c@@|fcb62a@|fcd238@|fcd254#
-000000          |fcd254%|fcd238%|fcc42a@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcc42a@|fcc438@|fcd22a@|fcd246@|fce070+|000000         |8cd254-|a8d254=|fcd254+|fcc446@|fcb61c@|fcb60e@|fca80e@|eea81c@|b6701c%|a8620e%%%|d28c2a%|fca80e@@|fcb60e@|fcc42a@|e0c446%|8cd238+|7ec438+|7ed246+++|7ed238=|7ed246+|eee062%|fce054@|fcd238@|fcc42a@|fcb60e@|fca80e@@|fcb61c@|d29a2a%|b67e1c%|a8620e%%|b6701c%|e09a1c%|fcb62a@|fca80e@|fcb60e@|fcc41c@|fcc42a@|eec446@|e0c462*|000000    |eec446@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|eea82a@|fcb61c@|fcb60e@|ee9a0e@|fcb61c@|fca80e@@|fcb61c@|ee9a1c@|fcb60e@|fcc40e@|fcb60e@|eea81c@|eec438%|fcd246%%|fce062%|000000         |fcd254@|fce046@|fcc446@|eeb638@|fcd22a@@|eeb62a@|fcc438@|fce046@|fcd246@|000000 |eec454=|fce062+|000000                 |fce070=|000000                    |fce062=+
-000000           |fcd270=|fce046@|fcc438@|eeb638@|fcd238@|eeb638@|fcd246@|fce054@|000000               |fcd262@|fcd238@|fcc42a@|fcb62a@|fcb61c%@|ee9a1c@|eea81c@|fca80e@|fcb61c@|fcb62a@|fcc41c@|fcd22a@|fcd238@|fcd254@|000000         |eed262=|fcc438@|fcd22a@|fcc41c@|fcb61c@|fcb62a@|fcb60e@|ee9a0e@|fcb61c@|eea80e@|fcb61c@|eea81c@|fcb60e@|fcc40e@|fcb61c@|eeb638@|fcd246#|fce054%|fce070=|000000   |fce062@|fce054@|fcd246@|fcc438%|eec446*|fcc42a@|fcc41c@|fcc40e@|fca80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@@|eea80e@|fcc41c@|fcd22a@|fcd238@|fcc446@|000000                |fce062@|fcd254#|000000 |eec454=|fce070=
-000000                                    |eec454+|fcd22a@|fcd21c@|fcb61c@|fcc41c@@|eeb61c@|fcc41c@|fcd22a@|fcc454#|000000            |fce062#|fcd254#|fcc446+|eec454*|fcc42a@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcc41c@|eeb61c@|fcb62a@|fcd238@|fcd246@|000000          |fcd254@|fce038@|fcd238@|fcb62a@|eeb62a@|fcc41c@|fcd21c@|fcb61c@|fcb62a@|fcc42a@|fce038@|fcc438@|d2b646+|eec446#|fcd254%|fce062@|fce070+
-000000                                    |fce062+|fce054%|eec454*|e0b646+|fcd254@|fce054@|eec454+|e0c454=|fcd254+|000000                |fce062@|fce046@|fcc446#|e0b646#|fcd238@@|eeb638@|fcc438@|fce046@|fcd254@|000000  |fce062=|000000          |fce062@|fce054%|eec454=|000000 |eec462*|fce046@@|eec446@@@|fce054@@
-000000                                                                 |fce062##|000000                      |fce062**
+    marcos: [
+      {
+        color: `
+000000                                                                                            |e0c462=|000000 |fcd262=|fce070*|000000                    |fce070+|fcd262=|e0c454+|eec454*|fce062*|fce070*
+000000                                                                                    |fce070+|fce062%|eec454#|e0b654*=|fcd246@|fce046@|eec446@@|fcc438@|fce046@|fcd246@|000000                |fce062#|fce054@|eec446@|e0b646%|fcd238@@|eeb62a@|fcc42a@|fce038@|fcc446@|000000 |fcd254+|fce054#|e0e062+|9ae054*|8cd246#|7ec446#*=|000000           |fce054@|fcd254@|000000         |7ec446+|8cd246*|9ae054*
+000000            |7ec446+|7ed246#|8cd246%|9ae054#|000000                                                                    |eec454+|fcd246@|fcd238@|fcc42a@|eeb62a@|fcc41c@|fcd21c@|fcb61c@@|fcc41c@|fcd22a@|fcb62a@|d2b638%|fcc438@|fcd246@|fce054@|fcd262%|000000        |fce062#|fce054%|fcd246#|eec454#|fcc42a@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcb60e@|eea81c@|fcc41c@|fcd22a@|eed246@|a8d262*|7ed238@|8ce046@|8cd246@|7ed238@|70c438@@|70b646*|000000     |fcd254@|fce038@|fcc42a@|eeb62a@|fcd21c@|fcc41c@|eeb62a@|fcc438@|fce046@|eed262=|000000   |70c438@|7ec438@|7ed238@|8ce046@|7ed238@|8cc454+|000000    |9ae062=|8cd246=
+000000         |70b646=|70c438@|7ec438@|7ed238@|8cd246@|8ce046@|7ed238@|8cc446*|000000                                                |fce062+*|e0b654+|eec454#|fcd254#|fce062%|000000       |7ec446=#|c4d246@|fce054@|fce046@|fcd238@|fcc438#|eeb638@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcc40e@|fcd21c@|fcd22a@|fcc446%|000000         |e0c462+|fcc438@|fcc42a@|fcc40e@|fcb61c@|fcb62a%|fcb61c@|eea81c@|fca81c@|ee9a1c@|fcb61c@|ee9a0e@|fcb60e@@@|eec42a@|fcd238@|fcd246@|d2d254@|7ed238@|8cd246@@|70c438@|70b62a%|70b646#|000000 |fce062*|fce054@|fcd238@|fcc438@|fcb62a@|fcc40e@|fca80e@|fcb60e@|fca80e@@|fcc40e@|fcc438@%|fcd246@|fce054@|7eb638@|70c438@|7ed238@|8cd246@|7ec438@|70c438@|7ec454+|000000   |e0e062*|d2d246@|b6d246@|fcd238@@|a8b638@|eed254+
+000000        |70b646*|70b62a%|70c438@|7ec438@|8cd246@@|7ed238@|a8d246@|7ec446#|9ad254+|9ae046@|8cd238@|7ed238@|7ec438@#|000000                                      |fcd262*|fce054@|fcc438@|e0b638@|fcc438@|fcd238@|eeb62a@|fcc42a@|fce038@|fcc438@|000000 |fcd246+|fce062@|fce070*|000000 |70b638*|70c438@@|7ed238@|8cd246@|d2b638@|fcc42a@|fcd21c@|fcd20e@|fcb60e@|fca81c@|fcb62a#|fcb60e@|eea81c@|fca81c@|eea81c@|fca81c@|eeb61c@|e09a0e%|fcb60e@@|eea80e@|eea81c@|fcc42a@|fcd238@|fce046@|fce054@|fce070%|000000   |fce07e=|fce054@|fcd238@|fcd22a@|fcc40e@|fca80e@@|fcb62a@|c47e1c%|a8620e%%%|a8700e%|d29a1c%|e0b61c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|e0c446@|7ec438@|70b62a%|70c42a@|70c438@|7ed246@|7ec438@|70b646%|000000 |b6c446*|eeb638@|fcb61c@|fcb60e@|fca80e@|eea838%|c47e1c%|a8701c%|b6701c%|c48c1c%|fcb62a%|fcb60e@@|fcb62a@|eeb638@|8cb638@|7ed238@|7ed246@|70c438@|70b62a%|70b646*|000000  |fce062+|fcd246+|eec446%|fcc41c@|fcb60e@@@|fcb61c@|fcd22a@|e0c446%|fcd254=
+000000        |62b62a%|70c438@@|9ad246@|fce046@|d2c438@|e0c42a@|fcd238@|eeb638%|d2c446@|d2d246@|8cd246@|8ce046@|7ed238@|70c438@@|70b638%|000000           |fce070=|fce062%|fcc454*|e0b654+|fcd238@|fce038@|c4b638@|a8c438@|c4d246@|b6e046@|8ce046@|8cd246@|8ce046@|7ed238@@|70c438@@|70b646+|000000    |fce070*|fce054@|fcd246%|fcc446*|fcc438@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@@|eea80e@|fcc41c@|fcd22a@|fcd246@|000000 |70b646#|70b62a%|70c438@|b6d246@|eee054@|fcd246@|fcd238@|fcc41c@|fcb60e@|fca80e@@|fca81c@|fcb638@|c48c2a%|a8700e%|a8620e%|a8700e%|a8620e%|b6701c%|e09a1c%|d2b61c@|eea80e@|fcb60e@|fcc40e@@|fcc42a@|fcc438@|d2c454@|8cd246*|7ec446*|7ec438*|7ec446#|7ec438#|b6c446@|fcc438@|fcb61c@|fcb60e@|fca80e@|fca800@|d29a2a%|a8620e%%|9a620e%%|a8620e%%|e0a81c@|fca800@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fcd246@|e0d254@|7ec446@|70c438@@|7ec438@|7ed246@|8cd246@|fcd254@|fcd238@|fcc41c@|fcb60e@|fca80e@|c48c1c%|a8620e%|9a620e%%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|eed254@|7ec438@|62b62a%|70b62a%|7ec438@|7ed246#*|7ed238+|d2c446@|fcc42a@|fcb60e@|eea80e@|e0a81c@|c48c1c%|c47e1c%|e0a81c@|eeb60e@|fcc40e@|fcc42a@|eec454@
+000000        |62b638%|a8c446@|eed246@|e0c42a@|eeb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc41c@|e0b61c@|d2d238@|e0d246@|8cd246@|7ed246@|70c438@|70c42a@|70b638%|000000        |fce062=|fcd254=|eec462+|fcd238@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|eea80e@|fcc41c@|fcd22a@|c4c438@|8cc438@|9ac438@|7ed238@|8cd246@@|7ed238@|70c438@@|70b638%|000000    |eeb638@|fcc42a@|fcc40e@|fcb60e@|fcb62a%|fcb61c@|eea81c@@|e09a1c%|fcb61c@|eea81c@|fcb60e@@@|fcc42a@|fcd238@|fcd246@|e0d254@|8cd246@@|a8c438@|fcc446@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fcb62a@|b6701c%|a8620e%|9a620e%%%%|a8620e%|a8700e%|e0a82a@|fca80e@@|fcb60e@@|fcc41c@|fcc42a@|fcd238@|e0d246@|c4d246@|7ec438@|7ec446%|eed254@|fce046@|fcd238@|fcc41c@|fcb60e@|fca80e@@|eeb62a@|c47e1c%|a8620e%%%|a8700e%|d28c1c%|fcb638@|fcb60e@@|fcb61c@|fcc42a@|eec446@|000000         |eec446@|fcc42a@|fcc40e@|fcb60e@|eeb638%|d28c1c%|c47e1c%%|d28c1c%|fcb638%|fcb60e@|fcc40e@|fcc42a@|eeb638@|a8d254+|000000 |7ed246==|7ed238=|7ed246+|7ec438*|a8d254*|fcd246@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8700e%|fca81c@|fcb60e@|fcc41c@|fcd246@|b6d246%|7ec446#|7ed238*|7ed246++
+8cd262-|7ec438%%@@@@@|70c438@|b6c446@|fcc42a@|fcb60e@|fca80e@|d29a2a%|b67e1c%|a8700e%|b67e1c%|eea82a@|fcb60e@|fcc41c@|fcc438@|9ac438@|70c438@|7ed246@|7ec438@|62b62a%|000000        |fcd246@|fcd22a@|fcc41c@|fcb62a@|e0b62a@|fcb60e@|e09a0e%|ee9a0e@|eea80e@|eeb61c@|e0b60e@|fcc41c@|fcd22a@|fcd246@|c4c446@|70c438@@|7ed238@|7ed246@|7ec438@|62b62a%|70b646#|000000 |fce054@|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fca81c@|c47e1c%|a8620e%%%%|c48c1c%|fcb638@|fca80e@|fcb60e@@|fcb62a@|eeb638@|a8d246@|70b638@|9ac438@|d2c438@|fcc438@|fcc42a@|fcc40e@@|fcb60e@|fca80e@|eeb61c@|b67e1c%|a8620e%%|9a620e%%%|a8620e%%|eea82a@|fca80e@@@|fcb60e@|fcc41c@|fcc42a@|fcd246@|fcd254#|fce062=|000000    |eec454*|fcc42a@|fcc41c@|fcc40e@|fcb61c@|fcb62a%|fcb61c@|eea81c@|fca81c@|ee9a0e@|fcb62a@|fca80e@|fcb60e@@|fcb61c@|fcc438@|fcd246@|fce054@|fce070#|000000        |fce062#|fcd246#|fcc446#|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@@|fcc40e@|fcc42a@|fcc438#|fcd246%|fce054%|000000        |eed262#|fcd238@|fcc41c@|fcb62a@|fcb61c@|e08c1c%%|fca81c@|fcb62a@|fcc41c@|fcd22a@|eed254@|000000 |7ed246=|7ec438=|7ed246+*
+000000         |fcd262*|fcc438@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8700e%|eea81c@|fcb60e@@|fcc438@|b6d246@|70b62a%%|70c438@|7ec438@|7ec446@|70c438@|7ec446@|70c438@|7ec438@%|70c438%|c4d254%|eec446@|fcc41c@|fcb60e@|fca80e@|eea81c@|a8700e%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcb61c@|fcc42a@|e0c446@|8cc438@|70b62a%|62b62a%%|70c438@|7ec438@|70c438@|7ec438@|a8c446@|eec438@|fcb61c@|fcb60e@@|fca80e@|e09a1c@|a8620e%%|9a620e%%|a8620e%%|e09a2a%|fc9a0e@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fcd246@|fce062@%|fce054@|fcd238@|fcc42a@|fcb61c@|fcb60e@|fca80e@@@|fcb638%|d29a2a%|b6701c%|a8620e%%|a8700e%|c47e1c%|e09a1c@|fcb638%|fca82a@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|fcc438@|eec454%|000000      |fce062@|fcd246@%|eec446#|fcc42a@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcb60e@|eea81c@|fcc42a@|fce038@|fcd254#|000000             |fcd262@|fce046@|fcc438@|eeb638@|fcd22a@@|eeb638@|fcc438@|fce038@|fcd254%|000000            |fcd262#|fcd22a@|fcb61c@|fcc41c@@|fcb61c@|fcd22a@|fcd254@
+000000          |fcd254@|fcd238@|fcc42a@|fcc41c@|fca80e@@@|fcb61c@|fcc42a@|fcd238@|fcd254@|000000        |8cd254=|7ed238=|7ed246++|e0d254+|fcc446@|fcc41c@|fcb60e@|fca80e@|eea81c@|a8700e%|9a620e%%|a8620e%|c48c1c%|fca80e@@|fcb61c@|fcc42a@|eed246%|9ad238#|7ec438#|7ec446#|7ed246#|7ec446*|7ec438*|7ed246*|eed254@|fce046@|fcd238@|fcc41c@|fcc40e@|fca80e@@|fcb61c@|c48c2a%|a8700e%|a8620e%%|a8700e%|d28c1c%|fcb638%|fca80e@|fcb60e@|fcc40e@|fcc42a@|eec446@|000000     |eeb638@|fcc42a@|fcd21c@|fcc40e@|fcb60e@|eea82a@|fcb61c%|fcb60e@|eea81c@|fcb61c@|fca81c@|fcb61c@|fcb62a@|ee9a1c@|fcb60e@|fcc40e@|fcb60e@|eea81c@|fcc438@|fcd238@|fcd246@|fce054@|fce070*|000000        |fcd262@|fce046@|eec438@|e0b638@|fcd22a@@|eeb62a@|fcc438@|fce038@|fcc446@|000000                    |fce062*|fcd254+|000000                   |fcd254*#|000000 |fcd262=|fce062+
+000000            |fcd246@|fcc438@|eeb62a@|fcd22a@|eeb62a@|fcc42a@|fcd246@|000000               |fcd254@|fcd238@|fcd21c@|fcc42a@|fcb62a%|fcb61c@|e09a1c%%|ee9a0e@|fcb62a@@|fcc41c@|fcd22a@|fcd246@|eed262*|000000         |eec454=|fcc438@|fcc41c@|fcc40e@|fcb60e@|fcb62a%|fcb61c@|eea80e@|fca81c@|ee9a0e%|fcb61c@|eea81c@|fcb60e@@|fcb61c@|fcc42a@|fcd246@|fce054@|fce070%|000000   |fce054@|fce046@|fcd238@|fcc438@#|fcb638@|fcc41c@|fcc40e@|fca80e@@|fcc40e@|fca80e@@|fcc40e@|fcb60e@|eea80e@|fcc41c@|fcd22a@|fcd238@|eec454#|000000                |fce062@|fcd254#|e0b654+|eec454*|fce062+|fce070=
+000000               |fce062+|000000                    |eec470=|fcc438@|fcd21c@|fcb60e@@|fcc40e@|eea80e@|fcc40e@|fcd21c@|fcc446%|000000 |fcd262=|000000          |fce062@|fce054@|fcd246%|eec446*|fcc42a@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@@|eea81c@|fcc42a@|fce038@|fcd254@|000000          |fcc454#|fce046@|fcd238@|fcc42a@|eeb62a@|fcc41c@|fcd21c@|fcb61c@@|fcd22a@@|fcc42a@|e0b646*|eec446#|fcd254%|fce070%
+000000                                     |fce062%|fcc446*|e0b646+|fcd246@|fce046@|eec446*+|fcd246@|fce054@|000000               |fcd262#|fce054@|fcc446@|e0b646%|fcd238@@|eeb62a@|fcc438@|fce038@|fcd246@|000000             |fce070*|fce062%|eec454*|e0b654+|e0c462+|fcd246@|fce046@|eec446@@@|fce054@@
+000000                                                                 |fce062*#|000000 |eec462+|000000 |fce070=|000000                  |fce070+|fce062=
 `,
-    plano: `
-                                                                                         **   =%                    %* -*%
-                                                                                    %%+-=@@###@@=               @@#*%%##@%  + +==-            @%         :==
-            -=++                                                                    *@@#*%%#*%%#+*@@=        =*++%%*##*##*#@%=*##*++-     %@#*%%*%@*   +**#*-
-          ++*##*=                                                %%-=#@       :=*@@#+#%%**#**#**#@%*          #%%#*#**+*+##*#%%#***++-  @%###****###%@*+*#*+-   *%#%%*++
-        -++**#*#+-##*+=                  =                   #@#*%@##@%--*  -++*#*#%%#*+#**+**+##**#%@@    =@%%#***=::::+**####*+++**+ =###**=--=**###+**++=   -*%####%#=+
-        =++#@*#@*#%##**++           =%+-%@**%%###**++-    =%*+#%#*#*##*#@% =++#%%%#****#=::::-+**##%####==++####**+::::::++*#%%@%*+++*%@%#*+=::::=+#%%%*++*+==###*+==+*##*
- :      =+%###*#*#*#%#*+++          =%%*##*#%#*##*#*+++    ##%#*#+++*****%%%#**#%####*#-:::::::+***##%%%#*+%@%%#***=::::=**####=        ###**=--=**###= :----#%#**::::**#%*+==-
- =++*****###*+::-+*##*+**=        %%%#**+++**#%%*++***+= @@%##**-::::-***###*+*#%%%##**-:::::::*+***###*-    =#%%#*#**+#+##*#%@         ***##*#**%#*#@*       *%%##++*##%%- :-=
-         +##*+::-+*##*+++****+**#%%#**+::::=**##%*++++*+*####**+::::::++*#%%@%#%%##*****+-::-=+**#%%%%#      @%+*%%**#*%#*#@%             %@#*%%*%@-            #%####@*
-          %###***##%%+         :-=##***-:::=**###=====--#@%##***+-::-+**####+    #%%%#*#*+#**#+##***#%%         @@#*%%##@% -+                 =                    =+
-           =@##@*%%               %@%#*#++*###%%%         -%%%#*#+#+#+##*#*#=   @@%*+#%%**%**%#*#%@%                @# -=
-                                    =%%*#%*#@*            ##++%%**%*#%*#@%          %@%#*%@##%@#=+#@=
-                                    +%+-%@=-=                %@*+%@##@%  =          @#- =@@###@@
-                                                                 #*                      *+
+        plano: `
+                                                                                            - -*                    +==+**
+                                                                                    +%*=-@@###@@                #@#*%%##@% =#=+++=:           @%         -++
+            -+*+                                                                    =@@#*%@#*%%#+#@@#        #%*+%%*#%*##*%@%+*##**+=     %@#*%%*%@-   +**#*-    --
+         :+**##*=                                                ++=**%       -=#@@%*#%%**%**%**#%%#         =#%%#*#+*+*+#**#%@%***++= *@%###****###@@++*#*+-   *%#%%*=
+        =++*#**#+=#***=                                      +@%*%@##@% +%* =++*#*#%%#*+#**+**+#***#%@@#   =@@%#***-::::=**####++++**+ =###**-::=**###+**++=  +=*%####%*=
+        =++#@##@*#%##**++           =%+-%@**#####**++-    *@#+#%#*%*##*#@% =++#%%%#****#=::::-+**##%###===++*###**+::::::+*##%%@%*+++**%%%#+=::::=+#%%%*++*+==###*+==+*#%#
+        =*%###*#*%*#%#*+++        =-=%%*#%*%%#****#*+++    #%%#*#+*+*****#%@%***%%###*#-:::::::+***##%%%#*+%@%%#***-::::=**####         ###**=--=*####- ---==+%%**::::**%%*+==-
+:++*****+###*+-:-**##****=        %%%#**+++**#%%#++***+= @@%#***-::::=**#####+*#%%###**-:::::::*+**###%#=    +#%%#*#+*+#+##*%%@*        #**#%*#**##*#%        *%%#*==*##%% --==
+         +##*+:::+*###+++****+**+###**+::::=**###+++++*+**###**+::::::++*#%%@%%@%%#*****+-:::-+**#%%%%*      @@#+%%**#*%#*%@#             %@#*%%*%@%            *%####%%
+          @%##***##%@        ----+%#**+::::=**###+==+===%@%%#*+*=::::=**####     #%%%#**#+#**#+##**#%@@*        %@#*%%##@#                    *=                   +* -+
+            @##%*%@               %%%#**+++##%%%+         -#%%#*#**+#+##*#%@%   @@@%+#%%**%**%#*#@%*                %*=++=
+               +                    -%%*#%*#%# =          @@#+#%#*%*##*#@%          *@@#*%@#*%@#=+#%
+                                     %+=%@+=%@               *@%*%@##@%             *#+-=@@###@@
+                                                                 ** = =                  +=
 `
+      },
+      {
+        color: `
+000000                                                                                            |eed270=|000000 |fce062*|000000                      |fce062#|000000 |e0c454+|eed254+|fce062%
+000000                                                                                    |fce062#|fcd254+|e0b654=|000000 |fcc454%|fce054@|fcc446@|eec446@|eec438@|fcd246@|fce046@|eec454#|000000  |fcd254=|fce062*|000000             |fce054@|fcd246@|eeb638@|fcc438@|fce038@|fcc42a@|fcb62a@|fcd238@@|d2c454*|000000 |fcd262+|fce070+|9ae054*|8cd246#|7ec446#*=|000000          |fcd262#|fce054@|eec454=|000000         |7ec446+|8cd246*|9ae054*
+000000            |7ec446+|7ed246#|8cd246%|9ae054#|000000                                                                    |fcd246@|fce046@|fcd238@|eeb62a@@|fcd22a@|fcd21c@|fcb61c@@|fcd21c@|fcc41c@|e0b62a@|eeb62a@|fcd238@|fce046@|fcd254@|000000         |fce070*|fce054@|fcd246@|fcc438#|eeb638@|fcd21c@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcc40e@|eea81c@|fcb61c@|fcd22a@|fcd246@|d2d254@|7ed238@|8ce046@|8cd246@|7ed238@|70c438@@|70b646*|000000     |fce046@|fcd238@|eeb638@|fcb61c@|fcd21c@|fcb61c@|fcb62a@|fcd238@|fcd246@|000000    |70c438@|7ec438@|7ed238@|8ce046@|7ed238@|8cc454+|000000    |9ae062=|8cd246=
+000000         |70b646=|70c438@|7ec438@|7ed238@|8cd246@|8ce046@|7ed238@|8cc446*|000000                                                 |fce062%|eec454=|e0c454*|eec454*|fce062%|fce070=|000000      |7ec446=#|fce062@|fce054@|fcd246@|fcc446#|eec446#|fcc42a@|fcd20e@|fcc40e@|eea80e@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|eea80e@|fcb60e@|fcd20e@|fcd21c@|fcc42a@|eec454+|eec446=|fcd254+|fce062=|000000      |eec470=|eeb638@|fcc42a@|fcc40e@|fcb60e@|fca81c@|fcb61c@|fca80e@|fca81c@|ee9a1c@|fcb61c@|e0a80e@|fcb60e@@@|eeb62a@|fcd246@|eed246@|e0d254@|7ed238@|8cd246@@|70c438@|70b62a%|70b646#|000000 |fce062#|fcd246%|fcd238%|fcc438@|fcb61c@|fcb60e@|ee9a0e@|fcb61c@|fca80e@|fcb60e@|fcc42a@|fcb62a@|fcd22a@|fcd246@|fcd254@|70b638%|70c438@|7ed238@|8cd246@|7ec438@|70c438@|7ec454+|000000   |d2d262+|eee054@|c4d246@|d2c438@|fce046@|b6b638@|c4c446=
+000000        |70b646*|70b62a%|70c438@|7ec438@|8cd246@@|7ed238@|9ad246@|9ac454%|9ad254+|9ae046@|8cd238@|7ed238@|7ec438@#|000000                 |fce070=|000000                     |fcd246@@|eeb638@@|fce038@|fcc42a@|eeb62a@|fcd22a@|fcd238@|eec454+|000000 |fcd254+|fce062*|000000 |70b638*|70c438@@|7ed238@|a8c446@|fcc438@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fcb62a#|fcb61c@|fca80e@|eea82a@|fca81c@|eea81c@|fcb61c@|e0a81c@|fca80e@|fcb60e@|eea80e@@|fcb61c@|fcd22a@|fcd238@|fce046@|fcd254@|000000     |fce054@|fcd238@|fcd22a@|fcc40e@|fcb60e@|fca81c@@|c47e1c%|a8620e%%%|a8700e%|d29a1c%|e0b61c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcc446@|9ac438@|70b62a%|70c42a@|70c438@|7ed246@|7ec438@|70b646%|000000 |d2c454@|fcc438@|fcc41c@|fcb60e@|fcb61c@|eea838%|c47e1c%|a8701c%|b6701c%|c48c2a%|fca81c@|fca80e@|fcb60e@|fcb62a@|e0b638@|8cb638@|7ed238@|7ed246@|70c438@|70b62a%|70b646*|000000  |fce070+|fcd246#|e0c438%|fcc41c@|fcc40e@|fca80e@|fcc40e@|fcb60e@|fcd22a@|eec446@
+000000        |62b62a%|70c438@@|8cd246@|fcd246@|eed238@|d2b62a@|fcd238@|fcc438@|c4c438@|d2e046@|9ad246@|8ce046@|7ed238@|70c438@@|70b638%|000000           |fce070*|fcd254*|e0c454-|eec454#|fce046@|fcd238@|a8b638@|b6c438@|e0e054@|9ad246@|8ce046@|8cd246@|8ce046@|7ed238@@|70c438@@|70b646+|000000    |fce070=|fce054@|fcd246@|fcc438#|eeb638@|fcc41c@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcc40e@|fcb60e@|fcb62a@|fcd22a@|fcd238@|fcd262#|70b646#|70b62a%|70c438@|a8d246@|d2d246@|e0d246@|eec438@|fcb61c@|fcb60e@|fca80e@@@|fcb638%|d28c2a%|a8700e%|a8620e%|a8700e%|a8620e%|b6701c%|d29a1c%|d2c42a@|fcb60e@@@|fcb61c@|fcb62a@|eeb638@|b6c454#|8cd246+|7ec446*|7ec438*|7ec446#|8cc446#|c4c446@|fcc438@|fcc41c@|fcb60e@|fca80e@|fca800@|d29a2a%|a8620e%%|9a620e%%|a8620e%%|e0a81c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|eed246@|c4d246@|7ec446@|70c438@@|7ec438@|7ed246@|8cc446@|eed254@|fcd238@|fcc41c@|fcb60e@|fca80e@|c48c1c%|a8620e%|9a620e%%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|e0d246@|7ec438@|62b62a%|70b62a%|7ec438@|7ed246#*+|d2c454%|fcc42a@|fcb60e@|fca80e@|d2a81c@|c48c1c%%|e09a1c@|eea80e@|fcb60e@|fcd22a@|fcd254@
+000000        |62b638%|8cc438@|fcd246@|fcd22a@|eeb61c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|eec42a@|c4c438@|c4d246@|9ad246@|7ed246@|70c438@|70c42a@|70b638%|000000          |fcd254%|fcd22a@|fcc41c@|eea81c@|fcc40e@|fcb60e@|fcb61c@|fcd21c@|fcc42a@|a8c438@|b6c438@|b6d246@|7ed238@|8cd246@@|7ed238@|70c438@@|70b638%|000000    |e0b646@|fcb62a@|fcc40e@@|fca81c@|fcb62a@|fca81c@|eea81c@|ee9a1c@|fca81c@|eea82a@|fca80e@|fcb60e@@|fcb62a@|fcd238%|eed246@|e0d254@|9ad246@|a8d246@|d2d246@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fcb62a@|b6701c%|a8620e%|9a620e%%%%|a8620e%|a8700e%|e0a82a@|fca80e@@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fce054@|eed254@|8cc438%|7ed246#|fce062%|fce054@|fcd238@|fcc41c@|fcb60e@|fca80e@@|fcb62a@|c47e1c%|a8620e%%%|a8700e%|d28c2a%|fcb62a@|fca80e@|fcb60e@@|fcb62a@|eec446@|fcd254=|000000        |e0b646@|fcb62a@|fcb60e@@|eeb638@|d28c1c%|c47e1c%%|d28c1c%|fcb638@|fcb61c@|fcc40e@|fcc42a@|fcc446@|c4c454*|000000 |7ed246==|7ed238+|7ed246+|7ec438*|b6d254*|fcd246@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8700e%|fca81c@|fcb60e@|fcc41c@|fcd246@|b6d246%|7ec446#|7ed238*|7ed246++
+8cd262-|7ec438%%@@@@@@|c4d246@|fcc42a@|fcb60e@|fca80e@|d29a2a@|b67e1c%|a8700e%|b67e1c%|eea82a@|fcb60e@|fcc41c@|fcc438@|9ac438@|70c438@|7ed246@|7ec438@|62b62a%|000000       |fce070*|fcd246@|fcd22a@|fcc41c@|fcb62a@|eeb62a@|fca80e@|e09a0e@%|fca80e@|e0b61c@|fcb60e@|fcc41c@|fcd22a@|fcc446@|9ac446@|70c438@@|7ed238@|7ed246@|7ec438@|62b62a%|70b646#|000000 |fce062%|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fcb62a@|c47e1c%|a8620e%%%%|c48c1c%|fcb62a@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcc438@|a8c446@|70b638%|70b62a%|9ab638@|fcc446@|fcc42a@|fcb61c@|fcb60e@@|fca80e@|fcb62a@|b67e1c%|a8620e%%|9a620e%%%|a8620e%%|eea82a@|fca80e@@@|fcb60e@|fcb61c@|fcc438@|eec446@|eed254=|000000     |eec446%|fcd22a@|fcd21c@|fcc40e@|fcb62a@%|fcb60e@|eea82a@|fca81c@|ee9a0e@|fcb62a@|fca80e@|fcb60e@|fcb61c@@|fcd22a@|fcd238@|fce054@|000000         |fce062@|fcd246@|fcc438%|fcb638@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|fcc438%|fcd246+|fce062*|000000        |fcd262%|fcd246@|fcc42a@|fcb62a@|fca81c@|e09a1c%|e08c0e%|fcb62a@|fcb61c@|fcc40e@|fcc42a@|d2c454%|000000 |7ed246=|7ec438=|7ed246+*
+000000         |eed262#|fcc438@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8700e%|ee9a1c@|fca80e@|fcc40e@|fcc438@|c4d246@|70b62a%%|70c438@|7ec438@|7ec446@|70c438@|7ec446@|70c438@|7ec438@%|70c438%|a8c446@|eec438@|fcb61c@|fcb60e@|fca80e@|eea81c@|a8700e%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc41c@|fcc42a@|fcd254@|9ac438@|70b62a%|62b62a%%|70c438@|7ec438@|70c438@|8cc438@|c4d246@|fcc438@|fcc41c@|fcb60e@@|fca80e@|e0a81c@|a8620e%%|9a620e%%|a8620e%%|e09a2a%|fc9a0e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fcd246@|e0d254@|fce054@@|fce038@|fcd22a@|fcc41c@|fcb60e@|fca80e@@|fca81c@|fcb62a@|d29a2a%|b6701c%|a8620e%%|a8700e%|c47e1c%|e09a1c@|fcb62a@|fca81c@|fca80e@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fcd254@|000000     |fce070*|fce054%|fcd246#|fcc438+|fcc454@|fcd21c@|fcc41c@|eea80e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fcb60e@|fcb61c@|fcd22a@|fcd238@|000000               |fce046@|fcd238@|eeb638@|fcc42a@|fcd22a@|eeb638@|eec438%|fcd238@|fce046@|000000            |fcd254@|fcd22a@|eeb61c@|fcc41c@|fcb61c@|fcc41c@|fcd22a@|eec454#|fcd254=
+000000          |fce054%|fcd238%|fcb62a@|fcb60e@|fca81c@|fca80e@|fcb61c@|fcb62a@|fcc42a@|fcd22a@|fcd254@|000000        |8cd254=|7ed238=|7ed246++|fce062#|fcd246@|fcc42a@|fcb60e@|fca80e@|eea81c@|a8700e%|9a620e%%|a8620e%|c48c1c%|fca80e@@|fcb60e@|fcc42a@|d2c446@|7ec438##|7ec446#|7ed246#|7ec446*|7ec438*|7ed246*|fce062#|fce054@|fcd238@|fcc42a@|fcb60e@|fca80e@@|fca81c@|c48c2a%|a8700e%|a8620e%%|a8700e%|c48c1c%|fcb638%|fca80e@|fcb60e@@|fcb62a@|eec446@|000000     |e0b654#|eeb62a@|fcc41c@|fcc40e@@|fca80e@|fcb62a#|fcb60e@|fca80e@|fcb61c@|fca81c@@|fcb61c@|eea82a@|fcb60e@|fcc40e@@|eeb61c@|eeb638@|fcc438#|fcd246%|fce054%|fce062#|000000        |fce054@|fcd246@|e0b646@|fcc438@|fce038@|fcc42a@|fcb62a@|fcd238@@|e0b654#*|fce062*|000000                   |fce062%|000000                   |fce062%|000000  |fce054*|fce07e=
+000000           |fcd270*|fcd246@|eeb638@|fcc42a@|fcd22a@|eeb62a@|fcd22a@|fcd254@|000000               |e0c462#|fcc438@|fcd21c@|fcc40e@|fcb62a@|fcb61c@|e09a0e%|ee9a1c@|e09a1c%|fcb61c@|fcb62a@|fcc41c@|fcd22a@|fcd246@|fce062%|000000         |eec446%|fcd238@|fcd21c@|fcc40e@|fcb60e@|fcb62a%|fcb60e@|eea81c@|fca81c@|ee9a0e@|fcb62a@|fca80e@|fcb60e@|fcb61c@@|fcd22a@|fcd238@|fce054@|fce070+|000000   |eed270=|fcd254@|fce046@|fcd238@|fcc42a@|eeb62a@|fcb61c@|fcc40e@|fcb60e@|fca80e@|fcb60e@@|fca80e@|fcc40e@@|eea80e@|fcb61c@|fcd22a@|fce038@|fcd246@|000000               |fcd262=|fce062@|eec454+#+|fce062#
+000000                                   |fcd254+|fcc446=@|fcd21c@|fcc40e@|fcb60e@|fcc40e@|fcb60e@@|fcd21c@|fcc438@|000000           |fce070=|fce054%|fcd254#|fcc438+|fcc454#|fcd22a@|fcc41c@|fca80e@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fcb60e@|fcb61c@|fcd22a@|fcd238@|eec462+|000000      |fcee7e=|fce062*|fcd254=|000000  |fcd246@|fce038@|fcd22a@|eeb62a@|fcb61c@|fcd21c@|fcc41c@|eeb61c@|fcc41c@|fcd22a@|fcd238@|eec454*|000000 |fcd254+|fce062*
+000000                                     |fce062@|fcd254%|eec446#%|fce046@|fcd246@|e0b654-|fcd246*|fce054@|fce070=|000000              |fce062@|fcd246@|eeb638%@|fce038@|fcc42a@|eeb638@|fcd238@|fce038@|eec454#|e0b646=|fcd262+|000000            |fce062@|fcd254%|eec454%|e0b654*|fcc446@|fce046@|fcd246@|e0b646@|eec446@|fcd254@|fce054@|fcd262*
+000000                                                                 |fce062%|eec454=|eec462+|eec454=|fce062*|000000                    |fce070*
+`,
+        plano: `
+                                                                                            - *                      # ==%
+                                                                                    #=- *@%##%@*  =*             @%##@##@@= =++++=:          *@=         -++
+            -+*+                                                                    %@%**%%*#@%*#%@%         +@%+#%#*%*#%*#%@#*##**+=     @@##%##@%    +**#*-    --
+         :+**##*=                                                 %-=+%-      -=@@%*+#%#*##*##**%%#=-==      -*#%#*#**+*+*#*##%%***++= #%####+#*###%@%++*#*+-   =@##@*-
+        =++*##*#+=#***=                 =                     @@##@##%@= +* =++**#%%%#+#***+***#**#%@@@     @@%%***-::::+**#%%#*+++**+ ####**-::=***##+**++=  +#*#%*#*%%
+        =++#%#*%#*%##**++           *+-*@%*#%####**++-    -@@*#%#*%*#%*#%@*=++#%%##*****=::::-+**####*+===++####**+::::::+*##%%%#*++***%%%#*=::::=*#%%%*++*+==*##*+==+*#%%
+        =*%%*#*#*#####*+++          #%%*##*%%*##**#*+++    *###*#*++***#*##%%###%%%##*#-:::::::+**##%%@@%++%@%##***-::::=**####-        ###**=--=*##%%+ ---==+%##*::::**%%*+==-
+:++******%##*+-:-**##****=       *@%%#**++***%%#*++***+= #%%%#**-::::=**####*++*#####**-:::::::*****###-     #%%##****+**#*#%@@         @%*#%**#*##*++        #%##*+=**#%* --==
+         *##*+:::+*#%#+++*******+*##**+::::=**#%%*++++*+*#%##**+::::::++*#%%%%@@@%%#*+**+-:::-+#**#%%%%     *%*=#%%*##*%*#%%               @%##@#*@@            %%*%##%*=
+          ####***##%%        ----*%%#*+::::=**###==++===*%%##***=::::=**####     +*#%#*+#****#+*%#***#%#        @%*#@##%@+=*                   %                   #  *=
+           *@##%#%%               *%%#*#+++#*#%@%         *%%%**#**+#+##*%@@+   =@@%#*#%#*##*#%**%@%               =@=+=#
+                                   =-#%#*%*#%%           =#*=*%%*##*%#*%@=      =+-  %@%*#@%*#@%+ =*
+                                     %%**@%:+@=              @%*#@%#%@*-+            @#*=#@%*#%@+
+                                                                 %-=-*                    *
+`
+      },
+      {
+        color: `
+000000                                                                                           |eec462=|000000 |fce062+|fce070=|000000                      |fce062*|fcd262+|000000 |eec462+|fcd262+|fce070+
+000000                                                                                    |fce062=|000000   |fce054@|fce046@|eec446@@|fcc438@|fce046@|fcd246@|000000  |fcd254+|fce062%|fce070#|000000             |fcd254@|fce046@|fcc438@|eeb638@|fcd238@@|eeb62a@|fcc438@|fce038@|eed246@|000000   |a8e054*|8cd246#|7ec446#*=|000000          |fce054@|fcd254%|000000  |fce062=|000000       |7ec446+|8cd246*|9ae054*
+000000            |7ec446+|7ed246#|8cd246%|9ae054#|000000                                                                   |fcd262%|fce046@|fcd238@|eeb62a@|e0a82a@|fcc42a@|fcd22a@|fcc41c@|fcb61c@|fcd21c@@|fcb61c@|e0a82a@|fcc42a@|fce038@|fcd246@|eec454*|000000          |fcd254@|fcd246@|fcc438@|eeb62a@|fcc41c@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcc40e@|fcb61c@|e0b61c@|fcd22a@|fce046@|fcd254@|8cd238@|8ce046@|8cd246@|7ed238@|70c438@@|70b646*|000000    |fcd262*|fce046@|fcd238@|eeb638@|fcc41c@|fcd21c@|eeb62a@|fcc42a@|fcd238@|fcc454#|000000    |70c438@|7ec438@|7ed238@|8ce046@|7ed238@|8cc454+|000000    |9ae062=|8cd246=
+000000         |70b646=|70c438@|7ec438@|7ed238@|8cd246@|8ce046@|7ed238@|8cc446*|000000                                               |eec462=|000000 |fce062*#|000000 |eec454+|fcd254*|fce062#|000000      |7ec446=|9ad246#|eee062@|e0d246@|d2d246@|e0c454*|fcc438@|fcc41c@|fcd20e@|fcb60e@|eea80e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcc40e@|fcd20e@|fcc41c@|e0b646%|fcc446+|fcd246#|fcd254#|fce062#|000000     |fce062=|fcd246+|eeb646%|eeb61c@|fcc40e@@|fca80e@|fcb62a@|fca80e@|eea81c@|ee9a1c@|fcb60e@|d2a81c@|fca80e@|fcc40e@|fcb60e@|eeb62a@|eec454#|c4c438@|c4d246@|8cd238@|8cd246@@|70c438@|70b62a%|70b646#|000000 |fce062+|fcd254#|fcc446*|fcb62a@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fca80e@|fcb60e@|fcb61c@@|fcd22a@|fcd246@|e0c462@|70b62a%|70c438@|7ed238@|8cd246@|7ec438@|70c438@|7ec454+|000000   |9ad254+|fce054@|d2d238@|c4c438@|fcd246@|e0c446@|a8b646=
+000000        |70b646*|70b62a%|70c438@|7ec438@|8cd246@@|7ed238@|7ec438@|b6d254%|9ad254+|9ae046@|8cd238@|7ed238@|7ec438@#|000000                                       |fcd254#|fce046@|fcc438@|eeb638@|fcd238@@|eeb62a@|fcc42a@|fce038@|fcd246@|000000  |fce070=|000000 |70b638*|70c438@@|7ed238@|e0c446@|fcd246@|fcd238@|fcd21c@|fcc41c@|fcb62a@|fcb61c%|fcb60e@|fca80e@|fcb62a@|fca81c@|eea81c@|fcb61c@|e0a81c@|fca80e@|fcb60e@|d2a80e@|eeb60e@|fcc40e@|fcd22a@|fcd238@|fcd246@|eed254+|000000     |fcd262#|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca81c@|fca82a@|c47e1c%|a8620e%%%|a8700e%|d29a1c%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|d2c446@|70b638%|70c42a@|70c438@|7ed246@|7ec438@|70b646%|000000 |eed254@|fcd238@|fcc41c@|fcb60e@|fca81c@|eea82a@|c47e1c%|a8701c%|b6701c%|c48c2a%|fca81c@|fca80e@|fcb60e@|fcb61c@|eec446@|b6c446@|8cd246@|7ed246@|70c438@|70b62a%|70b646*|000000  |fce070=|fce046@|eec438@|eeb61c@|fcc40e@|fca80e@|fcc40e@|fcb60e@|fcc42a@|fcd246@
+000000        |62b62a%|70c438%|7ec438@|8cd246@|e0d246@|fcd238@|e0c438@|fcc42a@|fcd238@|b6c446@|b6d246@|a8e046@|8ce046@|7ed238@|70c438@@|70b638%|000000           |fce062+|000000  |fcd246@|fce046@|e0c446@|c4c446@|e0d246@@|8ce046@@|8cd246@|8ce046@|7ed238@@|70c438@%|70b646+|000000     |fcd254@|fce046@|fcd238@|eeb62a@|fcb61c@|fcc40e@|fca80e@|fcb60e@@|fca80e@|fcc40e@|fcb60e@|eeb62a@|fcc42a@|fcd238@|fcd254@|9ab654@|70b62a%|70c438@|7ec438@|a8d246@|c4c446@|eeb638@|fcb61c@|fcb60e@@@|fca80e@|eeb646%|d28c1c%|a8700e%|a8620e%|a8700e%|a8620e%|b6701c%|d29a1c%|e0c42a@|fca80e@|fcb60e@@|fcb61c@|eeb62a@|eeb638@|eec446+|d2d254*|9ad246*|7ec438*|7ec446#|b6d246%|eed246@|fcc438@|fcc41c@|fcb60e@@|fca800@|d29a2a%|a8620e%%|9a620e%%|a8620e%%|eea81c@|fca80e@|fcb60e@@|fcc41c@|fcc438@|d2c446@|9ac438@|7ec446@|70c438@@|7ec438@|7ed246@|7ec438@|e0c446@|fcd238@|fcc41c@|fcb60e@|fca80e@|c48c1c%|a8620e%|9a620e%%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc41c@|fcc438@|c4d246@|7ec438@|62b62a%|70b62a%|7ec438@|7ed246#*|a8d246*|eed254*|fcb62a@|fcb60e@|fca80e@|d29a1c%|d28c1c%|c48c1c%|e09a1c%|eea80e@|fcb60e@|fcd22a@|fcd254@
+000000        |62b638%|70c438%|fcd246@|fcd22a@|eeb61c@|fcb60e@@@|fca80e@|fcc40e@|fcc42a@|c4c438@|b6d238@|9ad246@|7ed246@|70c438@|70c42a%|70b638%|000000          |fcd246@|fcd22a@|fcb61c@|fcb60e@|fcc40e@|fcb60e@@|fcd21c@|eeb62a@|b6c438@|d2d246@|c4d246@|7ed238@|8cd246@@|7ed238@|70c438@@|70b638%|000000  |fce070+|fcd254*|eec446%|eeb62a@|fcb60e@|fcc40e@|fca80e@|fcb638@|fca81c@|ee9a1c@@|fca81c@|fcb62a%|fca80e@|fcb60e@@|eeb61c@|fcc446#|c4c438@|c4d246@|9ad246@|d2d254@|fce054@|fce038@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fca80e@|fcb62a@|b6701c%|a8620e%|9a620e%%%%|a8620e%|a8700e%|e0a82a@|fca80e@@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fce046@|fce054@|eee062@|7ec438%|7ed246#|e0e054#|fcd246#|fcc438@|fcb61c@|fcb60e@|fca80e@@|fcb62a@|c47e1c%|a8620e%%%|a8700e%|c49a2a%|fcb61c@|fca80e@|fcb60e@@|fcc42a@|fcd246@|fcd254#|fce062=|000000       |eec446%|fcb61c@|fcb60e@|fca80e@|fca82a@|d28c1c%|c47e1c%%|d28c1c%|fcb62a@|fca81c@|fcc40e@|fcd22a@|fcd246@|e0d262#|000000 |7ed246==|7ed238=|7ed246+|7ec438*|a8d254#|fcc446@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8700e%|eea81c@|fcb60e@|fcc41c@|fcd246@|b6d254%|7ec446#|7ed238*|7ed246++
+8cd262-|7ec438%%@@@@@@|e0d246@|fcc42a@|fcb60e@|fca80e@|e09a2a@|b67e1c%|a8700e%|b67e1c%|eea82a@|fcb60e@|fcc41c@|fcc438@|a8c446@|70c438@|7ed246@|7ec438@|62b62a%|000000       |fce062#|fce054@|fcd238@|fcb62a@|fca80e@|fcb60e@|fca80e@|ee9a1c@|e09a0e%|fca80e@|e0b61c@|fcb60e@|fcc41c@|fcc42a@|e0b646@|7ec438@|70c438@@|7ed238@|7ed246@|7ec438@|62b62a%|70b646#|000000 |fcd270+|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fcb62a@|c47e1c%|a8620e%%%%|c48c1c%|fcb62a@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd238@|d2c446@|70b62a%|62b62a%|7eb638%|e0b646@|fcb62a@|fcb61c@|fcb60e@|fca80e@@|fcb61c@|b67e1c%|a8620e%%|9a620e%%%|a8620e%%|e0a82a@|fca80e@@|fcb60e@@|fcb61c@|eeb638@|eec454@|000000     |fcd262=|fcd246@|fcd22a@|fcd21c@|fcc41c@|fcb62a@|fcb61c@|fca80e@|fcb62a@|eea81c@|eea80e@|eea82a@|fcb60e@|fcb61c@|fcb62a@|fcc41c@|fcd22a@|fcd238@|fcd254%|000000         |fcd262%|fcd246@|fcd238@|fcb61c@@|fcb60e@|fca80e@|fcb60e@|eea80e@|fcb60e@|fcc40e@|fcc438@|eec454=|000000         |fcd262#|fcd246@|fcb61c@@|fca81c@|e09a1c%|e08c0e%|fca82a@|fca80e@|fcc40e@|fcc42a@|e0c454+|000000 |7ed246=|7ec438=|7ed246+*
+000000         |e0c454%|fcc438@|fcc40e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8700e%|e09a1c@|fca80e@|fcc40e@|fcd238@|c4d246@|70b62a%%|70c438@|7ec438@|7ec446@|70c438@|7ec446@|70c438@|7ec438@%|70c438%|b6c446@|eec438@|fcb61c@|fcb60e@|fca80e@|e0a81c@|a8700e%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd246@|9ac438@|70b62a%|62b62a%%|70c438@|7ec438@|70c438@|b6d246@|eed254@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@|e09a1c@|a8620e%%|9a620e%%|a8620e%%|e09a2a%|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|eed246@|c4d246@|d2d254@|fcd246@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|eea80e@|fca81c@|fcb61c@|d29a2a%|b6701c%|a8620e%%|a8700e%|b67e1c%|e09a2a@|fcb61c@|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fce046@|fce054%|000000    |fce070*|fcd254*|fcc446=|eec462+|fcc438@|fcd21c@|fcb60e@|fca80e@|fcc40e@|fcb60e@@|fcc40e@|eea80e@|fcc41c@|fcd22a@|fcc446@|000000               |fcd254@|fce038@|fcc438@|fcb62a@|fcd22a@|fcc42a@|e0b638#|fcd246@|fce054@|fcd262#|000000           |fcd246@|fcc438@|eeb61c@|fcd21c@|fcb61c@|fcc41c@|fcc42a@|fcc454*|fce054*|fce070=
+000000          |fce054*|fcc438@|fcb61c@|fcb60e@|fca81c@|fca80e@|fcb61c@|fca81c@|fcc40e@|fcd22a@|eec446%|000000        |8cd254=|7ed238=|7ed246++|e0d254@|fcd246@|fcd22a@|fcc40e@|fca80e@|e0a81c@|a8700e%|9a620e%%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcb61c@|fcc42a@|d2c446@|70c438#|7ec438#|7ec446#|7ed246#|7ec446*|7ec438*|7ed246*|c4d262*|fcd254*|fcc438@|fcb62a@|fcb60e@|fca80e@@|fcb62a@|c48c2a%|a8700e%|a8620e%%|a8700e%|c48c2a%|fcb62a@|fca80e@|fcb60e@@|fcb62a@|fcc446@|fcd246*|fce062=|fce070+|fcd254*|fcd246*|eec446*|e0b62a@|fcb61c@|fcc40e@@|fcb60e@|eea82a@|fcb61c%|fca80e@|fca81c@|fcb61c@|fca81c@|fcb60e@|fca82a%|fca80e@|fcc40e@@|fcc41c@|eeb62a@|eeb654*|fcc446+|fcd254+|fce062=|000000       |fce070%|fce054@|eec446%|e0b646#|fcd238@@|fcc42a@@|fce038@|fcc438@|e0b646#|eec454@|fce062@|000000                   |fce062**|000000                  |fce062#|000000 |fcd254=|fce062#
+000000           |fce062@|fcd246%|eeb638%|fcd22a@|fcc42a@@|fcd22a@|eec462#|000000 |fce070=|000000              |eeb638@|fcc41c@|fcc40e@|fca81c@|fcb62a@|e09a0e%|ee9a0e%|e09a1c%|fcb61c@@@|fcd22a@|fcd246@|fce062%|000000        |fcd262=|fcd246@|fcd22a@|fcd21c@|fcc41c@|fcb62a@|fcb61c@|fca80e@|fca82a@|fca80e@|eea80e@|fcb62a@|fca80e@|fcb61c@@|fcc42a@|fcd22a@|fcd238@|fcd254@|000000     |fcd254#|fcd246@|fce038@|fcd22a@|fcb61c@|eea80e@|fcc40e@@|fca80e@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|fcb60e@|eea82a@|fcc42a@|fcd238@|fce046@|fcd254%|000000              |fce062%|fcd254*|eec454*|e0c454+|fce062#|fce070*
+000000              |fce070=|000000                    |fce062%|fcd246*|eeb638%|fcc41c@|fcc40e@|fca80e@|fcc40e@|fcb60e@|fcb61c@|fcd21c@|fcd22a@|fcd254#|000000          |fce070+|fcd262+|fcc454=|eec462=|fcc438@|fcd22a@|fcc41c@|eea80e@|fcc40e@|fcb60e@@|fcc40e@|fca80e@|fcc41c@|fcd22a@|fcc446@|000000        |fce062%|fcd254#|fcc446+|000000 |eec454*|fcd238@|fcd22a@|fcc42a@|eeb61c@|fcc41c@|fcd21c@|fcb61c@|eeb61c@|fcd22a@|fce038@|fcc446@|000000   |fce070=
+000000                                     |fcd270+|fce054@|fcc446%|eec446#|fcd246@|fce046@|eec454+|000000 |fcd254*|fce070#|000000             |fce070+|fce054@|fcc446#|e0b654*|fcc438@|fce038@|fcc42a@@|fcd238@|fcc438@|e0b654*|eec446#|fce062%|000000            |fcd262*|fce062@|fcd254@|eec454@|e0b646#|fcd246@|fce046@|eec446@|e0b646@|eec446@|fcd254@|fce062@
+000000                                                                |fce070*|fce062+|e0c454=|e0c462=|fce062+*|000000                     |fce070*
+`,
+        plano: `
+                                                                                           - +=                      *= ==+
+                                                                                    =   @@###@%  =#*             %@#*%%*%@%   ++==:          @%  =       -++
+            -+*+                                                                   #@%#*%@#*%%#*%@@+          @@%*#%*##*%#*%@%*##*++=    *@%*%%*#@*    +**#*-    --
+         :++*##*=                                               - *# =+#      -+%%#=#%%**##*#*+#%#*=*##     ==**##*#*++*+*##**##***++= +*+###+#*#*#%%#++*#*+-   =@#*%#-
+        -++*#****=#***=                                       *@#*%%*#@%  = =++*#%@%#**#***+*+**+*%%@%+     *%%%#**-::::=**#%%%#+++**+ %%%#**-::=***###**++=  =@#*%*#*%%
+        =++*%%##%*###**++           +  %@#*#%####**++-     %@%*#%*##*%#*%@@*++*##***#***=::::-+*******====+*%%##**+::::::+**##%#*++++**#%##*=::::=*##%#*++*+==+##*+==+*#%%
+        =+%%*****##*##*+++          %@#*%*#%**##**#*+++  =+**##***++***##***##%@@%%##**-:::::::++*#%%%@@%++**##****-::::=***###*=       *#***=--=**#%%* ---==+%##*::::**#%*==--
+:++******%##*+-:-**#%*+**=       #@%#***++**#%#*+++***+= +%%%#**-::::=**##%%#+++##*****-:::::::*****###     =%%%#*#**++**###%%#         #@%*##*#+#%#-         #%##*+=**##= --==
+         ###*+:::+*#%#+++****+**+*###*+::::=**%%%*++++*+#%%%#**+::::::+**#%%%##%@%%#*+**+-:::-+***#%%@@#    *+-=%%#*%*##*#%#               %@##@%+#@*           @#*%*%#+*=
+          *##***#*#%#        ----#@%#*+::::=**###===+===++##****=::::=****##+==+++**#%*+*****#++#%#*====       #@*+%@##@#+#%                   *+                  # =#
+           %#*%##%* =              ###**+++***%%%        -%%%#*#***+**#*#%@%     *@@%**#%**#**%#*#%@#              %+==#+
+              =                    #+*#%*##*%%*          ++=-%%#*%#*%*#%%        %#= +%@#*%%#*%@%   =
+                                     +@*+%@= *#             +@*=%@##@%=*#            *@%#+%@#*#%@
+                                                                ++--=+                     *
+`
+      },
+      {
+        color: `
+000000                                                                                            |fcd262=|fce070*|000000                        |fce062%|000000   |fce062+
+000000                                                                                       |fcd262@|fce054@|eec446@@@|fce046@@|eec454*|d2b646+|eec446*|fce054@|fce062@|000000           |fce07e=|000000   |fce046@|fcd238@|eeb638@|fcc438@|fce038@|eeb638@@|fcd238@|fcd246@|c4c454+|000000  |9ae054*|8cd246#|7ec446#*=|000000         |fcd254+|fce054@|fcc454+|000000 |fcd254=|fce062*|000000       |7ec446+|8cd246*|9ae054*
+000000            |7ec446+|7ed246#|8cd246%|9ae054#|000000                                                                   |fce054@|fce046@|fcc438@|e0b638@|eeb62a@|fcd22a@@|fcb61c@@|fcd21c@|fcc41c@|eeb61c@|fcb62a@|fcd22a@|fce038@|fcc446@|000000           |fcd262#|fce046@|fcd22a@|eeb62a@|fcb61c@|fcd20e@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcc41c@|e0b61c@|e0c42a@|fcd246@|fce054@|b6d246@|8ce046@|8cd246@|7ed238@|70c438@@|70b646*|000000    |fce062@|fcd246@|fcc438#|eeb62a@|fcd21c@|fcc41c@|fcb62a@|fcd22a@@|e0b654+|eec454=|fce070=|000000  |70c438@|7ec438@|7ed238@|8ce046@|7ed238@|8cc454+|000000    |9ae062=|8cd246=
+000000         |70b646=|70c438@|7ec438@|7ed238@|8cd246@|8ce046@|7ed238@|8cc446*|000000                                              |fce070=|eec454=|e0c454=|eec462=|fce062@|000000  |eec462=|fce062*|000000      |7ec446=|9ad246#|b6d254%|a8c438@|a8d246@|d2c454@|fcc42a@|fcd21c@|fcc40e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@|fca80e@@|fcc40e@@|e0b61c@|eec438#|fcd246%@|fce054@|fce070@|000000     |fce062#|fcd246##|eeb62a@|fcb60e@@|fca80e@|fcb638@|fca81c@|ee9a1c@|eea81c@|fca80e@|e0b61c@|eea80e@|fcc40e@@|fcb62a@|e0c454%|a8c438@|9ac438@|7ed238@|8cd246@@|70c438@|70b62a%|70b646#|000000  |fcd254=|eec446#|fcc41c@|fcc40e@|fca80e@@|fcb60e@|fca80e@|fcb61c@|eea80e@|fcc41c@|fcd22a@|fcc446@|c4c470=|70b62a%|70c438@|7ed238@|8cd246@|7ec438@|70c438@|7ec454+|000000   |8cd254+|d2d246@|fcd246@|c4c438@|e0c438@|fcd246@|8cb646=
+000000        |70b646*|70b62a%|70c438@|7ec438@|8cd246@|9ad246@|7ed238@|7ec438@|a8c454@|9ad254+|9ae046@|8cd238@|7ed238@|7ec438@#|000000                                     |fcd262=|000000  |fcd246@|fcd238@|eec438@|fcc42a@|fce038@|fcb62a@|eeb62a@|fcd238@|fce046@|eec454=|000000   |70b638*|70c438@@|a8d246@|fce054@|fce046@|fcd238@|fcc42a@|fcb61c@|eea81c@|fcb60e@@|ee9a0e@|fcb62a@|fca81c@|eea81c@|eeb61c@|ee9a0e@|fcb60e@|d2b61c@|d2a80e@|fcb60e@|fcd20e@|fcd22a@|fcd238@|eec454@|000000      |eec462=|fcc446@|fcc42a@|fcc40e@|fcb60e@|fca81c@|eea82a@|c47e1c%|a8620e%%%|a8700e%|d29a1c%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|eed246@|9ac438@|70c42a@|70c438@|7ed246@|7ec438@|70b646%|a8d246+|fcd254@|fcd238@|fcd21c@|fcb60e@|fca81c@|eea82a@|c47e1c%|a8701c%|b6701c%|c48c2a%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|e0d246@|7ed238@|7ed246@|70c438@|70b62a%|70b646*|000000   |fce054@|fcd238@|e0b61c@|fcc40e@|fcb60e@|fcc40e@|fcb60e@|fcc41c@|fcd238@|eed262=
+000000        |62b62a%|70c438@|8cc438@|9ad246@|a8d246@|fce046@|eec438@@|fce038@|c4c438@|a8d238@|a8e046@|8ce046@|7ed238@|70c438@@|70b638%|000000             |eec446=|fce046@|fcd238@|d2c446@|d2c438@|fce046@|b6d246@|8ce046@@|8cd246@|8ce046@|7ed238@@|70c438@@|70b646+|000000     |eed262+|fcd246@|fcd238@|fcb61c@|eeb61c@|fcc40e@|fcb60e@@|fcc40e@|fca80e@|fcc40e@@|fcb62a@|fcc438%|fcd238@|fce046@|c4c446@|70b62a%|70c438@|7ec438@|8cd246@|c4b646@|eeb638@|fcb61c@|fcc40e@|fcb60e@@|fcb61c%|eeb638@|d28c1c%|a8700e%|a8620e%|a8700e%|a8620e%|b6701c%|c49a2a%|eeb61c@|fca80e@@@|fcb60e@|fcb62a@|fcc446@|fcd246%|fce054#|e0e062*|7ec438*|7ec446#|eee062%|fce054@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fc9a0e@|d29a2a%|a8620e%%|9a620e%%|a8620e%%|eea81c@|fca80e@|fcb60e@@|fcc41c@|fcc438@|c4c446@|7ec438@|7ec446@|70c438@@|7ec438@|7ed246@|7ec446@|e0c446@|fcc438@|fcc41c@|fcb60e@|fca80e@|c48c1c%|a8620e%|9a620e%%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcb61c@|fcc438@|b6c446@|7ec438@|62b62a%|70b62a%|7ec438@|7ed246#*|c4d254*|fcd246*|fcc42a@|fcb60e@|fca80e@|d29a1c%|d28c1c%%|e09a1c@|fcb60e@@|fcd22a@|fcd254@
+000000        |62b638%|70b62a%|d2d246@|fcd22a@|fcc41c@|eea80e@|fcb60e@@|fcb61c@|fcb60e@|fcd22a@|d2c438@|9ac438@|8cd246@|7ed246@|70c438@|70c42a@|70b638%|000000         |fcd262*|fce038@|fcd22a@|eeb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fcc41c@|e0b62a@|e0c438@|eee046@|a8c446@|7ed238@|8cd246@@|7ed238@|70c438@@|70b638%|000000  |fce070*|fce054%|fcd246%|eeb62a@|fcb60e@@@|eea82a@|fcb61c@|ee9a1c@|eea81c@|fca80e@|fcb61c%|fca81c@|fcb60e@|fcc40e@|fcb61c@|eec446@|9ab62a@|9ac438@|9ad246@|eee054@|fce054@|fcd238@|fcd22a@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%%|a8620e%|a8700e%|e0a82a@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd22a@|fcd246@|eed254@|b6d246@|7ec438%#|9ad246#|d2d246#|eec438@|fcb61c@|fcb60e@@|fca80e@|fcb638@|c47e1c%|a8620e%%%%|c49a2a%|fcb62a@|fca80e@|fcb60e@@|fcc42a@|fcd246@|fce054@|fce070#|000000      |fce070+|fcd246%|fcb62a@|fcb60e@|fca80e@|fca81c@|d28c2a%|c47e1c%%|d28c2a%|fcb62a@|fca80e@|fcb60e@|fcd22a@|fcd246@|e0d262@|000000 |7ed246==|7ed238+|7ed246+|7ec438*|9ac446#|eec446@|fcc41c@|fcb60e@|fcb61c@|a8700e%|9a620e%%|a8700e%|fca81c@|fcb60e@|fcc41c@|fcd246@|9ad246%|7ec446#|7ed238*|7ed246++
+8cd262-|7ec438%%@@@@@@|e0d246@|fcd22a@|fcb60e@|fca80e@|e09a1c@|b67e1c%|a8700e%|b67e1c%|eea82a@|fca80e@|fcc41c@|fcd238@|c4c446@|70c438@|7ed246@|7ec438@|62b62a%|000000       |fce062#|fcd254%|fcd238%|fcb61c@|fcb60e@@|ee9a0e@|eea80e@|e09a0e%|fca81c@|eea80e@|fcb60e@|fcc41c@|eeb62a@|d2b646@|8cc438@|70c438@@|7ed238@|7ed246@|7ec438@|62b62a%|70b646#|000000  |eec446@|fcc42a@|fcc41c@|fcb60e@|fca80e@|fcb62a@|c47e1c%|a8620e%%%%|c48c1c%|fcb62a@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|eed246@|9ac438@|70b62a%|9ab638@|e0c438@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fca81c@|b67e1c%|a8620e%%|9a620e%%%|a8620e%%|e0a82a@|fca80e@@|fcb60e@@|fcc41c@|fcc438@|eec446@|000000     |fce054@|fcd246@|fcd22a@|fcc42a@|fcb61c@@|fcb60e@|eea81c@|fcb61c@|ee9a1c@|fca80e@|eea81c@|fcb60e@|fcb62a%@|fcc41c@|fcd22a@|fcc446@|eed270=|000000         |eed270=|fcd246@|fcd22a@|fcb61c@|fca80e@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcc40e@|fcc42a@|eec462*|000000         |fce062*|fcd246%|fcb61c@@|eea81c@|e09a1c%|e09a0e%|eea82a@|fca80e@|fcb60e@|fcb62a@|fcd254=|000000 |7ed246=|7ec438=|7ed246+*
+000000         |e0c454@|fcc438@|fcc40e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8700e%|e09a1c@|fca80e@|fcc40e@|fcd238@|c4c446@|70b62a%%|70c438@|7ec438@|7ec446@|70c438@|7ec446@|70c438@|7ec438@%|70c438%|d2c454@|fcc438@|fcc41c@|fcb60e@|fca80e@|e0a82a@|a8700e%|a8620e%|9a620e%|a8620e%|c48c1c%|eea80e@|fcb60e@|fcc41c@|fcd238@|fcd246@|8cc438@|70b62a%|62b62a%%|70c438@|7ec438@|70c438@|d2d254@|fce054@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|e09a1c@|a8620e%%|9a620e%%|a8620e%%|e09a2a@|fca80e@|fcb60e@@|fcc41c@|fcc438@|e0c446@|9ac446#|9ad246#|d2d246@|fcd238@|fcd22a@|fcd21c@|fcc40e@|fcb60e@|fca80e@|eea82a%|fcb62a@|d29a2a%|b6701c%|a8620e%%|a8700e%|c47e1c%|e0a838@|fca80e@|fca81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fce046@|fce054@|fce070+|000000      |fcc454%|fcd22a@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcd21c@|fcd22a@|eec462*|fcc454=|fce062*|fce070=|000000            |eec462+|fcd238@|fcd22a@|eeb638@|fcd22a@@|eeb638%|fcc438*|fcd254@|fce062@|000000          |fcd270+|fcd246@|fcb62a@|fcb61c@|fcc41c@|fcb61c@|fcd21c@|eeb62a@|fcc438*|fce054%
+000000          |fcd254=|eeb638@|fcc40e@|fca80e@|fcb61c@|eea80e@|fcb61c@|fca80e@|fcc40e@|fcc42a@|eec454+|000000        |8cd254=|7ed238=|7ed246++|d2d254@|fcd246@|fcd22a@|fcc40e@|fca80e@|e0a82a@|a8700e%|9a620e%%|a8620e%|c48c2a%|fca81c@|fcb60e@|fcc41c@|fcc438@|e0c454@|70c438#|7ec438#|7ec446#|7ed246#|7ec446*|7ec438*|7ed246*|8cd254*|b6c438+|e0c446@|fcb62a@|fcb60e@@|fca80e@|fcb62a%|d28c1c%|a8700e%|a8620e%%%|c48c2a%|fcb61c@|fca80e@@|fcb60e@|fcc42a@|fcd238@|fce054@|fce062#|fce070%|fce062@|fcd254@|fcc438@|eec438@|eea81c@|fcb60e@|fcc40e@|fcb60e@|ee9a0e@|fcb638%|fcb60e@|fca81c@|fcb61c@|eea81c@|fca80e@|fcb61c@|eea82a@|fcb60e@|fcc40e@|fcd21c@|fcc42a@|e0b654@|000000          |fce062@|fcd254#|e0b646+|eec446%|fce038@|fcc42a@|eeb62a@|fcd22a@|fcd238@|e0b638@|eeb646@|fcd254@|fce070%|000000                |fce070+|000000  |fcd262=|fce062%|000000                 |fce062*|fcd254+|000000 |fcd254#|fce062*
+000000           |fce054%|fcc438#|eeb638@|fcd22a@|fcb62a@|fcc42a@|fcd22a@|eec446=|fcd254+|fce070=|000000              |eeb638@|fcb61c@|fcc40e@|fca80e@|fcb638@|ee9a0e%|e09a0e%|e09a2a@|fca80e@|fcb60e@@|fcc42a@|fcd246%|fce062#|000000        |fce054%|fcd246@|fcd22a@|fcc42a@|fcb61c@@|fcb60e@|fc9a0e@|fcb62a@|fca80e@@|eea81c@|fcb60e@|fcb62a%|fcb61c@|fcc41c@|fcd22a@|fcd238@|eed262*|000000      |fcc446@|fcd238@|fcd22a@|fcc41c@|eea80e@|fcb60e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fca80e@@|fcc40e@@|eeb62a@|fcc438#|fcd238@|fce046@|fce054@|fce070=|000000             |fce062#|eec454=|eec462+|eed254+|fce062@
+000000              |fce070=|000000  |fce062=|000000                 |fce054@|fcd246@|fcc438%|fcb61c@|fcd21c@|fcb60e@@|fcc40e@|eea81c@|fcc41c@|fcd22a@|fcd246@|000000             |fcd262*|fcd238@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|fca80e@|fcc41c@|fcd22a@|eec454#|fcc454-|fcd254+|fce062+|000000     |fce070#|fce054@|fcd254@|fcc446*|e0b654=|fcc438@|fcd22a@@|fcb61c@@|fcd21c@|fcc41c@|eeb61c@|fcc42a@|fcd238@|fcd246@|eec462*
+000000                                      |fce054@|fcd246@|eec446#|fcc438%|fce046@|fcd254@|000000  |fce062+|000000             |fce062%|fcd254#|e0b646+|eec454#|fce038@|fcd238@|eec438@|fcc42a@|fce038@|eeb638@|e0b646@|fcd254@|fce070%|000000             |fce054@@|eec446@|eec454@|eec446@|fce046@|fcd246@|e0b646#@|eec454@|fce062%|fce070=
+000000                                                                |fce062*|000000 |eec462=|000000 |fce062%|000000                      |fce070*|fce062=
+`,
+        plano: `
+                                                                                            -*                        %   +
+                                                                                       %@###@@+-+%@           =   @%##@##@@=  +++=:         =@= -*       -++
+            -+*+                                                                   @@#*#@%##@%*#@@%           #@%##%*#%*%%*#%@###**+=    @@+*%##%%=-=  +**#*-    --
+         :+**##*=                                              =---@  =*      -+####%%%**%**#**%%*+#@@%     ##***#***++***#%#******++=  -*#%****#*#%#-++*#*+-   =%%##@:
+        =++*##***=#***=                                     =  @%##@##%@=   =+*#@@@%**##+#***+**+#%%%#      -%%%#**-::::=**#%%@%*++**+-%%%#**-:-=***#%%**++=   @%*#*#*#@=
+        =+*##@##@*###**++             -@%*#@#####**++-     =@%#*%#*%*#%#*%@#++*#*#####*#=::::-+*****#%#**=+#@%%#*++::::::***###***++***####*=::::=*####*++*+=+*##*+==+*#%%
+        =+#%#*#*##%#*#*+++         *@%*#%*%%*#%***#*+++  *%##*#**#+****####+**%@@%%##**-:::::::+**#%%%%%#++++###***-::::=#**#%%@*      +##***=--=**#%@% ---==+###*::::*##%*+==-
+:++******%%#*+-:-**#%#***=       *%#***+++**###**++***+=  ####**-::::=**#%%%%*+*###****-:::::::***#####     %@%%*##+#+**#*#%%%-         -%%#*#*#**%%+         *###*++**##= --==
+         #%#*+:::+*#%#+++*******+#%##**::::=*#%%%*++++*+%@%%##*+::::::+**##%#++#%%%%#*+#+-:::-+****#%@@@+      *%%*#%*##*%%+=+=            =@%#%@*+%@          +@##%*%#+%
+          =##***#*%#=        ----#%%#*+::::=*####==++=====####**=::::=***##%%#%@@##**##++#*#****#%%#*          @#=#@%#%@*#@%                =  -%                 *+ *+
+           #+#@#%%-+=              ###**+++***#%#        #@%%#*#+#***#*#%%%+      %@@#*#%**#**%%**%@@=             #-==@
+              =  =                 @%*#%##%*#@%             +%%*#%*##*%%*-=+     *@%+-#@%##@%*#@@+
+                                      @@*#@#  +             %*-+@%#%@#*%%             @@###@@+#%%=
+                                                                * = %                      +=
+`
+      },
+      {
+        color: `
+000000                                                                                            |fcee70#|000000                       |eed262+|000000 |fce062#|fce070+
+000000                                                                                      |eed262=|fce054@|fcd254@|eec446@|eeb646@|fcd246@|fce046@|fcc446@|d2b646*|e0b646%|fcd246@|fce054@|fcd262%|000000            |fce062+|eec454=|000000 |fcd254@|fce046@|fcc438@|fcc42a@|fce038@|fcc438@|e0b638@|fcc438@|fce046@|eed254@|000000  |9ae054*|8cd246#|7ec446#*=|000000         |fce062%|fcd254#|000000  |fce054#|fce062+|000000       |7ec446+|8cd246*|9ae054*
+000000            |7ec446+|7ed246#|8cd246%|9ae054#|000000                                                                  |fce062@|fce054@|fcd246@|eeb638%|e0b638%|fcd22a@@|fcc41c@|eeb61c@|fcc41c@|fcd21c@|fcb61c@|eeb61c@|fcc42a@|fce02a@|fcd238@|eec462=|000000            |fcd246@|fcd238@|fcc41c@|eea81c@|fcc40e@@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcd20e@|fcc42a@|c4d238@|eed246@|fce054@|e0d254@|8ce046@|8cd246@|7ed238@|70c438@@|70b646*|000000    |fce062%|fcd246#|eeb646+|fcc42a@|fcd21c@|fcb61c@|fcc41c@|fcd22a@|fcc438@|e0b638+|fcd254*|fce070=|000000  |70c438@|7ec438@|7ed238@|8ce046@|7ed238@|8cc454+|000000    |9ae062=|8cd246=
+000000         |70b646=|70c438@|7ec438@|7ed238@|8cd246@|8ce046@|7ed238@|8cc446*|000000                                               |fcd262=|eec462+|e0c462=|fce062##|000000  |fcd262=|fce070+|000000     |7ec446=#|8cc446%|8cd238@|a8d246@|eec438@|fcd22a@|fcd21c@|fcb60e@|eea80e@|fcc40e@@|fca80e@|fcb60e@@|eea80e@|fcb60e@|fcc40e@|fcb60e@|d2b61c@|fcc438@|fcd238@|fce046@|fce054@|fcd270=|000000     |fce070#|fce054@|fcd246@|fcc42a@|fcb60e@@@|eea81c@|fcb61c@|ee9a1c@|fca81c@|fca80e@|fcb61c@|e0b61c@|fcb60e@|fcc40e@|fcc42a@|eec438@|9ac446@|7ec438@|7ed238@|8cd246@@|70c438@|70b62a%|70b646#|000000   |fcc446@|fcc41c@|fcc40e@|fca80e@|fcb61c@|fca80e@|fcb60e@|fcb61c@|fca80e@|fcc41c@|fcc42a@|e0b654%|000000 |70b62a%|70c438@|7ed238@|8cd246@|7ec438@|70c438@|7ec454+|000000   |9ad254*|a8d246@|fce046@|d2c438@|c4c438@|fce046@|c4c446=
+000000        |70b646*|70b62a%|70c438@|7ec438@|8cd246@|a8d246@|7ed238@|7ec438@|8cc446%|9ad254*|9ae046@|8cd238@|7ed238@|7ec438@#|000000                                     |fce062#|fcd254+|000000 |fcd254@|fce038@|fcc438@|eeb62a@|fcd22a@@|e0b638@|fcc438@|fce046@|fcd254@|000000   |70b638*|70c438@@|d2d254@|fce054@|fcd246@|fcc42a@|eeb61c@|eea80e@|fca80e@|fcb60e@|fca80e@|ee9a2a@|fcb61c@|eea81c@|fca81c@|eea81c@|fca80e@|fcb60e@|c4b62a@|fca80e@|fcc40e@|fcd20e@|fcc41c@|eeb638@|000000        |eec446@|fcc42a@|fcc40e@|fcb60e@|fcb61c@|eeb638@|c47e1c%|a8620e%%%|a8700e%|d29a2a%|fca81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fce054@|b6c446@|70c42a@|70c438@|7ed246@|7ec438@|70b646%|b6d254*|fce054@|fcd238@|fcc41c@|fcb60e@|fca80e@|eea81c@|c47e1c%|a8701c%|b6701c%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcd22a@|fcd246@|e0d254@|7ed238@|7ed246@|70c438@|70b62a%|70b646*|000000   |fcd254@|fcd238@|eeb61c@|fcb60e@@@@|eeb61c@|fcd246@|fcd262%
+000000        |62b62a%|70c438@|8cc438@|a8d246@|9ac438@|fcd238@@|e0c438@|fcd238@|e0c438@|8cc438@|a8e046@|8ce046@|7ed238@|70c438@@|70b638%|000000             |fcd254@|fce046@|fcc446%|e0c446@|fcd246@|fce046@|8cd238@|8ce046@@|8cd246@|8ce046@|7ed238@@|70c438@@|70b646+|000000      |fcd246@|fcd238@|fcc41c@|eea81c@|fcc40e@@|fca80e@|fcc40e@|fcb60e@@|fcc40e@|fcc42a@|fcc446#|fcd246%|fce054@|fcd254@|70b638@|70c438@|7ec438@|8cd246@|e0c446@|fcc438@|fcc41c@|fcc40e@@|fcb60e@|fca81c%|fcb62a@|d28c1c%|a8700e%|a8620e%|a8700e%|a8620e%|b67e1c%|c49a2a%|fcb61c@|fca80e@@@|fcb60e@|fcc42a@|fcd238@|fcd246@|fce054@|e0d262%|7ec438*|7ec446#|eed254@|fcd246@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fc9a00@|d29a2a%|a8620e%%|9a620e%%|a8620e%%|eea81c@|fca80e@|fcb60e@@|fcb61c@|eec438@|a8c446@|7ec438@|7ec446@|70c438@@|7ec438@|7ed246@|7ec446@|e0c454@|fcc438@|fcb61c@|fcb60e@|fca80e@|c48c1c%|a8620e%|9a620e%%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcb61c@|fcc438@|b6c446@|7ec438@|62b62a%|70b62a%|7ec438@|7ed246#*|c4d254*|fcd254@|fcc42a@|fcb60e@@|e09a1c%|d28c1c%%|e09a1c%|fcb60e@@|fcc42a@|fcd254%
+000000        |62b638%|70b62a%|a8c446@|fcc42a@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb61c@|fcb60e@|fcd22a@|fcc438@|8cc438@|8cd246@|7ed246@|70c438@|70c42a@|70b638%|000000         |fce054@|fcd238@|fcc42a@|eeb61c@|fcc40e@|fcb60e@@|fcc40e@|fcb61c@|e0b62a@|fcd238@|fcd254@|7ec438@|7ed238@|8cd246@@|7ed238@|70c438@@|70b638%|000000  |fce070*|fce054@|fcd238@|fcc438@|fcb60e@@@|eea81c@|fcb61c@|ee9a1c%|fca81c@|eea81c@|fcb61c@|fcb62a%|fcb60e@|fcc40e@|fcc41c@|eec446@|8cb62a%|7ec438@|8cd246@|d2e054@|e0d246@|fcd238@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|fcb61c@|b6701c%|a8620e%|9a620e%%%%|a8620e%|a8700e%|e0a82a@|fca80e@|fcb60e@@|fcc40e@|fcc41c@|fcc42a@|fcc446@|b6c446@|7ec438@%#|7ed246#|a8c446%|eeb638@|fcb61c@|fcb60e@@|fca80e@|eeb638@|c47e1c%|a8620e%%%|a8700e%|d29a2a%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fce054@|fce070*|000000      |fce070*|fcd246@|fcc42a@|fcb60e@|fca80e@|fca81c@|c48c2a%|c47e1c%%|c48c2a%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|eee062%|000000 |7ed246==|7ed238=|7ed246+|7ec438*|9ac446*|eec446@|fcc41c@|fcb60e@|fcb61c@|a8700e%|9a620e%%|a8700e%|fca81c@|fcb60e@|fcc41c@|eec446@|8cc446%|7ec446#|7ed238*|7ed246++
+8cd262-|7ec438%%@@@@@@|fcd254@|fcd22a@|fcb60e@|fca80e@|e09a1c%|b67e1c%|a8700e%|b67e1c%|eea82a@|fca80e@|fcc41c@|fcd238@|c4d246@|70c438@|7ed246@|7ec438@|62b62a%|000000       |fce062=|fcd254*|fcc438%|fcb61c@|fcb60e@@|e0a81c@|ee9a0e@|e09a0e%|eea81c@|fca80e@|fcb60e@|fcb61c@|eeb62a@|d2c446%|b6c446@|7ec438@|70c438@|7ed238@|7ed246@|7ec438@|62b62a%|70b646#|000000  |eec446@|fcc42a@|fcb60e@@|fca80e@|fcb638@|c47e1c%|a8620e%%%%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fcd246@|c4d246@|a8c446@|d2c446@|eec438@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|fca81c@|b67e1c%|a8620e%%|9a620e%%%|a8620e%%|e0a82a@|fca81c@|fcb60e@@|fcc40e@|fcc41c@|fcc42a@|fcc446@|fcd262*|000000   |fce070+|fce054@|fcd238@@|fcc42a@|fca80e@|fcb60e@@|eea82a@|fcb61c@|ee9a1c@|fca81c@|fca80e@|fcb61c@|fcb62a@|fcb61c@|fcc41c@|fcc42a@|eec446@|000000           |fcc446@|fcd22a@|fcc41c@|eea80e@|fcb60e@|fca80e@|fcb60e@@|fca80e@|fcc40e@|fcd22a@|fcc446@|000000         |fce062+|fcc438@|fcb61c@|fcb60e@|eea81c@|e09a1c%|e09a0e%|eea81c@|fcb60e@@|fcc42a@|fce054*|b6d254=|7ed246=|7ec438=|7ed246+*
+000000         |eed262@|fcd238@|fcc40e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8700e%|e09a1c@|fca80e@|fcc40e@|fcd238@|c4c446@|70b62a%%|70c438@|7ec438@|7ec446@|70c438@|7ec446@|70c438@|7ec438@%%|e0d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|e0a82a@|a8700e%|a8620e%|9a620e%|a8620e%|c48c1c%|eea80e@|fcb60e@|fcc41c@|fcd238@|eed246@|7ec438@|70b62a%|62b62a%%|70c438@|7ec438@|70c438@|d2d254@|fcd246@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca800@|e09a1c@|a8620e%%|9a620e%%|a8620e%%|e09a2a@|fca800@|fca80e@|fcb60e@|fcb61c@|fcc438@|d2c446@|7ec446*|7ed238+|b6d254%|eec438@|fcc42a@|fcc41c@|fcc40e@@|fcb60e@|fca82a%|fcb62a@|d29a1c%|b6701c%|a8620e%%|a8700e%|c47e1c%|e0a838@|fcb61c@|fca80e@@@|fcb61c@|fcc42a@|fcd238@|fcd246@|fce054@|fce070*|000000      |fcd246@|fcd22a@|fcc41c@|eea80e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fcd21c@|fcc438@|fcc454+|fcd254#|fce062%|000000           |fce062+|fcd254=|000000 |fcd238@@|fcc438@|fcc42a@|fcd22a@|fcc438@|e0b646-|fcd246*|fce054#|000000          |fce062#|fcd246%|eeb62a%|fcc41c@@|fcb61c@|fcc41c@|eeb62a@|fcd238@|fce054@
+000000          |eec462=|fcc42a@|fcc40e@|fca80e@|fcb61c@|eea80e@|fcb61c@|fca80e@|fcc40e@|fcb62a@|eec454=|000000        |8cd254=|7ed238=|7ed246++|d2c454#|fcd246@|fcc42a@|fcc40e@|fca80e@|eea82a@|a8700e%|9a620e%%|a8620e%|c48c2a%|fca81c@|fcb60e@|fcc41c@|fcd238@|eed246@|7ec438##|7ec446#|7ed246#|7ec446*|7ec438*|7ed246*|8cd246*|8cc446*|e0c438@|fcc42a@|fcc40e@|fcb60e@@|fcb638@|d28c1c%|a8700e%|a8620e%%%|c48c2a%|fcb62a@|fca80e@@|fcb60e@|fcc42a@|fcd238@|fce046@|fce070%#|fce054@|fce046@|fcd238@|fcc42a@|fcb62a@|eea80e@|fcb60e@@|fca80e@|e09a2a%|fcb61c@|fca81c@|fcb61c@|fca82a@|fca80e@|fcb60e@|fcb62a%|fcb61c@|fcc40e@|fcd21c@|fcd22a@|eec438@|000000         |fce070+|fce054#|fcc446=|000000 |fcd246@|fce038@|fcc42a@@|fcd22a@|fcc42a@|e0b638@|fcc446@|fce054@|000000                 |fce070=|fcd262=|000000  |fce062*|fce070+|000000                |fce062#|000000  |fce054%
+000000           |fce054*|eeb638=|fcc438@|fcd22a@|fcb62a@|fcd22a@|fcc438@+|fce054#|fce070=|000000             |fcd254+|eeb638%|fcb61c@|fcb60e@@|eea82a@|ee9a0e@|e09a0e%|eea82a@|fca80e@|fcb60e@@|eeb62a@|fcd254*|fce062=|000000        |fce054@|fcd246@|fcd238@|fcc42a@|fcb60e@@@|eea81c@|fcb61c@|ee9a0e@|fca81c@|eea81c@|fcb61c@|fcb62a%|fcb60e@|fcc41c@|fcd22a@|eec446@|000000       |eec454=|fcc438@|fcd22a@|fcd21c@|fcb60e@|eea80e@|fcc40e@@|fca80e@|fcb60e@@|eea80e@|fcb60e@|fcd21c@|fcc42a@|eec446#|fcc438#|fcd246@|fce054@|fce062@|000000            |fce070*|fcd262=|eec462+|e0c462=|fce062@#
+000000                                   |fce062@|fcd246@|fcc42a@|eeb61c@|fcc41c@|fcb60e@@|fcc40e@|fcb60e@|eeb62a@|fcd22a@|fce046@|fcd262*|000000            |fcd246@|fcd238@|fcc41c@|eea81c@|fcc40e@@|fca80e@|fcc40e@|fcb60e@@|fcd21c@|fcc438@|eec454+|fcd246*|fce062#|fce070=|000000      |fce062@|fce054@|fcd246@|eeb638#|e0b638%|fcd22a@@|fcc41c@|eeb61c@|fcc41c@|fcd21c@|fcb61c@|eeb62a@|fcc438@|fce046@|fcd246@
+000000                                      |fcd254#|fce046@|fcc446#|eec446#|fcd246@|fce046@|000000                |fce062*|fcd254=|000000 |fcd246@|fce038@|fcc438@|eeb638@|fcd238@@|e0b638@|eec446@|fce054@|fcd262+|000000             |fcd254+|fce054@|fcd246@|eec446@|e0b646@|fcd246@|fce046@|fcd246@|d2b654+|e0c454%|eed262%|fce070*
+000000                                                               |fce070=|fcd262=|000000  |fcd262*|fce062#|000000                       |fce062*
+`,
+        plano: `
+                                                                                            #                       = #+
+                                                                                      -@%##%@%=*%@#            +- %@##@%*#@%  +++=:         %#  *+       -++
+            -+*+                                                                  @@%*+%@#*%%#*%@%-            %@#*%#*%*#%##%@%##*++=    %*=#%##@#=+=  +**#*-    --
+         :+**##*=                                               ==-##  -+     -=**##%%#*##*##+#%#*#%@@-     #@%#*#***+**#*#%%#*****++=   #%%*#****%%* ++*#*+-   =#@#*@-
+        -++*##**+=#***=                                     #= #@##@%*#@%   =++%@@%#**#*+#+******%%%#        ####**-::::=*+*#%@@#++**++@@%***-:-=**#%@%**++=   %%*####*%#
+        =+*#*%%*%#*##**++             %@##%@*####**++-      %@%*#%*%*#%#+#@%++*###%%##+*=::::-+****##%@@#=+%@%%#*++::::::***###**++++**###**=::::=**##**++*+=+%%#*+==+*##%
+        =+*%#*#*#*%%***+++         @@#*%#*%#*%%+**#*+++  *@%%**#*#+*+#*#%%#++*%%%%##***-:::::::+**###%%#*+++*####**-::::=***#%@@*      +@#***=--=**#%@# ---==+###*::::*###+===-
+:++******%%#*+-:-**#%#+**=       =+**#*+++**##****+***+=  ####**-::::=***#%%@#*#####*+*-:::::::***##%%%+   =@@%#*#**#+**#*#%%#           %%#*#**#*%%#         +###*++**##+---==
+         %%#*+:::+*#%#+++****+**+#%%#*+::::=*#%%%+++++*+#%%%#*++::::::+**####=-*##%%#*+#=-:::-+*****#%@@*      %@#*%#*%*#%#=*#           +- %@##@%:+#          *#*%##%*%@
+          -##*#+#*##-        ----*%%#*+::::=*#%%%+==+=====####**=::::=***#%%@%#@@%%***#*+#****#**%%%#         +#= %@##@%*%@                 =-  *+                #  %
+           +-%%#%#=#=             =**#**++**#**+=        @@%#*##+#+**#*#%%#       -%%%**##*##+#%#+*%@@            *==-%*
+                                   %@#*%#*%**%@*            %@#*##*%*#%%=+#=      @@%+*%@#*%%#*%@%
+                                      *@**%@                *- %@##@%*#@=             +@%##%@%-*#*
+                                                               =-  *#                       *
+`
+      },
+      {
+        color: `
+000000                                                                                           |fce070+=|000000                      |fce070+|e0c462=|eec462+|eed262=|fce062%
+000000                                                                                      |fce062@|fce054@|eec446@@@|fce046@|fcd246@|e0b646#@|fcc446@|fce054@|fcd254@|000000             |fce062%|fcd254*|e0b646=|eec454#|fce046@|fcd238@|eeb638@|fcd22a@|fcd238@|e0b638@|eeb638@|fcd246@|fce054@|000000  |9ae054*|8cd246#|7ec446#*=|000000         |fce062%|eec454=|000000 |fcd254*|fce062@|000000        |7ec446+|8cd246*|9ae054*
+000000            |7ec446+|7ed246#|8cd246%|9ae054#|000000                                                                  |fce062@|fcd254@|fcc446*|e0a838=|fcc446@|fcd22a@@|fcb61c@@|fcd21c@|fcc41c@|eeb61c@|fcc41c@|fcd22a@@|eec446%|000000 |eec454=|fcd254+|fce070*|000000         |fcc454#|fcd238@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|d2c438@|c4d246@|eed254@|e0e054@|9ae046@|8cd246@|7ed238@|70c438@%|70b646*|000000   |fce070+|fce054*|fcc446=|eec454#|fcd22a@|fcc41c@|eeb61c@|fcc41c@|fcd22a@|eeb62a@|eec446#|fce054%|000000   |70c438@|7ec438@|7ed238@|8ce046@|7ed238@|8cc454+|000000    |9ae062=|8cd246=
+000000         |70b646=|70c438@|7ec438@|7ed238@|8cd246@|8ce046@|7ed238@|8cc446*|000000                                               |fce062*|eec454=*+|fce062@|000000         |7ec446=#|7ed246%|8cd246@|e0c446@|fcd238@|fcd22a@|fcc41c@|eea80e@|fcb60e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fca80e@@|fcc40e@@|eea80e@|e0b61c@|fcd22a@|fce038@|fce046@|fcd254%|000000      |fce070+|fce046@|fcd238@|fcd22a@|fcb61c@@|fcb60e@|eea80e@|fcb61c@|ee9a1c@|fca80e@|eea81c@|fcb60e@|e0c41c@|fcb61c@|fcc40e@|fcd22a@|fcc438@|b6c446@|70c438@|7ed238@|8cd246@@|70c438@|70b62a%|70b646*|000000  |eed262=|fcc438@|fcd21c@|fcb60e@|eea80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcc41c@|fcb62a@|eec462+|eed262=|7eb638@|70c438@|7ed238@|8cd246@|7ec438@|70c438@|7ec454+|000000   |b6d254#|8cd246@|fcd246@|eed238@|b6c438@|eed246@|fcd254*
+000000        |70b646*|70b62a%|70c438@|7ec438@|8cd246@|9ad246@@|7ec438@|7ec446#|9ad254+|9ae046@|8cd238@|7ed238@|7ec438@#|000000                                     |fce070%|fce054#|eeb646*|e0b654#|fcd238@@|eeb62a@|fcc42a@|fcd238@|eeb638@@|fcd238@|fce046@|eed262=|000000  |70b638*|70c438@|7ec438@|d2d254@|eed246@@|e0c42a@|eea81c@|fcb60e@@@|fc9a0e@|fcb638%|fcb61c@|ee9a1c@|fca81c@|eea81c@|fca80e@|e0b61c@|d2a80e@|fcb60e@|fcc40e@@|fcb62a@|e0b646%|000000        |eec446@|fcb62a@|fcb60e@@|fca80e@|fcb638%|c47e1c%|a8620e%%%|a8700e%|c49a2a%|fcb61c@|fca80e@@|fcb60e@|fcc42a@|fcd246@|eed246@|c4d246@|70c42a%|70c438@|7ed246@|7ec438@|70b646%|c4d254+|fce054@|fcd238@|fcc41c@|fcb60e@|fca80e@|eea81c@|c47e2a%|a8701c%|b6701c%|c48c1c%|fca82a@|fca80e@|fcc40e@|fcd22a@|fcd246@|d2d246@|7ed238@|7ed246@|70c438@|70b62a%|70b646*|000000   |fcd262+|fcd238@|fcc41c@|fcb60e@|fcc40e@|fcb60e@|fcc40e@|e0b61c@|fcc438@|fcd254@
+000000        |62b62a%|70c438%|7ec438@|c4d246@|a8d238@|e0c438@|fcd238@|e0c438@|eec438@|fcd246@|7ed238@|8cd246@|8ce046@|7ed238@|70c438@@|70b638%|000000             |fce054@|fcd246@|eec446%@|fce046@|e0d246@|7ed238@|8cd246@|8ce046@|8cd246@|8ce046@|7ed238@@|70c438@%|70b646+|000000      |eed262+|fcd238@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcb60e@@|fca80e@|fcc40e@|fcc41c@|fcc446%+|fcd254#|eed254@|8cc438@|70c438@|7ec438@|a8d246@|fcd246@|fcd238@|fcd21c@|fcc40e@@|fca80e@|fca82a%|fcb62a@|d28c1c%|a8700e%|a8620e%|a8700e%|a8620e%|b67e1c%|d29a1c%|fcb61c@|eea80e@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fce046@|fce054@|b6d254@|7ec438*|7ec446#|c4d254@|fcd246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fc9a0e@|d29a2a%|a8620e%%|9a620e%%|a8620e%%|eea81c@|fca80e@|fcb60e@@|fcc42a@|fcc438@|c4c446@|7ec438@|7ec446@|70c438@@|7ec438@|7ed246@|7ec446@|e0c446@|fcc42a@|fcb61c@|fcb60e@|fca80e@|c48c1c%|a8620e%|9a620e%%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc41c@|fcc438@|c4c446@|7ec438@|62b62a%|70b62a%|7ec438@|7ed246#*|b6d254#|fcd254@|fcd22a@|fcb60e@|fcb61c@|e09a1c%|c48c1c%|d28c1c%|d29a1c%|fcb60e@@|fcc42a@|fce054*
+000000        |70b638%|8cc438@|a8c438@|eec42a@|fcc41c@|fca80e@|fcb61c@|fca80e@|fcb60e@|fcb61c@|fcc41c@|fcd238@|a8c446@|8cd246@|7ed246@|70c438@|70c42a%|70b638%|000000        |fce07e=|fce054@|fcd246@|fcc438#|fcb61c@|fcd20e@|fcb60e@@|fcc40e@|eeb61c@|fcc42a@|fcd246@|d2d246@|7ec438@|7ed238@|8cd246@@|7ed238@|70c438@%|70b638%|000000   |fcd254@|fcd238@|fcd22a@|fcb61c@@@|fca80e@|fcb62a@|ee9a1c@|eea81c@@|fcb60e@|fcb62a%|fcb61c@|fcc40e@|fcd21c@|fcc438@|b6b638@|70c438%|7ed246@|9ad246@|b6c438@|eec438@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fcb61c@|b6701c%|a8620e%|9a620e%%%%|a8620e%|a8700e%|e0a82a@|fca80e@@|fcb60e@@|fcb61c@|fcc438@|eec446@|8cc446@|7ec438@%#|7ec446#|b6c446@|fcc438@|fcc41c@|fcc40e@|fcb60e@|fca81c@|eea82a@|c47e1c%|a8620e%%%|a8700e%|d28c1c%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fce054@|000000       |fcd270#|fcd246@|fcd22a@|fcb60e@|fca80e@|fca81c@|c48c2a%|c47e1c%%|d28c2a%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246%|fce062*|000000 |7ed246==|7ed238=|7ed246+|7ec438*|9ad254#|fcc446@|fcc41c@|fcb60e@|fcb61c@|a8700e%|9a620e%%|a8700e%|fca81c@|fcb60e@|fcc41c@|eec446@|8cc446%|7ec446#|7ed238*|7ed246++
+8cd262-|7ec438%%@@@@@@|eed254@|fcd22a@|fcc40e@|fca80e@|e09a2a@|b67e1c%|a8700e%|b67e1c%|eea81c@|fca80e@|fcc41c@|fcd238@|c4d246@|70c438@|7ed246@|7ec438@|62b62a%|000000         |eeb638@|fcc41c@|fcc40e@|fca80e@|e0a81c@|ee9a0e@%|e0a81c@|fca80e@|fcb60e@|fcb61c@|e0b62a@|eed246@|d2d246@|7ec438@|70c438@|7ed238@|7ed246@|7ec438@|62b62a%|70b646#|000000 |fcd254=|eec446@|fcb62a@|fcb60e@@|fca80e@|fcb62a@|c47e1c%|a8620e%%%%|c48c1c%|fca81c@|fca80e@@|fcb60e@|fcc42a@|fcd238@|fcd246@|e0d254@@|fcd246@|fcd238@|fcd22a@|fcc41c@|fcb60e@@|fca80e@|fca81c@|b67e1c%|a8620e%%|9a620e%%%|a8620e%%|e0a82a@|fca80e@@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd238@|fce054@|fce062+|000000  |fce070*|fce054@|fcd246@|fcc438@|eeb61c@|fcb60e@@|fca80e@|fcb638@|fca81c@|ee9a1c@|eea81c@|fca80e@|fcb62a%|fca80e@|fcc40e@|fcc41c@|fcb62a@|eec454#|fcc454=|000000          |eec454#|fcd22a@|fcc41c@|fca80e@|fcb60e@@|fca80e@|fcc40e@|eea80e@|fcb60e@|fcd22a@|fcd238@|eed262+|000000         |eec446@|fcb61c@|fcb60e@|eea82a@|e09a0e%|e09a1c%|eea81c@|fcb61c@|fcb60e@|fcd238@|fce054#|a8d254=|7ed246=|7ec438=|7ed246+*
+000000         |eed262@|fcd238@|fcc40e@|fca80e@|d29a1c%|a8620e%|9a620e%|a8700e%|e09a2a@|fca80e@|fcc40e@|fcc438@|a8c446@|70b62a%%|70c438@|7ec438@|7ec446@|70c438@|7ec446@|70c438@|7ec438@%%|e0d246@|fcd238@|fcd21c@|fcb60e@|fca80e@|e0a82a@|a8700e%|a8620e%|9a620e%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcc41c@|fcc438@|eec454@|70b62a%%|62b62a%%|70c438@|7ec438@|70c438@|a8d246@|e0d246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@|e09a1c@|a8620e%%|9a620e%%|a8620e%%|e09a2a%|fca800@|fca80e@|fcb60e@|fcb61c@|fcc438@|d2c454@|7ec438+|7ed238+|8cd246+|d2c446@|eeb62a@|fcc41c@|fcc40e@|fcb60e@@|fca81c#|fcb638@|d29a1c%|b6701c%|a8620e%%|a8700e%|c47e1c%|e0a838@|fcb62a%|fca80e@|fcb60e@@|fcb61c@|eeb62a@|fcc438%|fcd246#|fcd254*|000000      |fcd254@|fcd238@|fcd22a@|fcb62a@|fcb61c@|fcc40e@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcc41c@|eeb638@|fcc446#|fce046@|fce062@|000000           |fce070*|fcd254*|eeb646+|eec446@|fce038@|fcc42a@|eeb638@|fcd22a@|fcd238@|eec462*|000000 |fce062+|000000          |fce054#|fcd246*|eeb638@|fcd21c@|fcb61c@|fcc41c@@|fcb62a@|fcd238@|fcd254%
+000000          |eec462*|fcc42a@|fcc40e@|fca81c@|fcb61c@|fca80e@|fca81c@|fcb60e@@|fcb638@|fcd254+|000000        |8cd254=|7ed238=|7ed246++|d2c454%|fcc446@|fcc42a@|fcb60e@|fca80e@|eea82a@|a8700e%|9a620e%%|a8620e%|c48c1c%|fca81c@|fcb60e@|fcc41c@|fcd238@|fcd246@|9ad246%|7ec438#|7ec446#|7ed246#|7ec446*|7ec438*|7ed246*|8cd254*|b6c446@|fcc438@|fcc41c@|fcc40e@|fcb60e@|fca81c@|fcb62a@|d28c1c%|a8700e%|a8620e%%%|c48c1c%|fcb62a@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fce054@|fce07e+|000000 |fcd254@|fce046@|fce038@|fcd22a@|fcc41c@|eeb61c@|fca81c@|fcb60e@@|ee9a0e%|fcb62a@|fca81c@@|fcb62a@|ee9a0e%|fcb60e@|fcb61c@|fcb62a%|fcc41c@|fcd21c@|fcd22a@|fcd238@|eec454@|000000        |fce062*|fcd254=|000000 |eec454+|fce046@|fcd238@|eeb638@|fcc42a@|fcd22a@|eeb62a@|eec438@|fcd246@|fce054@|000000                  |fce062*|000000   |fce062#|000000                |fce054+|000000 |fcd254+|fce062%
+000000           |fcd254=|eec454+|fcd238@|fcc42a@@|fcd22a@|eeb638%|fcd238#|fce054@|000000              |fce062#|fcd246%|fcb61c@|fcb60e@@|eea81c@|ee9a1c@|e09a0e%|fca81c@@|fcb60e@@|fcb62a@|eeb646#|000000        |fce070=|fce054@|fcd246@|fcc438%|eeb62a@|fcb60e@@@|eea82a@|fcb61c@|ee9a1c@|fca81c@|fca80e@|fcb62a@|fca82a@|fcb60e@|fcc41c@|fcc42a@|e0b646%|000000    |fce062+|fcd254+|eec454=|000000 |eec454#|fcc42a@|fcd21c@|fcc40e@|eea80e@|fcb60e@|fcc40e@|fca80e@@|fcc40e@|fca80e@|fcb60e@|fcd20e@|fcd21c@|fcc438@|eec454+|fcc446*|fcd254%|fce062%|000000            |fce062+|eec462=|000000 |fcd254+|fce054@
+000000                |fce062+|000000                  |fcd254+|fce046@|fcd22a@|eeb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@@|eeb62a@|fcc438@|fce046@|fce062@|000000           |fcd254#|fcd246@|fcd22a@|fcb62a@|fcb61c@|fcc40e@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcd21c@|eec438@|fcc446*|fcd246%|fce062@|000000       |eed270+|fce054@|fce046@|fcc438@|e0b646@|fcb62a@|fcd22a@|fcd21c@|fcb61c@@|fcd21c@|fcd22a@|eeb62a@|eeb638@|fcd246@|fce046@|fcd262*
+000000                                       |fce046@|fcd246@|eec454*|fcc438%|fce046@|fcd254%|000000              |fce070+|fcd262=|000000  |fce046@|fcd238@|eec438@|fcc42a@|fce038@|fcc438@|eeb638@|fcd246@|fce054@|000000               |fcd254@|fce054@|fcc446@|eec446@@|fce046@@|eec454*|d2b654=|e0c454+|fcd262+
+000000                                                               |fce070=|000000   |fce062@|000000                         |fce070+
+`,
+        plano: `
+                                                                                           +-                      +-==%
+                                                                                      @@###@%+*#@%             #*-+@%#%%*#%@  ++==:         %- +@        -=+
+            -=*+                                                                  @%+-#@%*#%%*#%%* -+*         +%%*#%*##*%%##%%##*++=   =+-+%%*%%**#   ++*#*-    --
+         :++*##*=                                               *-+=@         -=**#%%#**%**#**##**%@@#      +@%%**#+*+*+#**%%%*+***++=  -%%#*#*#+#%#=-++***+-   +*%#*%+
+        -++**#*++=#***=                                     %#=+@%##@**%@-  -++%%%#**##++*+*+**+#%##*        ###***-::::=***##%%#++**+=@%#***-::=**#%%#**++=   +%#*#*#*%%
+        =+*#*#@##%*##*+++             @%*#@#*##*#**++-      =%%**%*##*%%#=*%*+*#%%%%#***=::::-=*+**#%@@@#=+#%%%#*++::.:::+**####*++++**###**=::::=**###*++*==*%%**+==+*##*
+        =+*#%*#*#*#%***++=        =@%*#%*#%*#@#+**#*+++   %%%#*#+*+++***#%%*+*#*###**+*-:::::::+***####**+++*####**-::::=**#%%%%       *%%#**=--=***##+ :---=+%##*::::*###*==--
+:++*****+%%#*+-:-+*#%#+**=         ###*++++****%#++***+= -###***-::::=***##%%%%%%%##*+*-:::::::+**#%%%%%+  *@%#**#***++***#%#+-          +%%****#*#%%=         ##**+++**##---==
+         %%#*+:::+*##*+++**+*+*++%%%#*+::::=*####+++++*+#%%%#**+::::::+**####=--*####*+*=-:::-+******#*+      #@%**%**#*%%**%%           **=#@##%%= =          *+#%####%%
+          +%#*#***##=        ----*###**::::-*#%%%*==+====#####**=::::=***#%%@+ %@@%#**##+#**#+##*#%%%#        += =@%##@*#%@                  *   #                + +#
+           -=%##%**@              *#***++=**##*+        =%%***#**#+**#*#%#*    ==- *%%#**#**#**%%#=+#%            +- =@
+                +                  =@%*#%*##*%@@           *@%#*%#*%*#%#+%@       +@@#*#%%*#%%*#%@*
+                                       @%+*@#              +-  @%##@##%@               %@###@@+:==
+                                                               =   @                         +
+`
+      },
+      {
+        color: `
+000000                                                                                           |fce070+|000000    |fce070=|000000                  |fce070=|fcd270=|eec462*|e0c454+|fce062#*
+000000                                                                                     |eed270=|fce062@|fcd254@|eec454@|e0b646#|fcd246@|fce046@|eec446@|e0b646@|eec446@|fcd246@|fce054@|eed262+|000000             |fce070+|fce054@|eec446#|e0b646+|fcd238@|fce038@|fcc438@|fcc42a@|fce038@|fcc438@|e0b638*|fcc446%|fce054@|fce062#|000000 |9ae054*|8cd246#|7ec446#*=|000000        |fce062*|fcd254+|000000 |eec462-|fce054@%|000000        |7ec446+|8cd246*|9ae054*
+000000            |7ec446+|7ed246#|8cd246%|9ae054#|000000                                                                 |fce070*|fce062#|fcd254+|000000 |eec462+|fcd238@|fcd22a@|fcc42a@|eeb61c@|fcc41c@|fcd21c@|fcb61c@@|fcd21c@|fcd22a@|fcc42a@|d2c470=|eec446+|fcd254#|fce062@|fce070#|000000       |fce070=|000000  |fcc438@|fcd22a@|fcb61c@|fcb60e@|fcc40e@|fcb60e@@|fcc40e@|eea80e@|fcc40e@|fcd21c@|eec42a@|b6c446@|d2d254#|b6d246@|a8e046@|8cd246@|7ed238@|70c438@@|70b646*|000000   |fce070=|fcd254-|000000 |fcc446@|fcd22a@|fcc41c@|fcb61c@|fcd21c@|fcc41c@|eeb638@|fcd246@|fce062@|000000   |70c438@|7ec438@|7ed238@|8ce046@|7ed238@|8cc454+|000000    |9ae062=|8cd246=
+000000         |70b646=|70c438@|7ec438@|7ed238@|8cd246@|8ce046@|7ed238@|8cc446*|000000                                               |fce070=|fce062+|e0c454*|eec454*|fce062#%|000000        |7ec446=#|7ed246%|b6d246@|fcd246@|fce038@|fcd22a@|fcb61c@|eea80e@|fcc40e@@|fca80e@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|fcb60e@|eea80e@|fcc41c@|fcd22a@|fcd238@|fcd246@|000000        |fcd254@|fcd238@|fcd22a@|fcc42a@|fcb62a@|fcb60e@|fca80e@|fca82a@|eea80e@|fca80e@|eea81c@|fca80e@|eeb61c@|eeb60e@|fcc40e@|fcd22a@|fcd238@|e0d246@|8cc438@|7ed238@|8cd246@@|70c438@|70b62a%|70b646#|000000  |fcd254@|fcd238@|fcc41c@|fcb60e@|fcb61c@|fcb60e@|fca80e@|fcb60e@|ee9a0e@|fcc40e@|fcc41c@|eeb638@|fcc446+|fcd262*|9ac438@|70c438@|7ed238@|8cd246@|7ec438@|70c438@|7ec454+|000000   |d2d254#|9ad246@|d2d246@|fcd246@|b6c438@|d2c446@|fce062#
+000000        |70b646*|70b62a%|70c438@|7ec438@|8cd246@@|a8d246@|7ec438@|7ec446#|9ad254+|9ae046@|8cd238@|7ed238@|7ec438@#|000000                                     |fce07e=|fce054@|fcc446%|e0b646*|fcc446@|fce038@|fcc42a@|fcb62a@|fcd22a@|fcc438@|e0b646#|fcc446@|fce046@|fce062@|000000  |70b638*|70c438@|7ec438@|b6d246@|c4d246@@|e0b62a@|eeb61c@|fcb60e@|fcc40e@|fcb60e@|eea82a@|fcb61c%@|ee9a1c@|fca81c@|eea81c@|fcb60e@|c4b61c@|fca80e@|fcc40e@@|fcb60e@|eeb62a@|eec446*|fcc446*|fcd254*|fce062+|000000    |fcd254*|fcc446@|fcb62a@|fcb60e@|fca80e@@|fcb62a@|c47e1c%|a8620e%%%|a8700e%|c49a2a%|eeb61c@|fca80e@|fcb60e@@|fcb62a@|eec446@|c4c446@|a8c446@|70c438@@|7ed246@|7ec438@|70b646%|000000 |fce062*|fcc438@|fcb61c@|fca80e@@|eea81c@|c47e2a%|a8701c%|b6701c%|c48c1c%|eea82a@|fcb60e@|fcc40e@|fcd22a@|fcd246@|c4c446@|7ed238@|7ed246@|70c438@|70b62a%|70b646*|000000    |fcd238@|fcc41c@|fca80e@|fcc40e@|fca80e@|fcc41c@|eeb61c@|eec438%|fce054%
+000000        |62b62a%|70c438@@|d2d246@|c4d246@|b6c438@|fcd238@|eec42a@|e0c446@|fce046@|9ad238@|8cd246@|8ce046@|7ed238@|70c438@@|70b638%|000000            |fcd254*|fce054@|fcc446#|eec446#|fcd246@|fce046@|a8c438@|8cc438@|a8d246@|9ae046@|8cd246@|8ce046@|7ed238@@|70c438@@|70b646+|000000    |fce062=|fcd254=|000000 |fcc446@|fcd22a@|fcc41c@|eea80e@|fcc40e@|fcb60e@@|fcc40e@|eea80e@|fcb60e@|fcd21c@|fcc438@|eec462+|fcd254=|d2c454%|9ac438@|70c438@|7ed238@|e0d254@|fcd246@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|fca82a@|fcb61c@|c48c2a%|a8700e%|a8620e%|a8700e%|a8620e%|b67e1c%|d29a1c%|eeb61c@|e0a80e@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fcd246@|d2d246@|8cd246#|7ec438*|7ec446#|a8d246@|d2d246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@|d29a2a%|a8620e%%|9a620e%%|a8620e%%|e0a81c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|e0d246@|a8d246@|7ec446@|70c438@@|7ec438@|7ed246@|8cc446@|e0c446@|fcc438@|fcc41c@|fcb60e@|fca80e@|c48c1c%|a8620e%|9a620e%%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|d2d246@|7ec438@|62b62a%|70b62a%|7ec438@|7ed246#*|a8d254#|fcd246@|fcd22a@|fcb60e@|eea81c@|ee9a1c@|c48c1c%%|d2a81c%|fca80e@|fcb60e@|fcb62a@|fcd254#
+000000        |62b638%|a8c446@|c4d246@|e0c42a@|fcc41c@|fcb60e@@@@|fcb61c@|fcc41c@|fcd238@|d2d246@|8cd246@|7ed246@|70c438@|70c42a@|70b638%|000000        |fce070#|fce054%|fcd246#|eeb638%|fcc41c@|fcc40e@|fca80e@|fcc40e@@|eeb61c@|fcd22a@|fcd246@|9ac438@|7ec438@|7ed238@|8cd246@@|7ed238@|70c438@@|70b638%|000000   |fcd254@|fcd238@|fcd22a@|fcc41c@|fcb61c@@|fca80e@|eea82a@|eea81c@|ee9a1c@|eea82a@|fca80e@|fcb61c%@|fcc41c@|fcd21c@|fcd238@|eed246@|7ec438@|7ed246@@|9ac438@|eec446@|fcb62a@|fcb61c@|fcb60e@|fca80e@@|fcb61c@|b6701c%|a8620e%|9a620e%%%%|a8620e%|a8700e%|e0a82a@|fca80e@@@|fcb60e@|fcb61c@|eeb62a@|e0c446@|8cc438@|7ec438@%#|9ad246@|e0d246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca81c@|fca82a@|c47e1c%|a8620e%%%|a8700e%|d28c1c%|fcb62a@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|fcd262#|000000       |eed262#|fcd246@|fcd22a@|fcc40e@|fca80e@|fcb62a@|d28c1c%|c47e1c%%|d29a2a%|fca81c@|fca80e@|fcb60e@|fcb62a@|eec446%|eed262=|000000 |7ed246==|7ed238=|7ed246+|7ec438*|9ad254%|fcd246@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8700e%|fca81c@|fcb60e@|fcc41c@|fcc446@|9ad246@|7ec446#|7ed238*|7ed246++
+8cd262-|7ec438%%@@@@@|70c438@|d2c446@|fcc42a@|fcc40e@|fca80e@|e09a2a@|b67e1c%|a8700e%|b67e1c%|eea81c@|fcb60e@|fcc41c@|fcc438@|c4d246@|70c438@|7ed246@|7ec438@|62b62a%|000000        |e0c462=|fcc42a@|fcc41c@|fcc40e@|eea80e@|eeb61c@|ee9a0e@@|e09a1c@|fcb60e@|eeb60e@@|eec42a@|fcd246@|d2d246@|70c438@@|7ed238@|7ed246@|7ec438@|62b62a%|70b646#|000000 |fce054*|fcd246@|fcc42a@|fcb60e@@|fca80e@|fcb62a@|c47e1c%|a8620e%%%%|c48c1c%|fcb62a@|fca80e@@|fcb60e@|fcc42a@|eec438@|e0d246@|d2d254@|fce054@|fce046@|fcd238@|fcd22a@|fcc40e@@|fcb60e@|fca80e@|eea81c@|b67e1c%|a8620e%%|9a620e%%%|a8620e%%|e0a82a@|fca81c@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fce046@|fce054@|fce062@|000000  |fce062+|fce054#|fcd246*|eeb638@|fcb61c@|fcb60e@@|fca81c@|fcb62a@|fca80e@|eea81c@|ee9a1c@|fcb61c@|fcb638@|fca80e@|fcc40e@|fcc41c@|eeb62a@|fcc446*|fcd246*|fce062+|000000         |eec454=|fcc42a@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@@|fcb61c@|fcd22a@|fcd238@|fcd254@|000000         |fcc438@|fcc41c@|fca80e@|fcb62a@|e08c0e%|e09a1c%|eea81c@|fcb61c@@|fcd238@|fcd254@|a8d254=|7ed246=|7ec438=|7ed246+*
+000000         |eed254%|fcd238@|fcb60e@|fca80e@|e09a1c%|a8620e%|9a620e%|a8700e%|e0a82a@|fcb60e@|fcc40e@|fcc438@|9ac438@|70b62a%%|70c438@|7ec438@|7ec446@|70c438@|7ec446@|70c438@|7ec438@%%|fcd254@|fcd238@|fcc41c@|fcb60e@|fca80e@|e0a81c@|a8700e%|a8620e%|9a620e%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcb61c@|fcc42a@|d2c446@|70c42a%|70b62a%|62b62a%%|70c438@|7ec438@|70c438@|8cc446@|b6c446@|fcc438@|fcc42a@|fcb60e@@|fca80e@|e09a1c@|a8620e%%|9a620e%%|a8620e%%|e09a2a%|fca800@|fcb60e@@|fcc41c@|fcc438@|eed254%|c4d254*|9ad246+|c4c454=|e0c454#|eeb62a@|fcb61c@|fcb60e@@@|fca81c@|fcc446%|d29a1c%|b6701c%|a8620e%%|a8700e%|c47e1c%|e0a82a@|fcb638#|fcb60e@@@|fcb61c@|eeb62a@|e0b646@|eec454=|000000       |fcd246@|fcd238@|fcc42a@|eeb62a@|fcc41c@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcd20e@|fcb61c@|eeb638%|fcd238@|fce054@|fce070*|000000           |fce070+|fce054@|fcc438#|e0b646%|fcd22a@@|eeb638@|fcc42a@|fce038@|fcd246@|000000            |fce054+|fcc454=|fcc438@|fcd21c@|fcb61c@|fcd21c@|fcb61c@|fcc42a@|fcd238@|fcd254+
+000000          |eed254@|fcd22a@|fcb60e@|fcb61c@@|fca80e@|fca81c@|fcb60e@|fcb61c@|fcc438%|fce054#|000000        |8cd254=|7ed238=|7ed246++|b6c446%|eec438@|fcb61c@|fcb60e@|fca80e@|eea82a@|a8700e%|9a620e%%|a8620e%|c48c1c%|eea80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|a8d246#|7ec438#|7ec446#|7ed246#|7ec446*|7ec438*|7ed246*|a8d254%|e0d246@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|fcb62a@|d28c1c%|a8700e%|a8620e%%%|d28c1c%|fcb62a@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fcd254%|000000  |eed262=|fcd246@|fcd238@|fcd22a@|fcd21c@|fcc41c@|eeb62a@|fcb61c@|fcb60e@|fc9a0e@|fca81c@|fcb61c@|fca81c@|fcb61c@|ee9a1c@|fca80e@|fcb60e@|fcb62a@@|fcc41c@|fcd22a@|fce038@|fcd246@|fcd262+|000000          |fcd254@|fce046@|fcc438@|eeb62a@|fcd22a@@|eeb62a@|fcc438@|fce046@|fcd254*|000000                  |fce062+|fcd254=|000000  |fce062+|fce070+|000000              |fce070+|fcd262=|000000 |fce054%|fcd262+
+000000            |fcd254#|fcd238@|fcc42a@@@|eeb62a%|fcd238@|fcd254@|000000              |fce054@|fcd238@|fcc42a@|fca80e@|fcb61c@|fca80e@|ee9a1c@|e09a0e%|fca81c@|fcb62a%|fcb60e@|fcc40e@|fcc42a@|e0b646@|000000        |fce070=|fce054*|fcd246*|eeb638%|eeb61c@|fcb60e@|fcc40e@|fca80e@|fcb62a%|fcb60e@|eea81c@|ee9a1c@|fca80e@|fcb638@|fca80e@|fcc40e@|fcc41c@|eeb62a@|eec446#|fcd254*|fce062+|000000  |fce070%|fce054%|fcd246#|fcc438*|eec454+|fcc438@|fcd21c@|fcd20e@|fcb60e@|eea80e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcc40e@|fcd21c@|fcc42a@|eec454*|000000 |fcd254+|fce062*|fce070=|000000          |fce07e=|000000   |fce062@|fcd262#|000000 |eec462+
+000000                |fce070+|000000                   |fcd246@|fcd22a@|fcc41c@|fcb60e@|fcc40e@|fcb60e@@|fcc40e@|eeb62a@|fcc438#|fcd246@|fce062@|000000           |fce054@|fce038@|fcc438@|eeb62a@|fcc41c@|fcc40e@|fca80e@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fcc41c@|eeb638@|fcd238%|fce054@|fce070%|000000        |fcd262@|fce046@|fcd238@|eeb638@|e0b638@|fcc42a@|fcd22a@|fcb61c@@|fcd21c@|fcd22a@|fcb62a@|e0b638@|fcc438@|fce046@|fce054@
+000000                                    |fce070+|eec454=|000000 |fcd254@|fce046@|eec446#*|fcd246@|fce054@|000000                 |fcd254@|fce046@|fcc438@|eeb638@|fcd238@@|eeb62a@|fcc438@|fce046@|fcd254%|000000           |fce070=|fcd262=|000000  |eec462+|fce046@@|eec446@@|fcc446@|fce046@|fcd254@
+000000                                                                  |fce062*#|000000 |eec462=|000000                  |fce070=|000000    |fce070=
+`,
+        plano: `
+                                                                                           +    =                  =-+=#+
+                                                                                     =@%#+%@#*#@@=             +%*=%@##@#=#@# +++=:        ++ -@%        -++
+            -+*+                                                                 *#+ =%@#*%%#*%@#-=#@#       =  %%#*%*##*#%##*###*++=   =- %@##%#*%@   +**#*-    --
+         :+**##*=                                               =+++##        -=*#%@%#*#%**#**%**#@@%        %@%###**+*****#%%#****++=  %%%**#*#+###=+*+*#*+-   *##@*##
+        =++*###*+=#***=                                     =@#=%@##@%+#@%  =+*###**###+**+**#*+###*++++    +##****-::::+****###*++**+ *##***=::=**#%%***++=    %%*#*%**#
+        =++%#*@##@*##**++            +@*+%@**####**++-    =- %%#*%#*%*#%%==**+*%@@%%#***=::::-+*+*#%%@%#+=+*#%%#**+::::::+**#%%%#++++**#%#**=::::=*#%%#*++*+=*%%#*+==+*##*
+        =*####**###%#**+++        *%**%%*%#*%@*+**#*+++   %%%#*#**++****#%%%+***###***#-:::::::+****###**++*#%%##**-::::=**#%%%*       *%%#**=--=***##- ---==+%%#*::::*##%*===-
+:++*****+#%#*+-:-**###***=        -#%#+*+++***#%%++***+= *%##***-::::=***###%%%@@%%##**-:::::::+**#%%@@@@  +**#*##*#*++***##*+++         -#%#*#*#**%@%         ##**=+*##%%---==
+         #%#*+:::+*##*+++****+**+%%%#*+::::=**###+++++*+*#%##**+::::::+**##%#=--+**###**+-:::-++*###*#-       @@%*#%*##*%#*%@+           =@*+%%##@%            +=#%*%*#@=
+          #%#****#*##        ----*###**::::=*#%%@+==+===*#%%%#**=::::=**#%%%#  -%@@%#*##+***#+*#*##%@%=          %@#*%%*%@+                  +=  +=              +- #=
+            *@##%*%@              %%#*#*+=**####        =*+**##***++*#*##*+++  %%*==#%%**##*##*#%%+ =+=          =   @# =
+                +                   %@#*%*#%*+%@           @@%*#%*##*%#*#@#        %@%#*%@#*%@#*#@@
+                                    +- %@++%@                 %@#*%%*#@#           ==  +@@###@%
+                                                                  *# -                  =    =
+`
+      },
+      {
+        color: `
+000000                                                                                          |fce070+|000000    |fce062=|000000                    |fce062*|e0c462=|eec462#|eed262+|fce062%
+000000                                                                                     |fce062@|fcd254%|eec454@|e0b646#|eec454%|fce046@|fcd246@|e0b638@|eec446@|fcd246@|fce046@|fcd254@|000000               |fce062@|fcd246@|e0b646%|eec446@|fce038@|fcc438@|fcb62a@|fcd238@@|e0b654#|eec446+|fcd254%|fce062@|000000 |9ae054*|8cd246#|7ec446#*=|000000        |fce070+|000000  |fcd254*|fce054@|eed254=|000000        |7ec446+|8cd246*|9ae054*
+000000            |7ec446+|7ed246#|8cd246%|9ae054#|000000                                                                 |fce062=|fcd254=|000000  |fcc446@|fce038@|fcd22a@|eeb62a@|fcb61c@|fcd21c@|fcc41c@|eeb61c@|fcb61c@|fcd21c@|fcd22a@|d2b638@|eec446+|fcd246%|fce054@@|000000        |fce062*|fcd246*|fcc446=|fcc454%|fcd22a@|fcc41c@|eea80e@|fcc40e@|fcb60e@|fca80e@|fcc40e@|fcb60e@@|fcd21c@|fcd22a@|c4c446@|b6d262*|9ad238@|9ae046@|8cd246@|7ed238@|70c438@@|70b646*|000000     |eed270=|fcd238@|fcd22a@|eeb62a@|fcc41c@|fcd21c@|eeb62a@|fcc438@|fce046@|fce062#|000000   |70c438@|7ec438@|7ed238@|8ce046@|7ed238@|8cc454+|000000    |9ae062=|8cd246=
+000000         |70b646=|70c438@|7ec438@|7ed238@|8cd246@|8ce046@|7ed238@|8cc446*|000000                                                |fce062#|eec454=#*|fce062@|fcd270=|000000       |7ec446=#|8cd246@|eed246@|fce046@|fcd238@|fcc42a@|eeb62a@|fcb61c@|fcc40e@|fcb60e@|eea80e@|fcb60e@@|fca80e@|fcb60e@@|eea80e@|fcb60e@|fcd21c@|fcd22a@|fcd238@|eec454+|000000        |eec454%|fcd238@|fcd22a@|fcc41c@|fcb62a@%|fcb60e@|eea81c@|fca80e@|eea80e@|eea81c@|fca80e@|fcb60e@|eea80e@|fcb60e@|fcc42a@|fcd238@|fcd246@|b6d246@|7ed238@|8cd246@@|70c438@|70b62a%|70b646#|000000  |fcd246@|fcd238@|fcc41c@|fcb62a@|fcb61c@|fca80e@@|fcb61c@|fca80e@|fcc40e@|fcc42a@|fcc446%|fcd246#|fce054#|8cc438@|70c438@|7ed238@|8cd246@|7ec438@|70c438@|7ec454+|000000   |e0e062%|b6d246@@|fce046@|d2c438@|b6c446@|fce054#
+000000        |70b646*|70b62a%|70c438@|7ec438@|8cd246@@|9ad246@|9ad238@|7ec446#|9ad254+|9ae046@|8cd238@|7ed238@|7ec438@#|000000                                      |fce062@|fcd254@|eeb638@@|fce038@|fcc438@|eeb62a@|fcd22a@|fcd238@|eec446%|eeb646*|fcd254@|fce054@|000000  |70b638*|70c438@@|7ed238@|9ad246@|b6c446@|eeb62a@|fcc41c@|fcc40e@@|fca80e@|eeb638#|fcb61c@|fca81c@|eea81c@@|fca81c@|fcb61c@|c4a81c%|fca80e@|fcb60e@@|eea80e@|eeb62a@|fcc438%|fcd246@|fce054@|fce062%|000000   |fce070=|fce054%|fcd238@|fcc42a@|fcb60e@|fca80e@@|fcb62a@|c47e1c%|a8620e%%%|a8700e%|d29a1c%|e0b61c@|fca80e@|fcb60e@@|fcb62a@|e0c446@|9ac446@|7eb638@|70c42a@|70c438@|7ed246@|7ec438@|70b646%|000000 |e0d254=|eeb638@|fcb61c@|fcb60e@|fca80e@|eea82a@|c47e1c%|a8701c%|b6701c%|d28c1c%|fcb638%|fcb60e@|fcc40e@|fcc42a@|fcc438@|a8c446@|7ed238@|7ed246@|70c438@|70b62a%|70b646*|000000    |fcc446@|fcd21c@|fcb60e@@@|fcc41c@@|e0b638#|fce054*
+000000        |62b62a%|70c438@@|b6d246@|e0d246@|b6c438@|fcc42a@|fcd22a@|d2b646@|eed246@|c4d246@|8cd246@|8ce046@|7ed238@|70c438@@|70b638%|000000            |fce062@|fcd254%|eec446*%|fce046@|fcc438@|8cc438@|9ad238@|b6e046@|8ce046@|8cd246@|8ce046@|7ed238@@|70c438@@|70b646+|000000    |fce062*|fcd254*|fcc446+|eec454#|fcd22a@|fcc41c@|fca80e@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcd21c@|fcd22a@|fcc454#|000000 |9ab646%|7ec438@|70c438@|9ad246@|fce054@|fce046@|fcd238@|fcd21c@|fcc40e@|fca80e@@|fca81c@|fcb62a@|c48c2a%|a8700e%|a8620e%|a8700e%|a8620e%|b6701c%|e09a1c%|e0b61c@|eea80e@|fcb60e@|fcc40e@@|fcd22a@|fcd238@|fcd246@|a8d254%|7ec446*|7ec438*|7ec446#%|b6c446@|fcc438@|fcc41c@|fcb60e@@|fca800@|d29a2a%|a8620e%%|9a620e%%|a8620e%%|e0a81c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fcd254@|d2d254@|7ec446@|70c438@@|7ec438@|7ed246@|9ad246@|eed254@|fcd238@|fcc41c@|fcb60e@|fca80e@|c48c1c%|a8620e%|9a620e%%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|e0d246@|7ec438@|62b62a%|70b62a%|7ec438@|7ed246#*|8cd246*|fcd246@|fcc42a@|fcb60e@|eea80e@|e09a1c@|c48c1c%|c47e1c%|d2a81c@|fca80e@|fcb60e@|fcc42a@|eec454%
+000000        |62b638%|b6c446@|d2d246@|d2c42a@|fcc41c@|fcb60e@|fca80e@|fcb60e@@|fcc41c@|e0b61c@|eed238@|e0d246@|8cd246@|7ed246@|70c438@|70c42a@|70b638%|000000        |fce062*|fcd254*|fcc446=@|fcd21c@|fcb60e@@|fcc40e@|fcb60e@|fcb61c@|fcd22a@|eed238@|7ec438@@|7ed238@|8cd246@@|7ed238@|70c438@@|70b638%|000000   |eec454*|fcc438@|fcd22a@|fcc40e@|fcb60e@|fcb62a%|fcb61c@|eea82a@|eea81c@|ee9a1c@|fcb62a@|fca80e@|fcb60e@|fcb61c@@|fcc42a@|fcd238@|fcd246@|b6d246@|7ed246@@|8cc438@|eec446@|fcc42a@|fcb61c@|fcb60e@@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%%|a8620e%|a8700e%|e0a82a@|fca80e@@@|fcb60e@|fcb61c@|fcc42a@|e0c438@|b6c438@|8cc446@|7ec438%|7ed246%|c4d246@|fcd246@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca81c@|fca82a@|c47e1c%|a8620e%%%|a8700e%|d28c1c%|fcb638@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcc446@|000000        |eec462*|fcd246@|fcd22a@|fcc40e@|fcb61c@|fcb62a@|d28c1c%|c47e1c%%|d29a1c%|fca82a%|fcb60e@@|fcb62a@|e0b646@|000000  |7ed246==|7ed238=|7ed246+|7ec438*|9ad246#|fcd246@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8700e%|fca81c@|fcb60e@|fcc41c@|fcd246@|a8d246@|7ec446#|7ed238*|7ed246++
+8cd262-|7ec438%%@@@@@|70c438@|b6c446@|fcc42a@|fcb60e@|fca80e@|d29a2a@|b67e1c%|a8700e%|b67e1c%|eea81c@|fcb60e@|fcb61c@|fcc438@|b6d246@|7ec438@|7ed246@|7ec438@|62b62a%|000000        |eec454@|fcd22a@|fcc41c@|fcb60e@|e0a82a@|fcb61c@|e09a0e%|ee9a1c@|ee9a0e@|fcb60e@|eeb60e@|fcb61c@|fcd22a@|fcd246@|d2d254@|70c438@@|7ed238@|7ed246@|7ec438@|62b62a%|70b646#|000000 |fce054@|fcd246@|fcc42a@|fcb60e@@|fca80e@|fca81c@|c47e1c%|a8620e%%%%|c48c1c%|fcb62a%|fca80e@|fcb60e@@|fcb62a@|e0b638@|b6d246@|9ac446@|d2d246@|fcd246@|fcd238@|fcd22a@|fcc40e@@|fcb60e@|fca80e@|eea81c@|b67e1c%|a8620e%%|9a620e%%%|a8620e%%|e0a82a@|fca80e@@|fcb60e@|fcc40e@|fcc41c@|fcd22a@|fcd238@|fce054@|fce062%|000000   |fcd254=|eec454+|eeb638@|fcc41c@|fcc40e@|fcb60e@|fca82a@|fcb61c@|fca80e@|fca81c@|e09a1c%|fcb61c@|eea82a@|fcb60e@@|fcb61c@|eeb638@|fcd246%|fce054%|fce062#|000000        |fce062+|fcd254+|fcc446@|fcc41c@|fcc40e@|eea80e@|fcb60e@|fca80e@|fcb60e@|fcc41c@|fcb62a@|fcc438@|fcd246@|fce054@|000000        |e0c462=|fcc438@|fcc41c@|fcb61c@|fcb62a@|e08c0e%|e09a1c%|fca81c@|fcb61c@|fcc42a@|fcd22a@|fcd254@|8cd254=|7ed246=|7ec438=|7ed246+*
+000000         |fce054*|fcc438@|fcb60e@|fca80e@|e09a1c%|a8620e%|9a620e%|a8700e%|ee9a1c@|fcb60e@@|fcc438@|a8c438@|70b62a%%|70c438@|7ec438@|7ec446@|70c438@|7ec446@|70c438@|7ec438@%%|eee054%|fcd246@|fcc41c@|fcb60e@|fca80e@|eea81c@|a8700e%|a8620e%|9a620e%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcb61c@|fcc42a@|d2c446@|70c42a@|70b62a%|62b62a%%|70c438@|7ec438@|70c438@|7ec438@|9ac438@|eec438@|fcc41c@|fcb60e@@|fca80e@|e09a1c@|a8620e%%|9a620e%%|a8620e%%|e09a2a%|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fcd246@|fce062*|eed262+|fcd254*|fcc446#|eeb62a@|fcb61c@|fcb60e@@|fca80e@@|fcc446#|d29a2a%|b6701c%|a8620e%%|a8700e%|c47e1c%|e09a2a@|fcb638#|fcb61c@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|eeb638@|e0c462-|000000      |fce062@|fce046@|fcd238@|fcc438#|eeb62a@|fcc41c@|fcb60e@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|eeb61c@|fcc42a@|fcd238@|fcd254@|000000             |fce054@|fcd246@|eeb638@|fcc438@|fcd22a@|fcc42a@|eeb638@|fcd238@@|eed270=|000000            |eed262+|fcd238@|fcc41c@|fcb61c@|fcc41c@|eeb61c@|fcd22a@|fcd238@
+000000          |fcd254@|fcd22a@|fcb62a@|fcc42a@|fca80e@@@|fcb61c@|fcb62a@|fcd238%|fce054@|000000        |8cd254=|7ed238=|7ed246++|b6c454#|eec438@|fcb61c@|fcb60e@|fca80e@|eea81c@|a8700e%|9a620e%%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|fce054@|a8d246#|7ec438#|7ec446#|7ed246#|7ec446*|7ec438*|7ed246*|c4d254@|fcd246@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|fcb62a@|d28c2a%|a8700e%|a8620e%%|a8700e%|d28c1c%|fcb62a@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcc438@|eec462+|000000   |eec454#|fcc438@|fcd22a@|fcd21c@|fcc40e@|fcb61c@|fcb62a#|fcb60e@|fca80e@|eea82a@|fcb61c@|fca81c@|fcb61c@|eea838@|fca80e@|fcb60e@|fcb61c@|eea81c@|fcb62a@|fcc42a@|fcd238@|fce046@|fce062@|000000         |eed270=|fce046@|fcd238@|eeb638@|fcc42a@|fcd22a@|fcc42a@|fcc438@|fcd238@|fcd246@|000000                    |fce062#|000000   |fce070+|000000              |fce062=|000000 |eec462=|fce054%|000000  |fce062=
+000000            |fcd254@|fcd238@|eeb62a@|fcd22a@|fcc42a@@|fcd238@|fcd254#|000000              |fcd254@|fcd238@|fcc42a@|fcb61c@|fcb62a%|fca81c@|e09a1c%|e09a0e%|eea80e@|fcb638%|fcb61c@|fcc40e@|fcc42a@|fcc438@|000000          |eec454=|eeb638@|fcc41c@|fcc40e@|fcb60e@|fca81c@|fcb61c@|fca80e@|fca81c@|ee9a0e@|fcb61c@|eea82a@|fcb60e@|fcc40e@|fcb61c@|eeb62a@|fcd238#|fcd246#|fce062#|000000  |fce070*|fce054@|fcd246@@|fcc438*|eec446#|fcc42a@|fcd21c@|fcc40e@|eea80e@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcd21c@|fcd22a@|fcc438@|000000                 |fcd262=|fce054@|eec454=|eec462*|eec454+|fce070+
+000000               |fce062=|000000                    |fcc454#|fcd22a@|fcc41c@|eea80e@|fcc40e@|fcb60e@@|fcc40e@|fcc42a@|eec446#|fcd246*|fce062#|000000          |fce062%|fce046@|fcd238@|fcc438#|eeb638@|fcc41c@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcd20e@|fcb61c@|eeb62a@|fcd238@|fce046@|000000          |fcd246@|fce046@|fcc438@|eeb62a@|fcb62a@|fcd22a@|fcd21c@|fcb61c@|fcc41c@|fcd22a@@|e0b638@@|fcd254@|fce062@|fce070*
+000000                                    |fce070*|fce054*|e0c454+|eec446*|fce046@|fcd246@|e0b654+|fcc446#|fce054@|fcd262#|000000                |fce054@|fcd246@|eeb638@@|fce038@|fcc42a@|eeb638@|fcd238@|fce046@|eed262=|000000            |fce062#|fcd254=|e0b654-|000000 |fcd254@|fce046@|fcd246@|eec446@@|fcd246@|fce054@|eed262*
+000000                                                                  |fce062@|eed262=|e0c454=|eec462=|000000                   |fce070+
+`,
+        plano: `
+                                                                                          +    =                    *-++%
+                                                                                     @%#+#@%*#%@%               @%*#@##%@+=%@ +++=:        +  *@=        -++
+            -+*+                                                                 =-  %@%##@%*#@%*=#@@        *+-#%%*##*%**%%#=*##**+=     =%%##%*#@#   +**#*-    --
+         :+**##*=                                                #=*+@-       -=*%@@%**%#*##*##*#%@%=        #%%%#****+*****%@@#***++=  @%%*#**#*##*##*+*#*+-   ###@#**
+        =++*###*+=#***=                                      @@#*@%#%@*=%@  =++*#**#%%*+#****#+*#***#%@%   =%%##***-::::=**####*+++**+ -##***-::=*####***++=    %%*#*##+*
+        =++#%*%%*%###**++            @#+*@%**####**++-    **=*%%*##*%**%%* +++#@@@%#*+**=::::-+***#%%%%*==+**###**+::::::+*##%%%%*++***%%##*=::::=*#%%%*++*+==%%#*+==+*##*
+        =#%###*#*#*%%**+++        *+=#%#*%*#@%*+**#*+++   +%%%#*#*++**#*#%@@#***####**#-:::::::+****###**++#%%%#***-::::=**##%#        +%%##*=--=**###  ---==+%%**::::**#%#+==-
+:++*****+*##*+-:-**###***=        #%%#**+++#*#%@#++***+= %%%#***-::::=***####*#%%%%##**-:::::::***##%%@@%   -=*###*#**+#*##*##%#        ==###+#*####@@        -%###=+*##%%---==
+         *%#*+:::+*##*+++****+**+%%%#*+::::=**###+++++*+**###**+::::::++*#%%%*+**#******+-:::-++######-      %@%*#%#*%*#%*#@@             @%*#@##%@-            =%%#%*%%
+          %%##***###%        ----+##***::::=**#%%+=++===%%@%%***=::::=**#%%%+   *%%%%*+#**#*#**##*#%@@@         -@%##@##@@                    #   +              = -%  =
+            @%*%##@*              %%%#**+++**%%#          -*#%#*#**+#**###*##  *@@%+*#%#*##*#%**%%#                 =@-+=+
+               =                    *%%*##*%%++*          #@%*#%#*%*#%*#%@          %@%*#%%*#@%**%@+
+                                    ++==@%=*@*                @%##@##%@-            #=: %@%##%@+
+                                                                  %---                   +
+`
+      }
+    ]
   },
   {
     cols: 160, alto: 13,
-    color: `
-000000                                                                                 |fce062#|fcd262+|000000   |fce062%|fce070=|000000                 |fcd262+|fce062%|000000 |eec462+|fcd254#|fce062%
-000000                                                                            |fcd262*|fce062@|fcd254#|e0b646*|eec446#|fce046@|fcd238@|eeb638@|eec438@|fcd238@|fce046@|fcc454%|000000              |fce054@|fcd246@|eeb638@|fcc438@|fcd22a@|fcb62a@|fcc42a@|fcd22a@|fcc438@|000000 |fcd254+|fce070+|9ae054=|8ce046#|7ed246#|7ec438*+|000000       |fce062=|000000  |fce054@|fcd254@|000000 |eec462=|fce070=|000000     |7ec438+|8cd246#|9ae054*
-000000          |7ec446=*|7ed238%|9ae054@|8cd254+|000000                                                              |fcd238@|fcd22a@|fcc41c@|eeb61c@|fcc41c@|fcd21c@|fcb61c@|fcb60e@|fcd21c@|fcc41c@|e0b62a@|fcc438%|fcd246@|fce054@|000000        |fce070+|fce054%|fcd246#|fcc446%|fcc41c@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@@@|fcd21c@|fcd238@|d2d254%|8cd254@|8cd238@|8cd246@|7ed238@|70c438@@|70b638#|000000     |fcd238@|fcd22a@|eeb61c@|fcc41c@@|fcb61c@|fcd22a@|fcd246@|000000   |70c438@@|8cd238@|8cd246@|7ed238@|000000    |9ae062=|8cd246*|9ad246+
-000000        |70b638+|70c438@|7ec438@|7ed238@|8ce046@|7ed238@|7ec438@|000000                                         |fce062*|000000  |fcd254@|fce054@|eec446#%|fce054@|fcd262#|000000     |7ec446=|7ec438#@|c4d246@|fce054@|fcd238@|fcc42a@|fcb638@|fcb61c@|fcc40e@|fca80e@@|fcb60e@|fca80e@|fcb60e@@|eea80e@|fcc40e@|fcd21c@|fcc42a@|eec454*|000000        |eec454+|eeb638@|fcc41c@|fcc40e@|fcb61c@|fcb62a%|eea81c@|e09a1c%%|eea81c@|eea80e@|fcb60e@|fca80e@|fcb61c@|fcd22a@|fcd246@|fcd254@|7ec438@|7ed238@|8cd246@|7ed238@|70b62a%|70b646*|000000 |fcd262#|fcd246@|fcd22a@|fcc42a@|fcb61c@|fca80e@@|eea81c@|fcb60e@|fcb62a%|fcc42a@|fcd22a@|fcd238@|d2c446@|70c438@|7ed238@|7ed246@|70c438@@|000000    |eee046@|d2d238@|eec42a@|fcd238@|d2b638@|fcd246@|fcd262+
-000000       |70b646*|70b62a%|70c438@|7ed238@|a8d246@|7ed238@|c4d246@|c4c446@|b6c470+|a8d246@|9ae046@|7ed238@|7ec438@@|70b638*|000000               |fce062%|b6c446=|8cc446+#|8cd246#|9ae054*+|7ed238*|7ec438*|7ec446+|000000         |fcd246@|fcd22a@|eeb62a@|fcc41c@|fcd21c@|fcb61c@|fcc41c@|fcd21c@|eeb638%|fcc438#|fce054@|fce070+|000000 |70b638%|70c438@|7ec438@|9ad238@|b6d246@|e0b638@|fcb62a@|fcc40e@@|fcb60e@|fcb638*|fcb61c@|e09a2a%|e09a1c%|d28c1c%|ee9a1c@|d2a81c@|fca80e@|eeb60e@|eea80e@|fcb60e@|fcd21c@|fcd238@|fce046@|fcd254@|000000    |fcd254@|fcd238@|fcc41c@|fcc40e@|fca80e@|fca81c@|c48c1c%|a8620e%%|9a620e%|a8620e%|b67e1c%|eea81c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|eec446@|9ac438@|70b62a%|62b62a%|70c438@|7ec438@|7ec446@|c4d246#|eec446@|fcc42a@|fcb60e@|fca80e@|eea81c@|a8700e%|a8620e%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|b6c446@|8cd246@|7ec438@|70b62a%|70b638%|000000   |fcd254%|fcd238%|eeb61c@|fcb60e@|fca80e@|fcb60e@@|eec41c@|fcc42a@|fcd246@|fce062+
-000000       |70b646%|70b62a%|8cc438@|b6d246@|fcd238@|fcb61c@|fcc41c@@|fcb61c@|fcd238@|a8c438@|a8d246@|9ad246@|70c438@@|70b638%|000000          |fcd254@|fcd238@|eec438@|fcc42a@|fcd22a@|eeb62a@|fcc438@|fce046@|e0d246@|7ed238@@|8ce046@|8cd246@|7ed238@|70c438@|70b638%|70b646=|000000   |fcd262%|fcd246@|fcd238@|fcb62a@|fcb61c@|fcb60e@|fca80e@|fcb60e@|fc9a0e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|fcc438@|fcc454=|b6c446@|9ac438@|70c438@|d2e054@|fce046@|fcd238@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fca82a@|e0a82a@|a8700e%|a8620e%%%%|a8700e%|d2a82a@|fca80e@@|fcb60e@@|fcb61c@|eeb638@|e0b646@|8cc438@|7ec438@|70c438@|8cc438@|eec446@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%|a8620e%%|fca81c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|fce062#|b6d254*|7ed246*|7ec446*+|8cd246+|eee062*|fcd246%|fcc42a@|fcb60e@|fca80e@|ee9a1c@|a8620e%|9a620e%|a8620e%|a8701c%|eea81c@|fca80e@|fcb60e@|fcc42a@|e0d246@|8cc446@|70c438@|7ec438@@|70c438@|8cd246@|c4d246@|fcc42a@|fcb60e@|fca80e@|c49a1c%|a8700e%|a8620e%|b68c1c%|fca80e@|fcb60e@|fcc42a@|fcd262*
-8cd254=|7ec438%##*+|7ed238+|70c446%|9ac446@|fcd238@|fcc41c@|eeb60e@|eea81c@|d28c0e%%|fca81c@|fcb61c@|fcc41c@|fcc438@|9ac438@|7ed246@|7ed238@|70b62a%|70b646%|000000       |fce054%|fcd238%|fcc438%|fcc42a@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|eeb61c@|e0c41c@|eed238@|eed246@|9ad246@|7ed238@|8cd246@|7ed246@|70c438@|62b62a%|70b646=|000000 |fce054*|fcd246%|fcb62a@|fcb60e@@|fca80e@|eea838%|d28c1c%|c47e1c%%|d28c2a%|fca81c@@|fcb60e@|fcc40e@|fcd22a@|fcd246@|d2c446@|7ed238@|7ec438@|e0c446@|fcc438@|fcb61c@|fcb60e@@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%|a8620e%%|b67e1c%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd246@|fce054@|e0e062#|000000 |fce062=|fce054*|fcd246#|fcb62a@|fcb60e@@|fca80e@|fcb638%|e09a1c%|c48c1c%|c47e1c%|d29a1c%|eea82a@|fcb61c@|fcb60e@|fcc40e@|fcd22a@|fcd246@|fcd262@|000000       |fcd270+|fcd246@|fcd22a@|fcc42a@|fcb62a%|fca80e@|ee9a0e@@|fcb61c@|fcb62a%|fcc42a@|fcc41c@|fcd238@|fcd262@|000000       |fcc446@|fcc41c@|fcb60e@|e09a2a@|b67e1c%%|d28c2a%|fca81c@|fcb60e@|fcc42a@|c4c446@|7ec438%@|7ed246@@|70b646+
-000000     |7ed238=|7ed246+|a8d246*|fcd246@|fcc42a@|fcb60e@|fca80e@|b67e1c%|9a620e%%|b6701c%|fca80e@|fcb60e@|fcc42a@|d2c446@|62b62a%|70c438@|7ec446@|70c438@|7ed246**+|7ed238+|7ed246+|7ec438=|d2d254+|eec438@|fcb61c@|fcb60e@|fca81c@|c49a1c%|b67e1c%|a8700e%|b67e1c%|c4a81c%|fca80e@|fcb60e@|fcb61c@|e0c446@|7ec438@|70b62a%|70c42a@|70c438@|7ed238@|7ec438@|70c446@|8cc446*|eec454@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb62a@|a8700e%|a8620e%|9a620e%%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd246@|d2d254@|fce054@|fce046@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|eea80e@|eea82a@|b67e1c%|a8620e%%%%|b6701c%|e0a838@|fca81c@|fcb60e@@|fcb61c@|fcb62a@|eeb638@|e0c454@|000000     |fce054@|fcd246@|fcd22a@|fcc438@|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcd21c@|fcc42a@|eec454*|000000            |fcd238@|fcd21c@|eeb61c@|fcc41c@@|fcb61c@|fcd22a@|fcd246@|000000          |fce054+|fcc446*|fcc438@|fcc40e@|fca80e@|fcb60e@@|fcc42a@|fcc446#|fcd246#|fce062+
-000000         |fcd246@|fcc42a@|fcb62a@|fcb61c@|e09a0e%%|fcb61c@|fcb62a@|fcc41c@|fcd238@|d2d254#|8cd254-|7ec446=|7ec438=|7ed246+|7ec438+|7ec446**|7ec438*#|b6d254#|fce054@|fcd238@|fcc40e@|fcb60e@|fca81c@|b6701c%|a8620e%|9a620e%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|e0d254@|70c438@@@@%|7ed246%|d2d254@|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@|fca81c@|c48c1c%|a8620e%%%%|c48c2a%|fca81c@|fcb60e@@|fcb61c@|eec438@|eec454#|000000   |eec462=|eeb638@|fcc41c@|fcc40e@@|fca81c@|fcb638#|fcb61c@|e09a1c@|ee9a1c@|e09a1c%|fca81c@|eea82a@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcc42a@|fcd238@|fce046@|fce062@|000000        |fcd246@|fcd238@|eeb62a@|fcb61c@|fcd21c@|fcb61c@|fcc42a@|fcd22a@|eeb638@*|fcd254%|fce070%|000000            |fce062*|eec454=|000000 |fce054%|fcd254#|000000               |fce054#|eec446*|fcd246#@|e0b654=|fce054+
-000000          |fcd262+|fcd238@|fcb61c@|fcc41c@|fcc42a@@|fcd238@|000000              |fcd254@|fcd22a@|fcc40e@|fcb62a@@|d28c1c%|e08c1c%|e09a0e%|fcb62a@|fcb61c@|fcc40e@|fcc41c@|fcc438@|000000         |eec454*|fcc42a@|fcc41c@|fcc40e@|fca81c@|fcb62a%|eea80e@|ee9a1c@|e09a0e%|fcb62a@|fca80e@|fcb60e@@|fcb61c@|fcd238@|fce054@|fce070*|000000   |fce054@|fce046@|fcd238@|fcc438%|eeb638@|fcc41c@|fcc40e@|fca80e@@|fcb60e@|fca80e@|fcb60e@@|eea80e@|fcb60e@|fcd21c@|fcd22a@|eec446%|000000           |fce070*|000000  |fcd254@|fce054@|eec446*|eec454#|fce062#=
-000000                                 |fcc454%|fcd21c@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcd22a@|eec454*|fcc446+|fce054*|000000         |fce054@|fcd246@|fcc446*@|fcc41c@|fcb60e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fcb60e@|fcb61c@|fcd22a@|fcd238@|000000         |eec454+|fcd238@|fcd22a@|fcc42a@|eeb61c@|fcc41c@|fcd21c@|fcb61c@@|fcd22a@|fcc42a@|e0b638%|eeb638%|fcd246@|fce054@|fcd270=
-000000                                 |fce062@|fcd254%|eeb646#|fcc446%|fce046@|eec446#|eec454*|fce054*|000000              |eed262=|fce046@|fcd246@|e0b646%|fcc42a@|fcd22a@|eeb62a@|fcc438@|fce046@|eec454+|000000 |fce062+|000000         |fce062#@|fcd254*|000000 |eec454#|fce046@|fcd238@|eeb646@|eec446@|fcd246@|fce054@|eec462=
-000000                                                           |fce062#|fce054#|000000                    |fce062#|fcd262+
+    marcos: [
+      {
+        color: `
+000000                                                                                 |fce070=|000000  |eec462+|000000 |fce062*|000000                   |fce062*|e0b654=|eec454#|fce054*|fce070*
+000000                                                                             |fce062@|fcd254%|e0b646#*|fce046@|fcd246@|eeb638@|eec438@|fcd238@|fce046@|eec454*|000000  |fce062=|000000           |fce054@|fcd246@|eeb638@|fcc438@|fce038@|fcb62a@|fcc42a@|fcd238@|eec446@=|fcd246#|fce054@|a8e062*|8ce046%|7ed246%|7ec438#+|000000       |fce062+|000000  |fce046@|fcd246@|000000        |7ec438*|8cd246#|8ce046*
+000000          |7ec446+#|7ed238@|9ae054@|8cd254*|000000                                                              |fcd246@|fcd238@|fcc42a@|eeb61c@|fcc41c@|fcd21c@|fcb61c@|fcb60e@|fcd21c@|fcc41c@|e0b62a@|fcc438@|fcd238@|fce046@|fcd262*|000000       |fce062%|fce046@|fcd238%|fcc438%|fcc42a@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@@@|fcd21c@|fcd22a@|d2c454@|9ac446@|9ad246@|8cd246@@|70c438@@|70b638%|000000     |fcd238@|fcd22a@|eeb61c@|fcc41c@@|fcb62a@|fcd22a@|fcd254@|000000   |70c438@@|8cd246@@|7ed238@|000000    |9ae054+|8cd246*|9ad246+|d2d254=
+000000        |70b638*|70c438@|7ec438@|7ed238@|8ce046@|7ed238@|7ec438@|000000  |8cd254-|000000                                      |fce062+|eec462=|000000 |fcd254#|fce054@|e0c446%|eec446@|fce054@|fcd262+|000000     |7ec446+|7ec438%@|d2d246@|fce046@|fcd238@|fcc42a@|fcb62a@|fcb61c@|fcc40e@|fcb60e@|fca80e@|fcb60e@|fc9a0e@|fcb60e@@|eea80e@|fcc40e@@|fcc41c@|eec446%|eec454=|fcd246=|fce062=|000000     |eec454*|eeb62a@|fcc41c@|fcc40e@|fcb61c@|fcb638%|ee9a1c@|e09a1c%|d28c1c%|e09a1c@|eea81c@|eeb60e@|fca80e@|fcb60e@|fcd22a@|fcd238@|eed254@|8cc438@|7ec438@|7ed246@|7ed238@|70b62a%|70b646#|000000 |fcd254@|fcd238@|fcc41c@|fcc42a@|fcb61c%|fca80e@|eea80e@|ee9a0e@|fcb61c@|fcb62a%|fcc42a@|fcd22a@|fcd246@|b6c446@|70c438@|7ed246@|7ed238@|70c438@@|000000    |fcd246@|d2c438@|fcc42a@|fcd22a@|c4b638@|fcd246%
+000000       |70b646*|70b62a%|70c438@|7ed238@|a8d246@|7ed238@|c4d246@@|9ad270-|8cd246@|8ce046@|7ed238@|7ec438@|70c438@|70b638#|000000               |fce062%|b6c446+|7ec438*|7ed246#|8cd246#|9ae054**|7ed238*|7ec438*|7ec446+|000000         |fcd246@|fcd238@|eeb62a@|fcc42a@|fcd22a@|fcb61c@|fcc41c@|fcd22a@|eeb638%|fcc438%|fce046@|fce062%|000000 |70b638%|70c438@|7ec438@|9ad238@|b6d246@|e0b62a@|fcb61c@|fcc40e@@|fcb60e@|fcb638*|fcb62a@|e09a2a%|d29a1c%|d28c1c%|e09a1c@|d2a81c@|fca80e@|eea80e@@|fcb60e@|fcd21c@|fcd22a@|fce046@|fcd254@|000000    |eee054@|fcd238@|fcd21c@|fcc40e@|fca80e@|fca82a@|c47e1c%|a8620e%%|9a620e%|a8620e%|b6701c%|eea81c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|d2c446@|9ac438@|70b62a%|62b62a%|70c438@|7ec438@|70c438@|8cc438#|e0c446@|fcc42a@|fcb60e@|fca80e@|eea81c@|a8700e%|a8620e%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|c4c446@|8cd246@|7ec438@|62b62a%|70b638%|000000   |fcd246@|fcd238%|eeb61c@|fcb60e@|fca80e@|fcb60e@@|eec41c@|fcc438@|fce054%
+000000       |70b646%|7ec438@|8cc438@|b6d246@|fcd238@|fcb62a@|fcc41c@@|fcc42a@|fcd238@|9ac438@|9ad246@|8cd246@|70c438@@|70b638%|000000          |fcd254@|fcd246@|eec438@|fcc42a@|fcd22a@|eeb62a@|e0c438@|fce046@|b6d246@|7ed238@@|8ce046@|8cd246@|7ed238@|70c438@|70b638%|70b646=|000000   |fcd254@|fcd246@|fcd22a@|fcb62a@|fcb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|fcc438@|fcc454+|c4c446@|a8c446@|70c438@|d2e054@|fce054@|fcd238@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fca82a@|e0a82a@|a8700e%|a8620e%%%%|a8700e%|d2a82a@|fca80e@@|fcb60e@@|fcb62a@|eeb638@|b6c446@|8cc438@|7ec438@|70c438@|8cc438@|d2c446@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%|a8620e%%|fca81c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|fce062#|a8d254*|7ed246*|7ec446*+|7ed246+|b6d254*|fcd254%|fcc42a@|fcb60e@|fca80e@|ee9a1c@|a8620e%|9a620e%|a8620e%|a8701c%|eea81c@|fca80e@|fcb60e@|fcc42a@|e0d246@|8cc446@|70c438@|7ec438@@|70c438@|7ec438@|a8d246@|fcc438@|fcb60e@|fca80e@|c49a1c%|a8700e%|a8620e%|b68c1c%|fca80e@|fcb60e@|fcc42a@|fcd254#
+8cd254=|7ec438%#**|7ed238+|7ed246=|70c446%|a8c446@|fcd238@|fcc41c@|eeb60e@|eea81c@|e08c0e%%|fcb62a@|fcb61c@|fcc41c@|fcd246@|9ac446@|7ed246@|7ed238@|70b62a%|70b646%|000000       |fce054@|fcd238@|fcc438@|fcc42a@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|eec41c@|d2c42a@|e0d238@|e0d246@|7ec438@|7ed238@|8cd246@|7ed238@|70c438@|62b62a%|7eb646=|000000 |fce054*|fcc446%|fcb62a@|fcb60e@@|fca80e@|eea838%|d28c1c%|c47e1c%%|d28c2a%|fca81c@@|fcb60e@|fcc40e@|fcd22a@|fcd246@|c4d246@|7ed246@|70c42a@|a8c438@|eec438@|fcb61c@|fcb60e@|fca80e@@|fcb61c@|b6701c%|a8620e%|9a620e%%%|a8620e%%|b67e1c%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fce046@|fce054@|e0d262#|000000 |fce062+|fce054#|fcc446%|fcb62a@|fcb60e@@|fca80e@|fcb638%|e09a1c%|c48c1c%|c47e1c%|d28c2a%|eea81c@|fcb62a@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fcd262%|000000       |eed270*|fcd246@|fcd22a@|fcc42a@|fcb62a%|fca80e@|ee9a1c@@|fcb61c@|fcb62a%|fcc42a@|fcd22a@|fcd246@|fcd262*|000000       |fcc438@|fcc41c@|fcb60e@|e09a2a@|b6701c%|a8701c%|c48c2a%|fca81c@|fcb60e@|fcc42a@|c4c446@|7ec438@@|7ed246@|7ed238@|70b646+
+000000    |7ed246=|7ec438+|7ec446*|7ec438*|e0d254@|fcc42a@|fcb60e@|fca80e@|b6701c%|9a620e%%|b6701c%|fca80e@|fcb60e@|fcc42a@|d2c446@|70b62a%|70c438@|7ed246@|70c438@|7ed246++==|8cd254=|7ed238-|9ad254=|eeb638@|fcb61c@|fcb60e@|fca81c@|c49a1c%|b67e1c%|b6701c%|c47e1c%|c4a81c@|fca80e@|fcb60e@|fcc42a@|eeb638@|8cc446@|70b62a%|70c438@@|7ed238@|7ec438@|70b646%|8cd246+|d2d254@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb62a@|a8700e%|a8620e%|9a620e%%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|eed246@|c4d246@|fcd254@|fce046@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|eea80e@|eea82a@|a8701c%|a8620e%%%%|a8701c%|e0a838@|fca81c@|fcb60e@@@|fcb62a@|eeb638@|e0c462=|000000     |fcd254@|fcd238@|fcd22a@|fcc42a@@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcd21c@|fcc438@|eec454+|fcd254=|fce062=|000000          |fcd238@|fcd22a@|eeb61c@|fcc41c@@|fcb61c@|fcd21c@|fcd238@|000000          |fce062*|fcd246*|fcc438@|fcc40e@|fca80e@|fcb60e@@|fcc42a@|fcc438%|fcd246#
+000000         |fcd246@|fcc41c@|fcb61c@|fcb62a@|d28c1c%%|fca82a@|fcb61c@|fcc41c@|fcc438@|b6c446*|8cd246+|7ec446+|70c438+|7ed246*|7ec438*##%%@|eed254@|fcd238@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|e0d254@|70c438@@@@@|7ed246@|c4d246@|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@|eea81c@|b67e1c%|a8620e%|9a620e%%|a8620e%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcb61c@|eec438@|fcd254+|000000   |e0b646+|eeb62a@|fcb61c@|fcc40e@@|fca80e@|fcb638*|fcb61c@|e09a2a@|e09a1c%%|eea81c@|eea838@|fca80e@|fcb61c@|eea80e@|fcb60e@|fcc41c@|fcd238@|fce046@|fce054@|000000     |fce070=|000000  |fcd246@|fcd238@|fcb62a@|fcb61c@|fcd21c@|fcb61c@|fcc41c@|fcd22a@|eeb638@|eec446#|fce054%|fce070=|000000            |fce070+|eec454=|000000 |fce054@|fcd246%|000000 |fcd254+|fce054#|000000            |fce054#|eec446*|fcc446%|fcd246@|eeb646+|fcd246%|fce062*
+000000          |eed270=|fcd238@|fcc41c@@@|fcb61c@|fcd22a@|fcc454*|000000             |eec446@|fcc42a@|fcc40e@|fcb61c@|fca82a@|d28c1c%|c48c1c%|d28c1c%|fcb62a@|fcb61c@|fcc40e@|fcc42a@|eec446@|000000        |fcd254=|eec446#|fcb62a@|fcc40e@|fcb60e@|fca81c@|fcb62a%|ee9a1c@|e09a1c%|d28c1c%|eea82a@|fca81c@|fcb61c@|fcb60e@|fcc41c@|fcd22a@|fcd246@|fce062%|000000   |fcd254@|fce046@|fcd22a@|fcc42a@|fcb62a@|fcb61c@|fcc40e@|fca80e@@|fcb60e@|fca80e@|fcb60e@@|eea80e@|fcc40e@|fcd21c@|fcc42a@|e0c454*|000000           |fce062+|eec454=|000000 |fcd254#|fce054@|eec446#|eec454@|fce054%|fce062+
+000000             |fcd262+|fce062+|000000 |fcd262=|000000              |fce070=|fcd246+|fcc446#|fcc41c@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fcc41c@|fcc446#|fcd246*|fce062*|000000         |fce054@|fcd246@|fcc438%@|fcc41c@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fcb60e@|fcb61c@|fcd22a@|fcd246@|000000      |fce070+|fcd254=|000000  |fcd238@@|fcc42a@|eeb61c@|fcc41c@|fcd21c@|fcb61c@@|fcd21c@|fcc42a@|e0b638%|eec446%|fce054@|fce062@
+000000                                 |fce062#|fcd254%|eec446#|fcc438@|fce038@|eec446%|eec438*|fcd246@|fce062@|000000              |fce046@|fcd246@|eeb638@|fcc42a@|fcd22a@|fcb62a@|fcc42a@|fcd238@|eec454*|e0c446-|fce062=|000000         |fce070=|fce062@|fcd254#|e0b646*|eec454#|fce046@|fcd246@|eeb638@|eec446@|fcd246@|fce054@|eec454=
+000000                                                           |fce062*#|e0c454=|eec462+|fce062+|000000                 |fce070*
 `,
-    plano: `
-                                                                                 #+   %=                 +% =*%
-                                                                            +@*=*@@##%@#              @%##@##@# =+-*+=-       =  @% -=     -+=
-          :=+#=                                                              %@#*%%*#%#*#@@        +%*#%#*#*##*%%***#**+=     %%*%#*%%   +**#*    -=-
-        -+**#**                                         +  %@+#@*     :=*#@@%##%**#+#*+#%#+        =####*++=+***#%%%****+- #%%##**+#*#%@#+***+    %##%*%=
-       -++*#*##=##**+=               %--+++===-         %%*#%*#%**@+ ++**#*###*+#++=++***#%@@%    %%%#**=::::-***###*+++*++###*+:::-**##***++   ####**###%=
-       ++*#%####%*##*++          @@##@##@%**##*++:   #@%###+#+#*#%#-**+%@@%%#**+::::::+***####**+*#%##**-:::::***#%%*+====*###*+::::**###*+****###*=::-*##+
--++===-+*%#**==**#%***+=       %####+#+###%%****++: *###***=--=***%%%#*+####***-::::::-**##%%@@* =**###**+=-=***#%%%       +%%#**++#*#%%%       ##*+--=*###+***-
-     --=%%#*-::-*#%#++*+==----=###*=-:-+*###++++**+=####**::::::**##%%#@@@%#****-::::-**######     @@%###*#*#**%#=            %%*%##%%          ++%#*##%**+
-         %%#*++###%*::---====*%%#**::::-*##%%+++++*#%%%#**=::::=**###*   -*#%#*+#+++******%%@@        %@##%##@#=#%            *- %*               #=*%-+
-          =%####@              %%###==+###%%         +#%#**+++**#*#%@*   @@%###%**#*##*#%%*           *  %@+**=
-                                 #%#*%*%%+=+         @%+#%#*#*%#*%%         =%@#*%%*#@%+*%@=
-                                 @#+*@+=*              -@%*%@##@= =         *@+ *@@##%@-
-                                                           *#                    #=
+        plano: `
+                                                                                 =  = *                   *-+**
+                                                                             @#+=@@##%@+  =           @%##@##@#-*%+**+-       +  @%        =*+
+          -+*#=                                                              %@#*%%*#%#*#@@+       #@#*##*#*#**%%#*##**++     %%*%##%%   +**#*    =+=-
+        =+**#**  :                                      +- *%*#@=     -+*#@@%###*+#+#*+#%#*-==     +###**+==+***#%%%****+= %%%#**++#*#%%*+**++    %##%*#
+       -++*#*##-##**+=               %-=++++==-         %@##%*#%*#@% ++**#*###*+#+==++**+#%@@@    %%%#**-::::-***###*+++*++###*+:::-**##***++   @#*#**###%
+       ++*#%####%*##*++          %@##@*#%#**##*++:   %@%###+#+#*#%#=**+%@@%%#**+::::::+***###***+*#%##**-:::::***#%%*+====+###*+::::**###*+****###*=::-*##*
+-++==--+*%#**==**#%***+=       @%###+#+####%****++: +###***=--=***%%%#*+*##****-::::::-**#%%%@@* =*##****==-=***#%%#       +%%#**++#*#%%*       ##*+-:=*###****-
+    --==%%#*-::-*#%#++*+=----:-###*=---+*###++++**+=#%##**:::::-**##%%#%@@%#**+*::::::+**####-     %@%###+#+#*#%#=--          %%*%#*%%          **##*####*
+         %%#*==*##%=---==++++*%%%**::::-*#%%%+++++*#%%%#**-::::=***##+   =*###*=#++=******%@@@     -  %@##%##@#+#=            +- @# =#            #+#%-#*
+          =%####%+             #%##*===*##%#        -*###*#++=****#%@#   %@%#*#%**#+##*#%%+           +- *@+#%+
+             ++ -              ==*%#*#*#%*+*         @%##%#*#*#*#%%      +-  %@#*%%*#@#*#@@
+                                 ##+#@*+@@              @%*#@##@=-=         =@*=+@@##%@-
+                                                           **-=+                 *
 `
+      },
+      {
+        color: `
+000000                                                                                 |fce070=|000000 |eec462+|000000 |fce062+|fce070+|000000                   |fce062#|eec462=|e0c454+|eed254*|fce062%
+000000                                                                            |fce062*|fce054#|e0c446*|d2b654=|fcd246@|fce046@|eec438@@|fcc438@|fce046@|fcd246@|000000  |fcd254+|fce062#|000000           |fcd262*|fce046@|fcc438@|eeb638@|fcd238@|fcc42a@|fcb62a@|fcd22a@|fcd238@|b6c454+|fcc446=|fce062#|c4e062#|8ce046%|7ed246%|7ec438#+|000000         |fcd254#|fce054@|eec446+|000000 |fce062=|000000      |7ec438*|8cd246#|8ce046*
+000000          |7ec446+#|7ed238@|9ae054@|8cd254*|000000                                                             |fcc454#|fcd238@|fcd22a@|fcb61c@@|fcd21c@|fcc41c@|fcb60e@|fcc41c@|fcd21c@|eeb61c@|eeb62a@|fcd22a@|fce038@|fcd246@|000000        |fcd270+|fce046@|fcd238@|fcc42a%|fcb61c@|fcc40e@|fca80e@|fcb60e@@@|fcc40e@|eea80e@|fcc41c@|fcd22a@|fcd246@|8cc446@|7ed238@|8cd246@@|70c438@@|70b638%|000000    |fcd254*|fcd238@|fcc42a@|fcb61c@|fcd21c@|fcb61c@|fcc41c@|fcd22a@|fcc454#|000000   |70c438@@|8cd246@@|7ed238@|000000    |9ae054+|8cd246*|7ec446+|eed262=
+000000        |70b638*|70c438@|7ec438@|7ed238@|8ce046@|7ed238@|7ec438@|000000  |8cd254-|000000                                      |fce070=|fcd262+|e0c454+|eec454=|fce054@|eec446#|eec454@|fcd254@|fce062@|000000     |7ec446+|7ec438%|9ad246@|fce054@|fce046@|fcd238@|fcc438%|fcb62a@|fcc40e@@|fca80e@@|fcb60e@|fca80e@|fcb60e@|eea80e@|fca80e@|fcc40e@@|eeb62a@|fcc446*|fcd246#|fce054%|fce062#|000000    |fce062+|fcd254*|eeb62a@|fcb61c@|fcb60e@@|fcb638%|eea81c@|d28c1c%%|ee9a1c@|e0a81c@|fca80e@@|fcb60e@|fcc42a@|fcd238@|fcd254@|9ad246@|7ec438@|7ed246@|7ed238@|70b62a%|70b646#|000000 |fcd254@|fcd238@|fcc42a@|fcb62a@|fcb61c@|fca80e@|fca81c@|ee9a0e@|fcb61c@|fcb62a@|fcc41c@|fcd22a@|fcd246@|9ab638@|70c438@|7ed246@|7ed238@|70c438@@|000000    |fcd246@|eed238@|e0c42a@|fcd238@|c4b62a@|eed246#|fce070=
+000000       |70b646*|70b62a%|70c438@|7ed238@|b6e054@|8cc438@|9ac438@|e0d246@|a8c462=|8cd246@|8ce046@|7ed238@|7ec438@|70c438@|70b638#|000000              |fce062#|fcd262*|7ec446=|7ec438*|8cd246##|9ae054**|7ed238*|7ec438*|7ec446+|000000       |fcd254=|000000 |fcd254*|fce038@|fcc42a@|eeb61c@|fcd21c@|fcc41c@|fcb61c@|fcd22a@|fcc446@|fcc438+|fcd246%|fce054@|b6d270=|70b638%|70c438@|7ec438@|7ed238@|b6c446@|eeb638@|fcc41c@|fcc40e@@|fcb61c%|fcb638#|fcb61c@|e09a2a@|d29a1c%|d28c1c%|e09a1c@|e0a81c@|fcb60e@|d2b61c@|fca80e@|fcc40e@|fcd21c@|fcd22a@|fcd246@|eed262+|000000    |eed262#|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca82a@|c47e1c%|a8620e%%|9a620e%|a8620e%|b6701c%|eea81c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|c4c446@|70b638@|70b62a%|62b62a%|70c438@|7ec438@|70c438@|7ec438#|d2c446@|fcb62a@|fcb60e@|fca80e@|eea81c@|a8700e%|a8620e%%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc42a@|e0d246@|9ad246@|7ec438@|62b62a%|70b638%|000000   |fcd254@|fcd22a@|eeb61c@|fcb60e@|fca80e@|fcb60e@@|fcc41c@|eec42a%|fcd246#
+000000       |70b646%|7ec438@|a8c438@|a8d246@|fcd238@|fcc41c@|fcb61c@|fcc41c@|eeb62a@|fcd238@|b6d246@|8cd246@@|70c438@@|70b638%|000000          |fce054@|fcd246@|eeb638%|fcd22a@@|e0b62a@|fcd238@|fce046@|9ad246@|7ed238@@|8ce046@|8cd246@|7ed238@|70c438@|70b638@|70b646=|000000   |eec462+|fcd238@|fcd22a@|fcc42a@|fcb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcd21c@|fcc42a@|eec454*|9ab638%|8cc438@|7ec438@|e0d254@|fce054@|fcd238@|fcd22a@|fcc40e@|fcb60e@|fca80e@|fca81c@|e0a82a@|a8700e%|a8620e%%%%|a8700e%|d2a82a@|fca80e@@@|fcb60e@|fcb61c@|eec438@|d2d246@|b6d246@|8cc446@|70c438@|b6d246@|eed246@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|b6701c%|a8620e%|9a620e%%|a8620e%%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|fce054@|a8d254*|7ed246*|7ec446*+|7ed246+|b6d254*|fce054@|fcc42a@|fcb60e@|fca80e@|e09a1c@|a8620e%|9a620e%|a8620e%|a8701c%|eea81c@|fca80e@|fcb60e@|fcc42a@|d2c446@|7ec438@|70c438@|7ec438@@|70c438@|7ec438@|c4d246@|fcc438@|fcb60e@|fca80e@|d29a1c%|a8700e%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc42a@|eec454%
+8cd254=|7ec438%#**|7ed238+|7ed246=|70c446%|7ec438@|eec438@|fcc41c@|fca80e@|eea81c@|e08c0e%|e09a1c%|fcb61c@@|fcc41c@|fcd246@|b6d246@|7ed246@|7ed238@|70b62a%|70b646%|000000      |fce070=|fce046#|fcd246*|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|eeb61c@|eec42a@|fcd246@|d2d254@|7ec438@|7ed238@|8cd246@|7ed238@|70c438@|62b62a%|7eb646=|000000 |fce054%|fcd246@|fcc42a@|fcb60e@|fca80e@@|eea838%|d28c1c%|c47e1c%%|d28c2a%|fca82a@|fca81c@|fca80e@|fcc40e@|fcd22a@|fcd238@|eee054@|8cd246@|70c438@|b6c438@|fcc438@|fcb61c@|fcb60e@@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%|a8620e%%|b67e1c%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd22a@|fcd246@|fce054%|e0e062=|000000  |fcd254=|eec446%|fcb62a@|fcb60e@@|fca81c@|fcb638@|d29a1c%|c48c1c%|c47e1c%|d28c2a%|fca81c@|fcb62a%|fcb61c@|fcc40e@|fcc42a@|fcc438@|000000         |fcd246@|fcd22a@|fcc41c@|fcb62a@|fcb61c@|ee9a0e@|ee9a1c@|fca81c@|fcb61c@@|fcd22a@|fcd246@|fce070%|000000      |d2d270=|fcc438@|fcc41c@|fcb60e@|e09a2a@|b6701c%|a8701c%|c48c2a%|fca80e@|fcb60e@|fcc42a@|d2d254@|7ec438@@|7ed246@|7ed238@|70b646+
+000000    |7ed246=|7ec438+|7ec446*|7ec438*|eed254%|fcc42a@|fcb60e@|fca80e@|b6701c%|9a620e%%|b6701c%|fca80e@|fcb60e@|fcc42a@|d2c446@|62b62a%|70c438@|7ed246@|70c438@|7ed246++==|8cd254=|7ed238-|c4c454#|fcc438@|fcc41c@|fcb60e@|fcb62a@|d29a1c%|b67e1c%|b6701c%|c47e1c%|d2a81c@|fca80e@|fcb60e@|fcb61c@|eec446@|9ac446@|70b62a%|70c438@@|7ed238@|7ec438@|70b646%|7ec438=|c4c454%|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb62a@|a8700e%|a8620e%|9a620e%%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|d2c438@|9ac438@|d2c446@|fcd246@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|eea82a@@|a8701c%|a8620e%%%%|a8701c%|e0a82a@|fca82a@|fcb60e@@|fcc40e@|fcc42a@|fcc438@|eec462*|000000    |fce070+|fce046@|fcd238@|fcc42a@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|eec446@|fcc446+|fcd254*|fce070+|000000          |fcc446%|fcd22a@|fcb61c@@|fcc41c@|eeb61c@|fcc41c@|fcd22a@|fcc454*|000000         |fce062=|fcc454*|fcc42a@|fcb60e@@|fca80e@|fcb60e@|fcc42a@|fcd238%|fcd246@
+000000        |eed270=|fcd246@|fcc42a@|fcb61c@|fca81c@|d28c1c%|d28c0e%|fcb62a@|fcb60e@|fcc41c@|eec438@|9ad254+|8cd246+|7ec446+|70c438+|7ed246*|7ec438*##%%@|d2d254@|fcd238@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|c4d246@|70c438@@@@@|7ed246@|e0d254@|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|a8620e%|9a620e%%|a8620e%|c48c1c%|fca80e@@|fcb60e@|fcc41c@|fcc438@|fcd246#|fce062++|fcd254#|fcc446*|eeb638@|eeb61c@|fcb60e@@@|eea82a#|fcb62a@|e09a1c@%%|eea81c@|fcb638%|fca80e@|fcb60e@|fca80e@@|fcc42a@|fcd238@|fcd246@|fce054@|fce070+|000000      |eed262=|fce046@|fcd238@|eeb62a@|fcc41c@|fcd21c@|fcb61c@|fcd21c@|fcd22a@|e0b638@|fcc446@|fce054@|000000             |fce062+|fcd254+|e0c454=|fcd246#|fce054@|000000  |fce054+|fce070=|000000           |fce054*|e0b646+|fcd246@|fcc438%|fcc446*|fce054@|fcd270=
+000000          |fcd262*|fcd22a@|fcb61c@|fcc41c@|fcb61c@|fcc41c@|fcc438@|fcd262+|fce054+|000000            |e0c454%|fcc42a@|fcc40e@|fcb60e@|eea838@|d28c1c%|c48c1c%|d28c1c%|fcb62a@@|fcc40e@|fcd22a@|fcd246@|000000         |eec446@|fcc42a@|fcc40e@|fcb60e@|fcb61c%|fcb62a@|e09a1c@%|e08c1c%|e0a82a@|fcb61c@|fcb62a@|fcb60e@|fcc41c@|fcd22a@|fcd246@|000000    |eed262+|fcd238@@|fcd21c@|fcb61c@|eea81c@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fca80e@@|fcc40e@|fca80e@|fcb60e@|fcd21c@|fcd22a@|eec446@|000000              |fce054@|fcd246%|eec454@|eec446%|fce054@
+000000             |fce062#|000000  |fce062*|000000              |fce070+|fcd246#|fcc446#|fcc42a@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcc454=|000000         |fce070#|fce054@|fcd246%|fcc446*|fcc42a@|fcc41c@|fcb60e@@@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcd22a@|eec454#|000000      |fce070%|fce054#|fcc446+|000000 |fcc446%|fcd238@|fcd22a@|fcb61c@@|fcd21c@|fcc41c@|fcb61c@|fcd21c@|fcd22a@|eeb638@|e0b646+|fcd254#|fce062%
+000000                                 |fcd262=|fce054@|fcc446%|eeb646%|fcd238@@|e0b646+|fcd246#|fce054@|000000             |fcd262#|fce054@|fcc438@|e0b638@|fcd238@|fcc42a@|eeb62a@|fcd238@@|e0b654+|fcd254*|fce070*|000000          |fce062@|fce054@|eec454@|e0b646*|fcc446@|fce046@|fcc438@|eeb646@|eec446@|fce054@|fcd262@
+000000                                                           |fce062%|eec454=+=|fce062*|000000                  |fce062#
+`,
+        plano: `
+                                                                                 = = ++                   #-=+%
+                                                                            **=-%@###@%  +#           +@#*@%#@%==****+-         *@= =      =*+
+          -+*#=                                                             *@@#*%%*%%**%@%        +@%##%*#*##*%@%**##*++    *@#*%##@*   +*##*    =+=-
+        =+**#**  :                                      =+=-@+#%@     -+*@@%###%**#*#**%##+*##    +*###***==+****%%%****+= @%%##**+###%%++***+    %%#@**=
+       -++*%**%-##**+=              #*:=++++==-       - *@%*@##@#=%@-++***##%#*+*+==++***%%%%=    *%%#**=::::-**####++++*++###*+:::-**#%##*++   @%*#*#*#**
+       ++##%%#%#%###*++          @%*%%*%@#**##*++:   =%%#*%*#*#*#%%++**%@@%##**+::::::+****####**#%%%#**-:::::**##%@@+====+%%#*+::::**###*+****#%#*=::-*##*
+-++==--+*#%**=+*##%#**++      =#*###*#*#*#%%**#*++: %%##***====***#%@%*+*###***-::::::-#*##%%@%=  -*###*#+=-=**#%%%         %%##*++*##%@#      -##*+--=*##%****-
+    --==%%#*-::-*#%#++*+=----:+####+---+*###*+++**+-*###*#:::::-**##%#*#%%%%#***::::::+*#####+    +@@##%#*#*#*%%#=*+          #@##%*%@+         =+%##*###%
+        -%%#*==**##----==++++*%%%#*::::-*#%%#*++++*%@%%#**-::::=**##%#++****###+#+++***#**#%@@+      =@%*%%*%%*%@             ++-*@  +=           *=@#+@-
+          *%*%#%%==            *##**===*##%%         ##%#*#++=+*##%%%    +%@%#*##+#**#*#%@#              @###@
+             *  *              +*+#%*#*#%#-         *@#+#%#*#*%*%%*      %#= #@%##%#*%@#=*%
+                                 -@#*@%-*@             *@#*@%#%%=**          @@#+%@%##@@
+                                                           %-+-+                  #
+`
+      },
+      {
+        color: `
+000000                                                                                  |e0c462==|000000 |fce070#|000000                    |fcd262=|fce062#|000000 |eec462+|fce062*|fce070=
+000000                                                                            |fce062*|eec454=|000000 |e0c470=|fce046@|fcd246@|eec438@@|fcd238@|fce046@|e0c454*|e0b646-|fcd254*|fce062@|fce070#|000000            |fcd246@|fcd238@|eeb638@|fcc42a@|fcd22a@|eeb62a@|fcc42a@|fce038@|e0c446%|000000 |fcd262=|e0e062*|8ce046%|7ed246%|7ec438#+|000000         |fce054@|fcd246@|eec454-|eed254=|fce062*|000000      |7ec438*|8cd246#|8ce046*
+000000          |7ec446+#|7ed238@|9ae054@|8cd254*|000000                                                             |fcd246@|fce038@|fcc42a@|eea81c@|fcc41c@|fcd21c@|fcb61c@|fcb60e@|fcd21c@|fcc41c@|eea81c@|fcc42a@|fcd238@@|eec454+|000000         |fcd246@|fcd238@|fcc42a@|eeb61c@|fcc40e@|fcb60e@@@|fca80e@|fcc40e@|fcb60e@|eec41c@|fcd22a@|fcd246@|b6c446@|7ed238@|8cd246@@|70c438@@|70b638%|000000    |fcd254@|fcd238@|eeb62a@|fcc41c@@|fcb61c@|fcd21c@|fcd22a@|e0b654+|fcd254=|000000  |70c438@@|8cd246@@|7ed238@|000000    |a8e054+|8cd246*|7ec446+|b6d254=
+000000        |70b638*|70c438@|7ec438@|7ed238@|8ce046@|7ed238@|7ec438@|000000  |8cd254-|000000                                       |fce062#|eec454*|e0b654+|fcd254@@|e0b646*|eec446%|fce054@|000000     |7ec446=|7ec438%|b6d254@|fce054@|eed246@|eed238@|eec446%|fcb61c@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fca80e@@|fcb60e@|ee9a0e@|fcb60e@|fcc40e@|fcb60e@|eeb638@|fcc438%|fcd246@|fce054@|fce070%|000000    |fce062#|fcd246%|fcc438@|fcb61c@|fcb60e@@|fca82a@|eea81c@|d28c1c%|e08c1c%|ee9a1c%|d2b61c@|fca80e@|fcb60e@@|fcc42a@|fcd246@|eed246@|b6d246@|7ec438@|7ed246@|7ed238@|70b62a%|70b646#|000000 |fce054@|fcd246@|fcc42a@|fcb60e@@|eea81c@|fca80e@|ee9a0e@|fcb62a@|fca80e@|fcc40e@|fcd22a@|eec446@|7eb646%|70c438@|7ed246@|7ed238@|70c438@@|000000    |d2c438@|fcd238@|e0c438@|fcd22a@|e0c438@|d2c446#|fce070+
+000000       |70b646*|70b62a%|70c438@|7ed238@|b6e054@|9ad238@|8cc438@|d2d246@|c4d262*|8cd246@|8ce046@|7ed238@|7ec438@|70c438@|70b638#|000000              |fce062%|e0c454-|7ec446=|8cc446*|9ad254#|8cd246#|9ae054**|7ed238*|7ec438*|7ec446+|000000       |fce062*|fcd254=|e0c462=|fcd238@|fcd22a@|eeb61c@|fcc41c@@|eeb61c@|fcd22a@|fcd238@|eec462=|fcd254*|fce062%|d2d270*|70b638%|70c438@|7ec438@|8cd246@|e0c446@|fcc438@|fcd21c@|fcc40e@|fcb61c@|fca82a%|fcb62a#|fca81c@|e09a2a%|d28c1c%|d29a1c%%|eea81c@|e0b61c@|d2a81c@|fcb60e@|fcc40e@|fcd21c@|fcc42a@|eec446@|000000     |d2d262+|fcc438@|fcc41c@|fcb60e@@|fcb62a@|c47e1c%|a8620e%%|9a620e%|a8620e%|b6701c%|e0a81c@|fca80e@|fcb60e@|fcc41c@|fcc42a@|d2c446@|70b62a%%|62b62a%|70c438@|7ec438@|70c438@|8cc438%|eec446@|fcc42a@|fcb60e@|fca80e@|eea82a@|a8700e%|a8620e%%|b6701c%|fca81c@|fca80e@|fcc40e@|fcd22a@|fcd246@|a8d246@|7ec438@|62b62a%|70b638%|000000   |fcd254@|fcd22a@|fcb60e@@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcc438@|fcd246+
+000000       |70b646%|70b62a%|c4d246@@|e0c42a@|fcd21c@|fcb61c@|fcd21c@|eeb62a@|eed238@|d2d246@|8cd246@@|70c438@@|70b638%|000000         |fce070*|fce054@|fcc438*|eeb638@|fcd22a@|fcc42a@|eec438@|fcd238@|eed246@|8ce046@|7ed238@@|8ce046@|8cd246@|7ed238@|70c438@|70b638%|70b646=|000000    |fcc446@|fcd22a@|fcc41c@|fca80e@|fcb60e@@|fca80e@@@|fcb61c@|fca80e@|fcc41c@|fcd22a@|fcc446%|7eb646%|70c42a%|7ec438@|c4d254@|eed246@|fcc438@|fcc42a@|fcb60e@|fca80e@@|fca81c@|e0a82a@|a8700e%|a8620e%%%%|a8700e%|e0a82a@|fca80e@@@|fcb60e@|fcc41c@|fcc438@|fcd246@|e0d254@|a8d246@|70c438@|c4d246@|fcd246@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|a8620e%|9a620e%%|a8620e%%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|eed254@|9ad254#|7ed246*|7ec446*+|7ed246+|a8d254*|fcd254@|fcd22a@|fcc40e@|fca80e@|e09a1c%|a8620e%|9a620e%|a8620e%|a8701c%|eea81c@|fca80e@|fcb60e@|fcc42a@|d2c446@|7ec438@|70c438@|7ec438@@|70c438@|7ec438@|d2d254@|fcd238@|fcb60e@|fca80e@|d29a1c%|a8700e%|a8620e%|c47e1c%|eea80e@|fcb60e@|fcc42a@|e0c454%
+8cd254=|7ec438%#**|7ed238+|7ed246=|70c446%|8cc438@|e0c438@|fcc41c@|fcb60e@|eea81c@|e08c0e%|e09a1c%|fca81c@|fcb61c@|fcc41c@|fcd238@|b6d246@|7ed246@|7ed238@|70b62a%|70b646%|000000       |fcd254+|fcc446*|fcc42a@|fcc40e@|fca80e@@@|fcb60e@@|eeb60e@|fcc42a@|fcd246@|b6c446@|7ec438@|7ed238@|8cd246@|7ed238@|70c438@|62b62a%|7eb646=|000000 |fce062@|fcd246@|fcc42a@|fcb60e@|fca80e@|fcb61c@|eea82a@|d28c1c%|c47e1c%%|d28c1c%|eea82a@|fca81c@|fca80e@|fcb60e@|fcd22a@|fcd238@|fcd254@|9ad246@|9ac438@|d2c446@|fcc438@|fcc42a@|fcb60e@@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%|a8620e%%|b67e1c%|fcb61c@|fca80e@|fcb60e@@|fcc41c@|fcc438@|fcd246@|fcd254+|000000    |eec446@|fcc42a@|fcc40e@|fcb60e@|fcb62a@@|d29a2a%|c48c1c%|c47e1c%|d28c2a%|fca82a@|fcb62a%|fcb60e@|fcc40e@|fcc42a@|eec446@|000000         |eec446@|fcc42a@|fcc40e@|fca81c@|fcb61c@|e09a0e%|eea81c@|fca80e@|fcb60e@@|fcc438@|fcd246%|fce062#|000000      |d2d262+|fcc438@|fcc41c@|fca81c@|e09a2a%|b6701c%|a8701c%|c48c2a%|fca80e@|fcb60e@|fcc438@|eed254%|7ec438@@|7ed246@|7ed238@|70b646+
+000000    |7ed246=|7ec438+|7ec446**|eed254@|fcc42a@|fcb60e@|fca80e@|b6701c%|9a620e%%|b6701c%|fca80e@|fcb60e@|fcc42a@|d2c446@|62b62a%|70c438@|7ed246@|70c438@|7ed246++==|8cd254=|7ed238-|e0d254%|fcd238@|fcc41c@|fcb60e@|fca81c@|e09a1c%|b67e1c%|b6701c%|c47e1c%|d2a81c@|fca80e@|fcb60e@|fcb61c@|eec446@|b6c446@|70b62a%|70c438%@|7ed238@|7ec438@|70b646%|8cc446=|e0c454#|fcc438@|fcb61c@|fcb60e@|fca80e@|fcb61c@|a8700e%|a8620e%|9a620e%%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcb61c@|fcc438@|c4c446@|7ec438@|9ac438@|e0c446@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fca82a@|eea82a@|a8701c%|a8620e%%%%|a8701c%|e0a82a@|fca81c@|fca80e@|fcc40e@@|fcc42a@|fcd238@|fcd254@|000000    |fce062%|fce054@|fcd238@|fcc438#@|fcc40e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc42a@|fcc446#|fcd246#|fce054%|fce070=|000000        |fce062+|fcd254=|eec454*|fcd22a@|fcc41c@|fcb61c@|fcd21c@|fcb61c@@|fcd22a@|fcd246@|000000          |fcc454%|fcc41c@|fcb60e@@|fca80e@|fcc40e@|fcb61c@|fcd22a@|fcd254@
+000000        |fcd270=|fcd246@|fcc42a@|fcb61c@|fca81c@|e08c1c%|d28c0e%|eea82a@|fcb60e@|fcc41c@|eec438@|b6d246=|8cd246+|7ec446+|70c438+|7ed246*|7ec438*##%%@|c4d246@|fcd238@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcc438@|a8c446@|70c438@@@@@|7ed246@|eee062@|fcd246@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|a8620e%|9a620e%%|a8620e%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd246@|fce062%@|fce054@|fcd246@|fcc438@|eeb61c@|fca80e@|fcb60e@@|fca81c@|fcb62a%|ee9a1c@|e09a1c%%|eea81c@|fcb62a%|fca81c@|fcb60e@@@|eeb61c@|fcc438%|fcd246@|fce054@|fce070#|000000      |fcd254@|fce046@|fcc438@|eeb62a@|fcd22a@|fcc41c@|fcb61c@|fcd21c@|fcb62a@|eeb638@|fcd246@|fce062@|000000              |fce062#|eec454++|fce054@|fcd254#|000000  |fce062=|000000          |fce070=|fcc454=|eec454+|fce046@|eec446*|fcd246%|fce054@
+000000          |fcd254@|fcd238@|eeb61c@|fcc41c@|fcb61c@|fcc41c@|fcc438@|fcd246*|fce062#|000000            |eec446#|fcb62a@|fcb60e@|fca80e@|eea82a@|d28c1c%|c48c1c%|d28c1c%|fca81c@@|fcb60e@|fcd22a@|fcd246@|fce070=|000000        |fcc438@|fcc42a@|fcc40e@|fcb61c@|fcb62a%|fcb61c@|e09a2a@|e09a1c%|e08c1c%|e09a2a@|fcb61c@|fcb62a@|fcc41c@@|fcd238@|eec454%|000000     |eec446@|fcd238@|fcd22a@|fcc40e@|eea80e@|fcb60e@|fcc40e@|fca80e@|fcb60e@@|fca80e@|fcc40e@|fcb60e@|eea80e@|fcc41c@|fcd22a@|fcd246@|eec454+|000000            |fcd262+|fce054@|eec446%|eec454%|fce054@|fce062@
+000000             |fce062*|000000 |fcd254=|fce062+|000000              |fce070+|fce054@|fcc438%|eeb61c@|fcc40e@|fcb60e@@@@|fcc41c@|fcc42a@|eec462=|000000         |fce062#|fcd254#|fcc446*|eec454#|fcc42a@|fcc41c@|fca80e@|fcb60e@@@@@|fcd21c@|fcc438@|eec454+|fcd254+|fce062+|000000    |fce070+|fce062@|fcd246%|fcc446+|e0b654+|fcc438@|fcd22a@|fcc41c@|eeb61c@|fcc41c@@|eeb61c@|fcc41c@|fcd22a@|fcc438@|000000 |eec454-|fce062*|fce070+
+000000                                  |fce054@|fcd246@|eec446%|fcc438@|fce038@|eeb646*|fcc446+|fce054%|fce070+|000000            |fce062@|fcd246@|eeb638#|fcc438@|fce038@|fcc42a@@|fce038@|eec438@|eeb646%|fcd254@|fce062=|000000          |eed262=|fce054@|fcd254@|eec446@|eeb646%|fcd246@@|e0b646@|eec446@|fcd254@|fce062@
+000000                                                          |fce062=*|e0c454==|fce062*|000000                   |fce062++
+`,
+        plano: `
+                                                                                  -- #                    =* =+=
+                                                                            *= -@%##%@+:+%#            %%*%%*#@# -+*+=-         @%--*      =++
+          -+*#=                                                             %@#*#%**%#*#@%=         %%#*#**#*#*#%%#*#*+++    %%*#%*%%=-  ++*#*    =+--
+        -++*#**  :                                       *+-%%=#@     -+#%%#*#%#+#**#+##***%@%    ###****+==+****#%%#***+= %%#*#+++#*#%#++**++    #%*%#++
+       -++*%**#+*#**+=              %-:=++++==-       *=-%%*%%*%%-+#+++**##%%#+**+==++*+*%%##     =###**-::::-**####++++*++###*+:::-**#%%#+++   #%***#*##=
+       ++###%*%*##**+++         +%+#%##%%#**#**++:    #%#*#****#*%%#+++#%###***+::::::+*+**#%%%*+#%%%#**-:::::***#%%%+==--+%%#*+::::**##**++*+*#%#*=::-*###
+-++==--++##**=+**#%#**+=       =+##******%%*+***++: @%%#***=--=***#%%%**####***:::..::-***###%=    ####*#==-=**####         #%#**++***#%#      =##*+-:=*###****-
+    --==%##*-::-*###++*+=----:#%##*+---+**##*+++**+-*##***:::::-***##*+*#%%##**+::::::+**##%%%    %@%*##******%#**#=        +=+%#*%*#%%          *#*#*#*%%
+        =%#**==**##----===+++*#%#**::.:-**##*+++++*%%%#***-::::-**##%%#%@%#***#+*++++**##**#%%#      %@#*%##%#*%%              #==@*  =          =-=@+#%
+          %%*%*%#+*            +##**===**#%%=        #%##*#+==+#*#%%#     #%%#+*#+**+#**#%%=            +@**@%
+             * -+              =@**#****%#-         ##+*%%*#**#*%#==+    +@#==%%#*%%*#@% -++
+                                  %%*%@==#+            @%+#@##@#*%=          -@%#*%%*#%@
+                                                          -*--*                   ++
+`
+      },
+      {
+        color: `
+000000                                                                                  |eec462=|000000 |fce062*|000000                    |eec462=|000000 |fce062%|000000  |eed254=|fce062*
+000000                                                                           |fce070=|000000   |fcd254%|fce054@|fcc446@|eec446@|fcc438@|fce046@|fcd246@|d2b646+|eec446#|fcd254@|fce062@|000000          |fce070+|fcd254=|000000 |fcd246%|fce038@|fcc438@|fcb62a@|fcd22a@|fcb62a@@|fcd238@|fcd246@|a8d254=|000000 |c4e062+|9ae046%|7ed246%|7ec438#+|000000         |fce054@|fcc446*|eec454=|fcd254*|fce062*|000000      |7ec438*|8cd246#|8ce046*
+000000          |7ec446+#|7ed238@|9ae054@|8cd254*|000000                                                            |fcd254%|fce046@|fcd238@|eeb62a@@|fcd21c@|fcc41c@|fcb61c@|fcc41c@|fcd21c@|fcb61c@@|fcd22a@|fcd238@|fcc446@|000000          |eec454*|fcd238@|fcd22a@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fcb60e@|e0b61c@|fcd22a@|fcd238@|eed246@|7ed238@|8cd246@@|70c438@%|70b638%|000000    |fce046@|fcd238@|eeb62a@|fcc41c@|fcc40e@|fcb61c@|fcd21c@|fcc438@|eeb638+|fce054*|000000  |70c438@@|8cd246@@|7ed238@|000000    |9ae054+|9ad254*|7ec446+|8cc446-
+000000        |70b638*|70c438%|7ec438@|7ed238@|8ce046@|7ed238@|7ec438@|000000  |8cd254-|000000                                       |fce062*|fcd254*|eec454#*|fce054@|eec454+*|fcd254%|fce062%|000000    |7ec446=|7ec438%|c4d254@|d2d246@@|c4d246@|eeb638@|fcc41c@|fcc40e@|fca80e@@|fcb60e@|fca80e@|fcb60e@|fca80e@@|fcc40e@|fcb60e@|e0b61c@|fcc42a@|fcd238@|fce046@|fce054@|fce070=|000000    |fce062%|fcd246@|fcd238@|fcb61c@|fcb60e@|fcb61c@|fca81c@|eea82a@|d28c1c%|e09a1c%%|e0b61c@|fca80e@|fcb60e@@|eeb62a@|e0c446@|d2d246@|b6d246@|7ec438@|7ed246@|7ed238@|70b62a%|70b646#|000000 |fce054#|fcd246#|fcb62a@|fcb60e@@|eea81c@|fca80e@@|fcb62a@|fcb60e@|fcc41c@|fcc42a@|e0b646#|7eb638%|70c438@|7ed246@|7ed238@|70c438@@|000000   |e0d270=|a8c438@|fcd238@|eec438@|fcc42a@|fcd238@|b6b638*|fce062=
+000000       |70b646*|70b62a%|70c438@|7ed238@|a8e046@|c4d246@|8cc438@|a8c438@|e0d262%|8cd246@|8ce046@|7ed238@|7ec438@|70c438@|70b638#|000000             |fce062+|fce054*|000000 |8cc446=|c4d254*|8cd246##|9ae054**|7ed238*|7ec438*|7ec446+|000000       |fce062%|fcd254#|eeb638+|fcc438@|fcd22a@|fcc42a@|fcc41c@|fcd21c@|eeb61c@|fcc41c@|fcd22a@|fcc454#|000000 |fcd254+|eee062*|70b638%|70c438@|7ec438@|a8d246@|fcd246@|fcd238@|fcd21c@|fcc40e@|fcb61c@|fca82a%|fcb61c@|eea82a@|e09a2a@|d28c1c%|e09a1c%|d29a1c%|fca81c@|c4b62a@|e0b60e@|fcc40e@@|fcc41c@|eeb62a@|e0c462*|000000     |eec470=|eec438@|fcb61c@|fcb60e@|fca80e@|fcb61c@|c48c1c%|a8620e%%|9a620e%|a8620e%|b6701c%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcc42a@|eed246@|8cc438@|70b62a%|62b62a%|70c438%|7ec438@|70c438@|a8c446%|fcc446@|fcc42a@|fcc40e@|fcb60e@|e0a82a@|a8700e%|a8620e%%|b6701c%|eea82a@|fca80e@|fcc40e@|fcd22a@|fcd246@|9ad246@|7ec438@|62b62a%|70b638%|000000   |fcd262+|fcd22a@|fcc40e@|eea80e@|fcb60e@@|fca80e@|fcc41c@|fcc42a@|fcd254=
+000000       |70b646%|70b62a%|c4d246@|d2d246@|d2b62a@|fcd21c@|fcb61c@|fcc41c@|fcb61c@|e0c438@|e0d246@|8cd246@@|70c438@@|70b638%|000000         |fce070#|fcd246*|eeb646=|fcc42a@|fcd22a@|eeb62a@|fcc42a@|fce038@|c4d246@|9ad246@@|7ed238@|8ce046@|8cd246@|7ed238@|70c438@|70b638%|70b646=|000000    |eec454#|fcc42a@|fcd21c@|fcb60e@@@|fca80e@|fcb60e@|fca80e@|fcc40e@|fca81c@|fcc41c@|fcd22a@|fcd246@|9ab638@|70c42a%|70c438@|a8d246@|c4d246@|eec438@|fcb62a@|fcb60e@@|fca80e@@|e0a838@|a8700e%|a8620e%%%%|a8700e%|e0a82a@|eea80e@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fce046@|fce054@|9ad246@|70c438@|c4d246@|fcd246@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|a8620e%|9a620e%%|a8620e%%|eea82a@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|d2d246@|9ad254#|7ed246*|7ec446*+|7ed246+|9ad254#|fcd254@|fcd22a@|fcc40e@|fca80e@|e09a1c%|a8620e%|9a620e%|a8620e%|a8701c%|eea82a@|fcb60e@|fcc40e@|fcc42a@|e0c446@|7ec438@|70c438@|7ec438@@|70c438@|7ec438@|d2d254@|fcd238@|fcb60e@|fca80e@|d29a1c%|a8700e%|a8620e%|c47e1c%|eea80e@|fcb60e@|fcc42a@|eed254@
+8cd254=|7ec438%#**|7ed238+|7ed246=|7ec446%|a8c438@|d2c438@|fcb61c@|fcb60e@|eea81c@|e09a0e%|e09a1c%|fca81c@|fcb61c@@|e0d238@|b6d246@|7ed246@|7ed238@|70b62a%|70b646%|000000        |eec446#|fcc41c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|eea80e@|fcb61c@|fcd22a@|fcd246@|8cc438@|7ec438@|7ed238@|8cd246@|7ed238@|70c438@|62b62a%|7eb646=|000000 |fce062%|fcd246@|fcd22a@|fcc40e@|fca80e@|fcb61c@|eea81c@|d28c2a%|c47e1c%|c48c1c%|d28c1c%|eea82a%|fca80e@@|fcb60e@|fcc42a@|fcd238@|eed246@|b6d246@|d2d246@|fcd246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%|a8620e%%|b67e1c%|fcb61c@|fca80e@@|fcb60e@|fcb61c@|fcc438@|eec454@|a8d246=|000000   |d2d254=|eec438@|fcc42a@|fcc40e@|fcb60e@|fcb62a@@|d28c2a%|c48c1c%|c47e1c%|d28c2a%|fca82a@|fcb62a%|fcb60e@|fcc40e@|fcb62a@|eec446@|fcd254=|000000        |e0b646#|fcc42a@|fcc40e@|fca80e@|fcb62a@|ee9a0e%|fca81c@|eea80e@|fcb60e@@|fcb62a@|fcd246#|fce062+|000000      |eed262*|fcd246@|fcc41c@|fca80e@|e09a1c%|b6701c%|a8701c%|c48c1c%|fca80e@|fcb60e@|fcc42a@|eed254@|7ec438@@|7ed246@|7ed238@|70b646+
+000000    |7ed246=|7ec438+|7ec446*|7ec438*|e0c454@|fcc42a@|fcb60e@@|b6701c%|9a620e%%|b6701c%|fcb60e@@|fcc42a@|c4c446@|62b62a%|70c438@|7ed246@|70c438@|7ed246++==|8cd254=|7ed238-|eed254@|fcd238@|fcc41c@|fcb60e@|fca81c@|e09a1c%|b67e1c%|b6701c%|b67e1c%|e0a81c@|fca80e@|fcb60e@|fcc41c@|fcd246@|c4d246@|70b62a%|70c438%@|7ed238@|7ec438@|70b646%|d2d254=|fcd254#|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb61c@|a8700e%|a8620e%|9a620e%%|a8620e%|b6701c%|fcb61c@|fca80e@|fcb60e@|fcc41c@|fcc438@|c4c446@|70c438@@|b6c438@|fcc438@|fcc41c@|fcc40e@|fcb60e@@|fca82a@|e0a82a@|a8701c%|a8620e%%%%|a8701c%|e0a81c@|fca82a@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fcd246@|fce062*|000000   |fce062%|fcd246%|fcc438*|eec446@|fcc41c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcc41c@|fcc438@#|fcd246@|fce054@|000000         |fce062*|fcd246#|eec446*|fcc42a@|fcd21c@|fcb61c@|fcc41c@@|eeb62a@|fcd238@|fce046@|fcd262=|000000         |fcc446@|fcc41c@|fca80e@|fcc41c@|fca80e@|fcb61c@@|fcd22a@|fcd254@
+000000         |fcd246%|fcc42a@|fcb60e@|eea81c@|e09a1c%|e08c0e%|eea82a@|fcb60e@|fcb61c@|fcc438%|eee054=|8cd246+|7ec446+|70c438+|7ed246*|7ec438*##%%@|b6c446@|fcc438@|fcc41c@|fcb60e@|fcb61c@|a8700e%|9a620e%%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcb61c@|fcc438@|a8c446@|70c438@@@@@|7ed246@|c4d254@|eed246@|fcc438@|fcb61c@|fcb60e@|fca80e@|fca81c@|b67e1c%|a8620e%|9a620e%%|a8620e%|c48c1c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd246@|fce062%@|fce054@|fcd238@|fcd22a@|fcb61c@|fca80e@@|fcb60e@|fca80e@|fcb638%|eea81c@|e09a1c%|e09a2a%|ee9a1c@|fcb62a@|eea82a%|fcb60e@|fcc40e@|fcb60e@|eeb61c@|eeb638%|fcc446*|fcd254*|fce062=|000000      |fce054@|fcd246@|eeb638%|fcc42a@|fcd22a@|fcb61c@|fcc41c@|fcd21c@|eeb62a@|fcc438@|fce046@|fcd262+|000000              |fce062%|fcd254*|eec454+|fcd246%|fce054@|000000               |fcd246#@|eec446*|fcd246@|fcd254#
+000000          |fcd246@|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcc41c@|eeb62a%|fcd246%|fce062#|000000            |fcd254*|fcb62a@|fcb60e@|fca80e@|eea82a@|d28c1c%|c48c1c%|d28c2a%|fca81c@@|fcb60e@|fcd22a@|fcd246@|fce070+|000000       |fcd254#|fcd238@|fcd22a@|fcc41c@|fcb60e@|fcb61c%|fca81c@|eea82a@|e09a1c%|e08c1c%|e09a1c%|fcb61c@@|fcc40e@|fcc41c@|fcc438@|e0c454*|000000     |eec462=|fcc438@|fcd22a@|fcd21c@|fcb60e@|eea80e@|fcc40e@|fca80e@@|fcb60e@|ee9a0e@|fcb60e@|fcc40e@|eeb61c@|fcc42a@|fcd22a@|fce046@|fcd254@|000000            |fce062@|fcd254%|eec454%|eec446#|fce054@|eec462=
+000000            |fce062=|fcd254=|000000 |fce054*|000000                |fcd246@|fcd238@|eeb61c@|fcb60e@@@|fcc40e@|eea80e@|fcc41c@|fcd22a@|fcc454%|000000         |fce062+|fcd254+|eec454=|fcc446@|fcd21c@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@@@|fcd21c@|fcc446@+|fcd254#|fce062#|000000     |fce062@|fce054@|fcd246@|eeb638*@|fcd22a@|fcd21c@|fcb61c@|fcc41c@|fcd21c@|fcb61c@@|fcd22a@|fcd238@|fcc454#|000000  |fce070=
+000000                                  |fcd254#|fce046@|fcc446%|eec438@|fce038@|fcc446@|000000 |fcd254+|fce062*|000000           |fce070=|fce054@|fcc446*|e0b654*|fcd238@|fcd22a@|eeb62a@|fcc42a@|fcd238@|e0b638@|fcc446@|fce054@|000000            |fcd262@|fce054@|eec446@@|fcc446@|fce046@|fcc446@|e0b646%|eec446@|fce054@|fce070#
+000000                                                          |fce062*|eed262=|eec462+|eec454=|fce062%|000000                    |fce062#
+`,
+        plano: `
+                                                                                  - *                    - #  -+
+                                                                           =   #@###@#-+%@          +- *@##@##%%- =*+=-         @+-+*      =++
+          -+*#=                                                            #@%**%%*#%**%%#          +%%*##*#+##*#%%*#*++=    @%*%#*%#=*  ++***    =+-:
+        -++*#*+  :                                       +*++@=+##    -+####*#%**#+**+##*#%@@=    #%%****+==+**#**###***+= *****+++**##+++**++   -*%##%==
+       -++*##**#*#**+=             ++ :+++++==-       %*-#%##%*#%* =++++*%%%#****+==+***###*=     -##***-::::-**##%#++++*++###*+:::-**#%%*+++   =%#****##-
+       ++##*%*###%**+++         #*-#%##@##**#**++:    +#%**#+*+#*#%%+++####****+::::::+++*#%%%%*+#%%##**-:::::**##%%#+==--+%%#*+::::**###*++*+*#%#*=::-+##%
+-+===--+*##*+=+*####**+=        *##+**#**%%++***+=: %%%#***=--=****##%##%%%##**:::..::-****###-   -###***==-=**####-        +##**+*+**#*+      +%#*+-:=**##****-
+    --==###*-::-*##*++*+-----:%%%**+---+**#%#+++*++-*##***:::::-***##*++*####***::::::+**#%%%%+   ##+###******##*%@         +*=#%*%#*%%-         #%*#*#*%%
+         ##*+==**#*----===++++*##**::.:-**##*+++++*#%##***-::::-**#%%%#@@%%#*****+=++#+###**++=      @%*#%*#%*#@+              %+-#@               *%+%*
+          %#*#*%*##            ****+=-=***%%=       *%%#***+==+**###=     -#%%**#**#+##*#%@%            @##*@=
+            == *                %%*##*#*#%*         +=-#%#*#*#*#%#=**     @@#=*%%*#%**%%*  -
+                                  *@##@# =*           =%+=%%*#%*#@            %@###@#*#%*
+                                                          *-=-#                    *
+`
+      },
+      {
+        color: `
+000000                                                                                   |fcd262=|fce070*|000000                   |fce062=|eec462=|e0c454=|fcd254*|fce062#|000000  |fce062=
+000000                                                                               |fce054@|fcd246@|eec446@|eeb638@|fcd246@|fce046@|e0b646%@|fcd246@|fce054@|fcd262%|000000          |fce070=|fce054*|eec446=|e0b654+|fcd238@@|eeb62a@|fcd22a@@|eeb638@|fcd238@|fce046@|d2d254%|000000 |9ae054+|8ce046%|7ed246%|7ec438#+|000000        |fce062#|fce054@|eec454+|eec446+|fce054@|fcd262=|000000      |7ec438*|8cd246#|8ce046*
+000000          |7ec446+#|7ed238@|9ae054@|8cd254*|000000                                                            |fce054@|fce046@|fcc438@|e0a838@|fcc42a@|fcd21c@|fcb61c@@|fcd21c@|fcc41c@|eea81c@|fcc41c@|fcd22a@|fcc42a@|eec462=|000000 |fcd254=|fce070+|000000        |fcc438@|fcd22a@|fcb61c@|fca80e@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|eec42a@|e0d238@|fcd246@|fce054@|9ad246@|8cd246@@|70c438@@|70b638%|000000   |fce062#|fce046@|fcc438#|fcb62a@|fcd21c@|fcb61c@|fcc41c@|fcd21c@|eeb62a@|fcc446%|fce054%|000000  |70c438@@|8cd246@@|7ed238@|000000    |9ae054+|a8d254*|8cc446+|7ec446-
+000000        |70b638*|70c438@|7ec438@|7ed238@|8ce046@|7ed238@|7ec438@|000000  |8cd254-|000000                                        |fce062%|eec454%#|fce054@|fcd254%|e0b654=|eec454*|fce062%|000000    |7ec446+%|a8d246@@@|c4c438@|fcc42a@|fcd21c@|fcc40e@|eea80e@|fcb60e@@|fc9a0e@|fcb60e@|fca80e@@|fcc40e@|eeb60e@|e0b61c@|fcc42a@|fcd238@|fce046@|fcd254%|000000     |fce070*|fcd246@|fcd22a@|fcc41c@|fcb60e@|fcb61c@|fca80e@|eea82a@|d28c1c%|e09a1c%%|eeb61c@@|fcb60e@|fcc40e@|fcb62a@|d2c446@|a8c438@|9ac438@|7ec438@|7ed246@|7ed238@|70b62a%|70b646#|000000 |fcd254=|fcc454*|fcb61c@|fcc40e@|fca80e@|fca81c@|ee9a0e@|fca80e@|fca81c@|fcb60e@|fcc41c@|eeb62a@|eec454+|a8c446@|70c438@|7ed246@|7ed238@|70c438@@|000000   |fce062+|9ac438@|fcd238@|fcc42a@|eec438@|fcd238@|c4b646#
+000000       |70b646*|70b62a%|70c438@|7ed238@|9ad246@|d2d246@|9ac438@@|eee062%|8cd246@|8ce046@|7ed238@|7ec438@|70c438@|70b638#|000000             |fce062*|000000  |c4c454=|e0d254*|7ed246#|8cd246#|9ae054**|7ed238*|7ec438*|7ec446+|000000       |fce062#|fce054@|fcc438%|e0b646%|fcd22a@|fcc42a@|fcb61c@|fcd21c@|fcc41c@|fcb61c@|fcd22a@|fcd238@|000000  |e0d262=|70b638%|70c438@|7ec438@|e0d254@|fce046@|fcd238@|fcd21c@|fcb60e@|eea80e@|fca81c@|fca80e@|eea82a@|ee9a1c@|d28c1c%|e09a1c%|d29a1c%|fca81c@|b6b62a@|fca80e@|fcc40e@@|fcb61c@|e0b638@|eec446=|fcd254=|000000    |fcd262+|eec438@|fcb61c@|fcb60e@|fca80e@|fca81c@|c48c1c%|a8620e%%|9a620e%|a8620e%|b6701c%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd246@|c4d246@|70b62a%|62b62a%|70c438@|7ec438@|70c438@|a8d246@|fcd246@|fcd22a@|fcc40e@|fca80e@|e09a1c@|a8700e%|a8620e%%|b6701c%|eea82a@|fcb60e@|fcc40e@|fcd22a@|eed246@|8cd246@|7ec438@|62b62a%|70b638%|000000   |eec462-|fcc438@|fcc40e@|eea80e@|fcb60e@@@|fcc40e@|fcc42a@|eec454+
+000000       |70b646%|70b62a%|a8c446@|eed246@|c4c42a@|fcc41c@@@|fcc42a@|c4c42a@|d2d246@|9ad246@|8cd246@|70c438@@|70b638%|000000         |fce062*|fcd246=|eeb654*|fcd238@|fcc42a@|eeb62a@|fcd22a@|fcd238@|a8c438@|b6d246@|a8d246@|7ed238@|8ce046@|8cd246@|7ed238@|70c438@|70b638@|70b646=|000000   |fcd254=|eec454+|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|eea80e@|fcb60e@|fcb61c@|fcc42a@|fcd22a@|fcd238@|d2c446@|70c438@@|8cd246@|a8c446@|eeb638@|fcb62a@|fcb60e@@|fca80e@@|e0a82a@|a8700e%|a8620e%%%%|a8700e%|e0a81c@|eea80e@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fce046@|e0d254@|8cc446@|70c438@|a8d246@|e0d246@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb61c@|b67e1c%|a8620e%|9a620e%%|a8620e%%|eea82a@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|a8d246@|7ed246**|7ec446*+|7ed246+|a8d254*|fcd254@|fcd22a@|fcc40e@|fca80e@|e09a2a@|a8620e%|9a620e%|a8620e%|a8701c%|eea82a@|fcb60e@|fcc40e@|fcd238@|eed246@|7ec446@|70c438@|7ec438@@|70c438@|7ec438@|e0d246@|fcd238@|fcc40e@|fca80e@|d29a1c%|a8700e%|a8620e%|c47e1c%|eea80e@|fcb60e@|fcd22a@|fcd254@
+8cd254=|7ec438%#**|7ed238+|7ed246=|7ec446%|c4d246@|e0d238@|fcb61c@|fcb60e@|eea81c@|e09a0e%|e09a1c%|eea81c@|fcb61c@@|d2c438@|b6d246@|7ed246@|7ed238@|70b62a%|70b646%|000000        |fcc446@|fcd21c@|fcb60e@|eea80e@|fcb60e@|fca80e@|fcb60e@|eea80e@|fcc41c@|fcd22a@|e0c446@|7ec438@@|7ed238@|8cd246@|7ed238@|70c438@|62b62a%|7eb646=|000000 |fcd262*|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca81c@|eea81c@|d28c2a%|c47e1c%|c48c1c%|d28c1c%|eeb638%|fca80e@|fcb60e@@|fcb62a@|d2c438@|d2d246@|d2e054@|fcd254@|fce046@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%|a8620e%%|b67e1c%|fcb61c@|fca80e@@|fcb60e@|fcb61c@|eec438@|e0c454@|8cd246=|000000   |eed254%|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca81c@@|d29a2a%|c48c1c%|c47e1c%|d28c1c%|eeb638@|fca81c@|fcb60e@@|fcb61c@|fcc446%|fcd254#|fce062+|000000       |eec446*|fcb61c@|fcb60e@|fca80e@|fca81c@|ee9a0e@|fca80e@|eea81c@|fcb60e@@|fcb61c@|fcc454*|000000       |eed262+|fcd246@|fcc41c@|fca80e@|e09a1c%|b6701c%|a8701c%|d28c1c%|fca80e@|fcb60e@|fcc42a@|e0d254@|7ec438@@|7ed246@|7ed238@|70b646+
+000000    |7ed246=|7ec438+|7ec446*|7ec438*|e0c446@|fcc42a@|fcb60e@@|b6701c%|9a620e%%|b6701c%|fcb60e@@|fcc42a@|b6c446@|62b62a%|70c438@|7ed246@|70c438@|7ed246++==|8cd254=|8cd246=|eed254@|fcd238@|fcc41c@|fcb60e@|fca81c@|e09a1c%|b67e1c%|b6701c%|b67e1c%|ee9a1c@|fca80e@|fcb60e@|fcc41c@|fcd246@|c4d246@|70b62a%|70c438@@|7ed238@|7ec438@|70b646%|fce062*|fcd254%|fcc438@|fcc41c@|fcb60e@|fca80e@|fca81c@|a8700e%|a8620e%|9a620e%%|a8620e%|b6701c%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|e0c446@|7ec438@|70c438@|9ac446@|eeb638@|fcb61c@|fcb60e@@@|fca81c@|e0a838@|a8701c%|a8620e%%%%|a8701c%|e0a81c@|fca81c@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fce046@|fce054@|000000   |fce062+|fcd246+|fcc446+|fcc438@|fcc41c@|fcc40e@|eea80e@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcc41c@|fcb638@|fcd238@|fcd246@|fce062@|000000         |fce070+|fce054@|fcc438%|eeb62a@|fcd21c@|fcb61c@|fcb60e@|fcc41c@|eeb62a@|fcc438@|fce046@|fce062%|000000         |fcd238@|fcc41c@|fcb61c@|fcb60e@@@@|fcd22a@|fcd254*
+000000         |fcd254#|fcb61c@|fcb60e@|eea81c@|e08c1c%%|eea81c@|fcb60e@|fcb61c@|fcd238%|eee062+|8cd246+|7ec446+|70c438+|7ed246*|7ec438*##%%@|c4c446@|fcc438@|fcb61c@|fcb60e@|fcb61c@|a8700e%|9a620e%%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcb61c@|fcc438@|a8c446@|70c438@@@@@|7ec438@|8cc446@|c4c438@|eec438@|fcb61c@|fcb60e@|fca80e@|fca81c@|b67e1c%|a8620e%|9a620e%%|a8620e%|c48c1c%|fca81c@|fca80e@|fcc40e@|fcc41c@|fcd238@|fcd246@|fce070+|fcd270+|fcd254@|fce038@|fcd22a@|fcc41c@|fcb60e@|eea80e@|fca80e@@|eea838@|eea81c@|e09a1c%%|e09a2a@|fcb61c@|fcb646#|fcb61c@|fcc40e@@|fcb62a@|e0b638@|eec454-|000000       |fce062%|fce054@|fcc438%|e0b638%|fcd22a@|fcd21c@|fcb61c@|fcd21c@|fcc41c@|eeb62a@|fcd238@|fcd246@|000000               |fce062*|fce054%|eec454=|eec446*|fce054@|fcd262*|000000              |fcd254@|fcc446%#|fce046@|eec462=
+000000          |fcd246%|fcb62a%|fcc41c@@@@|fcb62a%|fcd246@|fce062*|000000            |fce054%|fcc42a@|fcb60e@|fcb61c@|eea81c@|d28c1c%|c47e1c%|d28c2a%|eea81c@|fca80e@|fcb60e@|fcc42a@|fcd246%|fce070+|000000       |fce054@|fcd238@|fcd22a@|fcb61c@|fca80e@|fcb61c@|fca81c@|eea82a@|d28c1c%|e09a1c%|ee9a1c@|fcb62a@|fcb60e@|fcc40e@|fcc41c@|eeb638@|eec454+|000000  |fce070=|fcd262+|fcc454+|000000 |eec446%|fcc42a@|fcd21c@|fcc40e@|eea80e@|fcb60e@@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcb638%|fcc438@|fcd238@|fce054@|fce062*|000000           |fce062@|eec454##|fcd254@@|000000 |eec454+|fce070=
+000000            |fce062*|000000  |fce062#|000000                |fcd246@|fcd22a@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb61c@|fcd22a@|fcd246@|000000           |eec462+|fcd238@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fcc41c@|fcc446%|fcd246#|fce054@|fce070+|000000     |fcd262+|fce054@|fcd246@|fcc438@|e0b638%|fcc42a@|fcd21c@|fcb61c@@|fcd21c@|fcc41c@|eeb61c@|fcc42a@|fce038@|fcd246@
+000000                                   |fce046@|fcd238@|eec446%|fcd238@|fcd246@|000000  |fce062=|000000           |fce070#|fcd254#|eec446=#|fce038@|fcc42a@|eeb62a@|fcd22a@|fcc42a@|eeb638@|fcd246@|fce054@|000000            |eec454=|fce054@|fcd246@|eec446@|eeb646@|fcd246@|fce046@|e0b646#%|eed254@|fce062#
+000000                                                          |fce062+|eec462=|000000 |fce062#*|000000                    |fcd262=|fce062*
+`,
+        plano: `
+                                                                                   =*                   ==-+#  -
+                                                                               @%##@@**%@%          =*-=@%#%%*%@* =**+-        #%==@-      =*+
+          -+*#=                                                            @@#*#@#*%%*#@%- =+        %%#*%*#*#%#%%@###*++   #@*#%##%**%  +*##*    =+=:
+        =+**#**  :                                        %*+@%-+%    -+###*#%#*##+#**#**%@@%     *@%#*#**=++#*####*****+= =+##**+**###=*+***+   +*%##@+
+       -++*#%**###**+=             *  -+++++==-       #@**@%#%##@%  -++*%@@%#****+=++***###*--    +###**=::::-**#%%%#+++*+#%%#*+:::-**%%%**++   -%%*#**#%=
+       ++#%*%##%*%##*++         *==@%#%%*##*##*++:   ==#%#*#+#+###%@#+*######***::::::++*#%%@@%*+#%%##**-:::::**##%%#=====+%%#*+::::**#%%*+****%%#*=::-*#%%
+-++==--+#%##+++*####**++        %%#*#*#*#%#+**#*++: +%%%***=-==***####%%@@%%#**-::::::-#**####-   #%%%***+=-=**####*+       +##**+**###+       =%#*+-:=*#%%****-
+    --==###*-::-*##*++*+=-----%%%**+---+*#%%#+++**++%%##**:::::-**##%#*+*####***::::::+**#%%@@@   ++=#%#*#*#*###%@%         +@*#%##%*%@#         %#*#*##%+
+         ###*==**##+---==++++*###**::::-*###*+++++**###***-::::=**#%%@++@@@%******+++#+*%%#*-       #@#*%%*%%*%@               +%-+@+              @#*@-
+          %*#####@*            ##**+===***#%+       @@%#*#**=++#*###=  =+= *%%#*##*#**%#*%@@+           @*+@@ ==
+            +  #                %%#*#*%*#%%           =%%**#*#*#%*#@+     =@@#*%@#*%%*#@%
+                                   @%*%@  =           #*-*@%#@%#%@            -@%##@@**%#
+                                                          +- #*                    -*
+`
+      },
+      {
+        color: `
+000000                                                                                   |fce062*|000000                    |fce070=|eed262=|eec462*|eec454=|fce062@
+000000                                                                              |fcd262%|fce054@|fcc446@|eec446@|fcc438@|fce046@|fcc446@|e0b646@|eec446@|fce046@|fce054@|000000            |fce062@|fcd246#|e0b638+|fcd246@|fcd238@|fcc42a@@|fcd22a@|eeb638@|eec438@|fce046@|fcd254@|000000 |9ae054+|8ce046%|7ed246%|7ec438#+|000000        |fce062@|fcd246*|eec454+|fcd254#|fce054@|000000       |7ec438*|8cd246#|8ce046*
+000000          |7ec446+#|7ed238@|9ae054@|8cd254*|000000                                                           |fce062@|fce054@|fcd246@|eeb638#@|fcd22a@|fcd21c@|fcb61c@@|fcd21c@|fcb61c@@|fcd21c@|fcd22a@|e0c438@|000000 |fcd246*|fce054%|fce070#|000000      |fcd262=|000000 |fcc446%|fcd22a@|fcc41c@|fca80e@|fcc40e@|fcb60e@@@|fca80e@|fcc40e@|fcc41c@|d2c438@|eed246@|fce054@|b6d246@|8cd246@@|70c438@@|70b638%|000000   |fce054%|fcd246#|eec446*|fcc42a@|fcc41c@|fcb61c@|fcc41c@@|eeb62a@|fcd246@|fce062@|000000  |70c438@@|8cd246@@|7ed238@|000000    |9ae054+|a8d254*|a8d246+|7ec446-
+000000        |70b638*|70c438@|7ec438@|7ed238@|8ce046@|7ed238@|7ec438@|000000  |8cd254-|000000                                        |fce062%|fcd254#|eec454@|fcc446%|fce054@|000000  |fce062+|fce070+|000000   |7ec446+|7ec438%@|8cd238@|9ad246@|eec438@|fcd22a@|fcd21c@|fcb60e@|eea80e@|fcc40e@|fca80e@@|fcb60e@|ee9a0e@|fcb60e@@|eea80e@|fcb60e@|fcd21c@|fcd238@|fcd246@|000000       |fcd246@|fcd22a@|fcc41c@|fcb60e@|fcb62a@|fcb61c@|e09a2a@|e08c1c%|e09a1c%|d29a1c%|fcb61c@|e0b61c@|fcb60e@|fcc40e@|fcc42a@|e0c446@|8cc438@|7ec438@@|7ed246@|7ed238@|70b62a%|70b646#|000000  |eec446%|fcc41c@|fcc40e@|fca80e@|fcb62a@|ee9a0e@|fca81c@|fca80e@|fcb60e@|fcb61c@|eeb638@|fcd246*|c4c446@|70c438@|7ed246@|7ed238@|70c438@@|000000   |fce062#|a8c438@|eec438@|fcd22a@|e0c438@|fcd238@|e0c446%
+000000       |70b646*|70b62a%|70c438@|7ed238@|8cd246@|c4d246@|b6d238@|8cc438@|e0e070#|9ad246@|8ce046@|7ed238@|7ec438@|70c438@|70b638#|000000             |fce062=|000000  |fce062*|c4d246*|7ed246#|8cd246#|9ae054**|7ed238*|7ec438*|7ec446+|000000        |fce054@|fcd246@|e0b638%|fcc42a@|fcd22a@|fcb61c@|fcc41c@|fcd21c@|eeb62a@|fcd22a@|fcd238@|fcc454+|000000  |70b638%|70c438@|8cd238@|fce054@|fce046@|fcd238@|fcc41c@|fcb60e@|fca80e@@@|eeb638%|ee9a1c@|d28c1c%|d29a1c%|e09a1c%|eea81c@|d2b61c@|fcb60e@@@|eeb61c@|eeb638@|fcd246#|fcd254#|fce070+|000000  |fce070=|fce054#|fcc446@|fcc41c@|fcb60e@|fca80e@@|c48c1c%|a8620e%%|9a620e%|a8620e%|b6701c%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|e0d254@|70b638@|62b62a%|70c438@|7ec438@|70c438@|b6d246@|fcd246@|fcd22a@|fcc40e@|fca80e@|e0a81c@|a8700e%|a8620e%%|b6701c%|eea82a@|fcb60e@|fcc40e@|fcc42a@|eec446@|7ed246@|7ec438@|62b62a%|70b638%|000000   |fcd262=|fcc438@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb60e@@|fcd22a@|eec454%
+000000       |70b646%|70b62a%|8cc438@|fcd246@|e0c42a@|fcb61c@|fcc41c@|fcb61c@|fcd22a@|c4b62a@|c4d246@|a8d246@|8cd246@|70c438@@|70b638%|000000         |fcd254=|000000 |fcd254@|fcd238@|fcc42a@@|fcd22a@|eec42a@|a8c438@|d2e054@|9ad246@|7ed238@|8ce046@|8cd246@|7ed238@|70c438@|70b638%|70b646=|000000  |fce070=|fce054*|fcd246+|eec446@|fcc41c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcc40e@|fcb62a@|fcc438@|fcd246@|fcd254@|8cc438@|70c438@|8cd246@|a8c446@|eec438@|fcc42a@|fcc40e@|fcb60e@@|fcb62a@|e0a82a@|a8700e%|a8620e%%%%|a8700e%|e0a81c@|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fcd246@|a8c446@|7ec438@|70c438@|8cc438@|b6c438@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb61c@|b67e1c%|a8620e%|9a620e%%|a8620e%%|eea82a@|fca80e@|fcb60e@@|fcc42a@|e0c446@|8cc446*|7ed246**|7ec446*+|7ed246+|9ac454*|eec446@|fcc42a@|fcc40e@|fca80e@|e0a82a@|a8620e%|9a620e%|a8620e%|a8701c%|e0a81c@|fca80e@|fcc40e@|fcd22a@|eed246@|8cd246@|70c438@|7ec438@@|70c438@|7ec438@|d2c446@|fcc438@|fcc40e@|fca80e@|d29a1c%|a8700e%|a8620e%|c47e1c%|fca80e@|fcb60e@|fcc42a@|fcd254@
+8cd254=|7ec438%#**|7ed238+|7ed246=|70c446%|d2d246@|eed238@|fcb61c@|fcb60e@|eea81c@|e09a1c%|e09a0e%|eea82a@|fcb60e@|fcc41c@|d2c438@|a8d246@|7ed246@|7ed238@|70b62a%|70b646%|000000       |eed262=|fcd238@|fcd21c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcc42a@|a8b638@|8cc438@|7ec438@|7ed238@|8cd246@|7ed238@|70c438@|62b62a%|7eb646=|000000  |eec446@|fcc42a@|fcc40e@|fcb60e@|fcb62a@|fca81c@|d28c2a%|c47e1c%%|d28c1c%|fcb62a%|fca80e@|fcb60e@@|fcb62a@|c4b638@|a8c438@|b6d254@|eed254@|fcd246@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%|a8620e%%|b6701c%|fcb61c@|fca80e@|fcb60e@@|fcc41c@|fcc438@|eec446@|b6d254*|000000  |d2e062+|fcd246@|fcd238@|fcd21c@|fcb60e@|fca80e@|fca81c@@|d29a2a%|c48c1c%|c47e1c%|d28c1c%|eeb638%|fca80e@|fcb60e@@|fcb62a@|fcd238@|fce054@|fce070#|000000      |fce070+|fcd254*|eeb62a@|fcb60e@@|eea81c@|ee9a0e@@|fcb62a@|fca80e@|fcc40e@|fcc41c@|eeb646#|000000       |eed270+|fcd246@|fcc41c@|fca80e@|e09a1c%|b6701c%|a8701c%|d28c1c%|fca81c@|fcb60e@|fcd22a@|e0d254@|7ec438@@|7ed246@|7ed238@|70b646+
+000000    |7ed246=|7ec438+|7ec446*|7ec438*|e0c454@|fcc42a@|fcb60e@@|b6701c%|9a620e%%|b6701c%|fcb61c@|fcb60e@|fcc42a@|c4c446@|62b62a%|70c438@|7ed246@|70c438@|7ed246++==|8cd254=|8cd246=|fce054%|fcd246@|fcc41c@|fcb60e@|fca81c@|d29a1c%|b67e1c%|b6701c%|b67e1c%|e0a81c@|eea80e@|fcb60e@|fcd22a@|fcd246@|c4c446@|70b62a%|70c438@@|7ed238@|7ec438@|70b646%|e0d254%|fcd254@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|a8700e%|a8620e%|9a620e%%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|eed246@|b6d246@|9ac446@|c4d246@|eeb638@|fcb61c@|fcb60e@@|fca80e@@|e0a838@|a8701c%|a8620e%%%%|a8701c%|e0a82a@|fca81c@|fca80e@|fcb60e@@|fcc41c@|fcd238@|fcd246@|fce054@|000000     |eec454#|fcc42a@|fcd21c@|fcb60e@@@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb61c@|fcc42a@|fcd22a@|fcd246@|eed262=|000000          |fce046@|fcd238@|eeb62a@|fcc41c@@|fcb61c@|fcd21c@|fcb62a@|fcc438#|fcd246%|fce062@|000000        |eed270+|fcd238@|fcc42a@|fcb61c@|fcb60e@@|fca80e@|fcc40e@|fcc42a@|eed262+
+000000         |fcc446%|fcb61c@|fcb60e@|eea82a@|e08c0e%|e09a1c%|eea81c@|fcb61c@@|fcd246@|e0d254#|8cd246+|7ec446+|70c438+|7ed246*|7ec438*##%%@|c4c446@|fcc438@|fcb61c@|fcb60e@|fcb61c@|a8700e%|9a620e%%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcc438@|b6c446@|70c438@@@@@|7ec438@|7ec446@|a8c438@|eec438@|fcb61c@|fcb60e@|fca80e@|fcb62a@|b67e1c%|a8620e%|9a620e%%|a8620e%|c48c1c%|fca82a@|fca80e@|fcc40e@|fcc41c@|fcd238@|fcd254@|000000  |fcd254%|fcd238@|fcd22a@|fcd21c@|fcc40e@|fca81c@%|fcb60e@|eea82a@@|e09a1c%%|e0a82a@|fcb61c@|fcb638#|fcb62a%|fcc40e@@|fcc42a@|eec438@|e0c470+|000000       |fce054@|fcd246%|eec446+@|fcd22a@|fcc41c@|fcb61c@|fcd21c@|fcb61c@|fcc42a@|fce038@|fcd254%|000000                |fce054@|fcc454+|eec454=|fcd246%|fce062@|000000              |fce046@|fcc446#|fcc438@|fcd246@|000000 |fcd254=
+000000         |fce070=|fcd246#|eeb638%|fcd21c@|fcb61c@|fcc41c@|fcb61c@|fcc42a@|fcd246@|000000             |fcd254@|fcd238@|fcb60e@|fca81c@|eea81c@|d28c2a%|c47e1c%|d28c1c%|eea82a@|fca80e@|fcb60e@|fcb62a@|fcd246*|fce070=|000000      |fce070*|fcd254@|fcd238@|fcc42a@|fcb60e@|fca80e@|fcb60e@|fca82a@|eea81c@|d28c1c%%|ee9a1c@|fcb638@|fcb60e@@|fcb61c@|eeb638@|fcd246*|fce054*|000000 |fce070+|fce054%|fcd246%|fcc438*|eec446*|fcb638@|fcc41c@|fcc40e@|fca80e@@|fcb60e@|fca80e@|fcb60e@@|fca80e@|fcc40e@|fcc41c@|fcc438@#|fcd238@|fce054@|fce062@|000000          |fce062*|fcd254#|eec454#*|fce054@|eec454#|e0b654*|eed254*|fce07e=
+000000            |fce054=|000000 |fcd254+|fce062*|000000                |fcc454#|fcd22a@|fcc41c@|eea80e@|fcc40e@|fca80e@|fcb60e@@|fcb61c@|fcd22a@|fcd246@|fcd262+|000000          |fcd246@|fcd22a@|fcc41c@|eea81c@|fcc40e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb61c@|fcc438%|fcd246@|fce054@|000000       |fcd254@|fce046@|fcd238@|eeb62a@@|fcd21c@|fcc41c@|fcb61c@|fcc41c@|fcd21c@|fcb61c@|eeb62a@|fcd238@|fce046@|fcd262*
+000000                                   |fcd246@|fce046@|eec446%|fcc438@|fce046@|fcd254#|000000             |fce062*|fcd254=|000000 |fcd246@|fcd238@|fcc438@|fcc42a@|fcd22a@|eeb62a@|fcc438@|fce046@|fcd262+|000000         |fce070=|000000   |fcd254@|fce046@|fcc446@|eec446@|fcc438@|fce046@|fcd246@|d2b646=|e0c454*|fcd262*
+000000                                                         |fce070=|000000   |fce062@|000000                      |fce062+
+`,
+        plano: `
+                                                                                   *                    =-+-%
+                                                                              %@###@#*#@@            %*-%@##@*#@% =**=-        %+=*@       =*+
+          -+*#=                                                           %@%+*%%*#%#*%%# +##      - *%%*#*#**%##%%##**++   ##+#%*%#*%%  +**#*    =+=:
+        =+**#**  :                                        %*##@  +=   -+**##%%**#**#+##*#%@%       %%%**#+===#*####+****+=  *##*#+**###+#+**++   **#%*%*
+       -++*###+*##**+=             =  ++++++==-        @%*#%*%%*%@=  ++*@@%#*****+==+**##**#**+  -*%##**=::::-**#%%@%+++*+#%%#*+:::-**#%#**++   =##*#**#%#
+       ++*%##%#%*##**++         - #@##@#*%#*##*++:  =*+###*#*#*####%%*+**####**+::::::+**#%%%%**+*####**-:::::**####=======###*+::::+*#%%*+****#%#*=::-*#%%
+-++==--+#%#**++**###**+=       -%%******%#******++:  #%##**=--=**###**#%%%%##**-::::::-***####+  +%%%#***+=-=****#%%*      =+#***++**##+       =%#*+-:=*#%#****-
+    --==###*-::-*##*++*+=-----#%#**+---+*#%%#+++**+#@%%#**:::::-**#%%%#*###*****::::::+***#%%@@     *%%**#+#+#*#%%=          @%*%##%#+%@        =%####*#%=
+         *#**==+*#%*---==++++**##**::::-*##%*+++++***###**-::::=**#%%%  #%%%#*+***+++*+*#%%#=       @#=#@##%##@#                @=-#@              @*#% =
+         =**%####%             @%***===***#*=      *@%%*****==+#*###++ =##++#%%**#****%%#+%@@          **++@*=+=
+            = =+                *%#*#*##*%@+          #%%*##*#*%#*%@       %@%**%%*#%**%@*
+                                   %@*#@*             *= %@##@##@+         =   %@###@%:+*
+                                                         =   @                      +
+`
+      },
+      {
+        color: `
+000000                                                                                  |fce070==|000000   |fce070=|000000                 |fce062+|e0c454+|eec454*|fcd254*|fce062#
+000000                                                                              |fce054@|fcd246@|eec446@|e0b646@|fcd246@@|e0b646@|eec438@|fcd246@|fce046@|fcd262#|000000            |fce070%|fce054@|eeb646%|eeb638%|fce038@|fcc42a@|fcb62a@|fcd22a@|fcc438@|e0b638#|fcd246@|fce054@|eed270=|9ae054+|8ce046%|7ed246%|7ec438#+|000000        |fce054#|eec454=+|fce054@|fcd254#|000000       |7ec438*|8cd246#|8ce046*
+000000          |7ec446+#|7ed238@|9ae054@|8cd254*|000000                                                           |fce062@|fcd254%|fcc446*|e0b646+|fcc438@|fcd22a@|fcc41c@|eeb61c@|fcc41c@@|eeb61c@|fcc41c@|fcd21c@|fcc42a@|d2b646#|fcc446*|fcd254@|fce062@|fce070+|000000      |fce062*|fcd246+|eec446*|fcc438@|fcd21c@|fcb60e@@@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|d2c42a@|d2d246@|e0d254@|c4e054@|8cd246@@|70c438@@|70b638%|000000   |fce062*|fcd246+|eec446#|fcd22a@|fcc41c@|fcb61c@|fcd21c@|fcb61c@|fcc438@|fce046@|fcd262*|000000  |70c438@@|8cd246@@|7ed238@|000000    |9ae054+|9ad246*|c4d254*|7ec446-
+000000        |70b638*|70c438@|7ec438@|7ed238@|8ce046@|7ed238@|7ec438@|000000  |8cd254-|000000                                        |fcd262+|fce054%|eec446@@|fce054@|fcd262#|000000  |fce070+|000000   |7ec446+|7ec438%@|7ed238@|d2c446@|fcd238@|fcd22a@|fcc41c@|eea80e@|fcb60e@|fcc40e@|fca80e@@@@|fcb60e@@|eea80e@|fcc40e@|fcd21c@|fcd22a@|eec446#|000000       |eec446@|fcd22a@|fcc41c@@|fcb62a@@|e09a2a@|e09a1c%|e08c1c%|d29a1c%|fcb61c@|e0b61c@|fcb60e@|fcc40e@|fcc42a@|fcc446@|8cc438@|70c438@|7ec438@|7ed246@|7ed238@|70b62a@|70b646#|000000  |fcc446@|fcc41c@|fcc40e@|fca81c@|fcb61c@|ee9a0e@|fca81c@|fca80e@|fcb60e@|fcb61c@|fcc438%|fcd246%|d2d246@|70c438@|7ed246@|7ed238@|70c438@@|000000   |fce062*|c4d238@|d2c438@|fcd238@|e0b62a@|eec438@|fcd254@
+000000       |70b646*|70b62a%|70c438@|7ed238@|8cd246@|a8d238@|e0d246@|8cc438@|c4d270+|a8d246@|8ce046@|7ed238@|7ec438@|70c438@|70b638#|000000            |fce070=|000000   |fce062#|8cc446*|7ed246#|8cd246#|9ae054**|7ed238*|7ec438*|7ec446+|000000        |fcd254@|fcd246@|eeb638@|eeb62a@|fcd22a@|fcc41c@|fcb61c@|fcd21c@|eeb62a@|fcc42a@|fce038@|fcd254@|000000  |70b638%|70c438@|a8d246@|eee054@|fcd246@|eec438@|fcb61c@|fca80e@|fcb60e@@|fca81c@|fcb638@|e09a1c@|d28c1c%%|e09a1c@|d2b61c@|eea80e@|fcb60e@|fca80e@@|fcb61c@|fcc438@|fcd246@|fce054@|fce070#|000000  |eee070+|fce054@|fcd238@|fcc41c@|fcb60e@|fca80e@@|c47e1c%|a8620e%%|9a620e%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd246@|eed254@|7ec438@|62b62a%|70c438@|7ec438@|70c438@|c4d254%|fcd246@|fcd22a@|fcb60e@|fca80e@|e0a81c@|a8700e%|a8620e%%|b6701c%|fca82a@|fcb60e@@|fcc42a@|d2c446@|7ed238@|7ec438@|62b62a%|70b638%|000000  |fce070=|fcd246*|fcc438%|fcc41c@|fcb60e@@|fca80e@|fcb60e@@|fcd22a@|fcd254@
+000000       |70b646%|70b62a%|7ec438@|fcd246@|fcc42a@|eeb61c@|fcd21c@|fcb61c@|fcd22a@|e0c438@|a8d238@|b6e046@|8cd246@|70c438@@|70b638%|000000           |fcd246@|fcd238@|eeb638@|fcc42a@|fcd22a@|d2b62a@|c4c438@|e0e054@|8cd238@|7ed238@|8ce046@|8cd246@|7ed238@|70c438@|70b638@|70b646=|000000   |fce054@|fcd246%|fcc446#|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@@|fcb60e@|fca80e@|fcc40e@|fcb62a@|fcc438%|fcd246@|fcd254@|a8c446@|70c438@|8cd246@|c4c446@|fcd246@|fcc42a@|fcc40e@|fcb60e@@|fca82a@|e0a82a@|a8700e%|a8620e%%%%|a8700e%|e09a2a@|e0a81c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcc438@|e0c446@|7ec438@@|70c438@@|a8c438@|eec438@|fcb61c@|fcb60e@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%|a8620e%%|eea81c@|fca80e@|fcb60e@@|fcc42a@|e0c446@|8cc446*|7ed246**|7ec446*+|7ed246+|8cd254*|e0c446@|fcc42a@|fcb60e@|fca80e@|e09a2a@|a8620e%|9a620e%|a8620e%|a8701c%|eea81c@|fca80e@|fcc40e@|fcd22a@|fcd254@|9ad246@|70c438@|7ec438@@|70c438@|7ec438@|b6c446@|fcc438@|fcc40e@|fca80e@|c49a1c%|a8700e%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc42a@|fcd254%
+8cd254=|7ec438%#**|7ed238+|7ed246=|70c446%|d2d246@|fcd238@|fcc41c@|fcb60e@|fca81c@|e09a1c%|e08c0e%|fcb62a@|fcb60e@|fcc41c@|e0c438@|8cc438@|7ed246@|7ed238@|70b62a@|70b646%|000000       |fcd254%|fcd238@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcc41c@|eeb62a@|a8c438@@|8cd238@|7ed238@|8cd246@|7ed238@|70c438@|62b62a%|7eb646=|000000  |eeb646@|fcc42a@|fcc40e@|fcb60e@|fcb61c%|fca82a@|d28c1c%|c47e1c%%|d28c2a%|fca82a@|fcb62a@|fcb60e@|fcc40e@|fcc42a@|d2b638@|8cc438@|9ad246@|b6d246@|e0d246@|fcc438@|fcc41c@|fcc40e@|fcb60e@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%|a8620e%%|b67e1c%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcc42a@|eed246@|d2d254@|a8d254+|000000 |e0e062%|fcd246@|fcd238@|fcc42a@|fcb60e@|fca80e@|fca81c@|fca82a@|e09a2a%|c48c1c%|c47e1c%|d28c1c%|eea838@|fca80e@@|fcb60e@|fcc42a@|fcd238@|fcd254@|fce070+|000000      |fce070+|fcd246%|fcc438@|fcb60e@@|eea81c@|eea80e@|ee9a0e@|fcb62a@|fca80e@|fcc40e@|fcc41c@|eec446@|000000       |eee062=|fcd246@|fcc41c@|fcb60e@|e09a2a@|b6701c%|a8701c%|d28c1c%|fca81c@|fcb60e@|fcc42a@|c4c446@|7ec438@@|7ed246@|7ed238@|70b646+
+000000    |7ed246=|7ec438+|7ec446*|7ec438*|d2d254@|fcc42a@|fcb60e@|fca80e@|b6701c%|9a620e%%|b6701c%|fca80e@|fcb60e@|fcc42a@|d2c446@|70b62a%|70c438@|7ed246@|70c438@|7ed246++==|8cd254=|8cd238-|fce062+|fcd246%|fcb61c@|fcb60e@|fca80e@|c49a1c%|b67e1c%|b6701c%|c47e1c%|e0a81c@|eea80e@|fcb60e@|fcc42a@|fcd246@|a8c446@|70b62a@|70c438@@|7ed238@|7ec438@|70b646%|c4d254@|fcd246@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|a8700e%|a8620e%|9a620e%%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd246@|e0d254@|d2d254@|fcd246@|fcc438@|fcc42a@|fcb60e@|fca80e@@@|eea838@|a8701c%|a8620e%%%%|a8701c%|e0a838@|fca80e@@@|fcb60e@|fcc42a@|fcc438@|fcd246%|fce062#|000000     |fcc446@|fcd22a@|fcc41c@|fca80e@|fcb61c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|eea80e@|fcc41c@|fcd238@|fcd246@|000000           |fcd254@|fcd238@|fcb62a@|fcc41c@@|fcb61c@|fcc41c@@|eec446#|fcd246*|fce062#|000000        |fcd262*|fcd238@|fcb62a@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc438@|fcd262=
+000000         |eec446@|fcc41c@|fcb60e@|eea82a@|d28c0e%|d28c1c%|fca81c@|fcb61c@|fcc41c@|fcd246@|d2d254#|8cd246+|7ec446+|70c438+|7ed246*|7ec438*##%%@|c4c446@|fcc438@|fcb61c@|fcb60e@|fcb61c@|a8700e%|9a620e%%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|c4d246@|70c438@@@@@|7ec438@|7ec446@|b6c438@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb62a@|b67e1c%|a8620e%|9a620e%%|a8620e%|c48c1c%|fcb62a@|fcb60e@@|fcc41c@|fcc438@|eec454*|000000   |eec446@|fcc42a@|fcd21c@|fcc40e@|fcb61c@|fca82a%|fcb61c%|fca80e@|e0a82a@|e09a1c%%|eea82a@|fca81c@|fcb61c%|fcb62a%|fcb61c@|fcc40e@|fcd22a@|fcd238@|eec454@|000000      |fce070=|fce054#|fcd246+|eec462=|fcd238@|fcd22a@|fcb61c@|fcc41c@|fcd21c@|eeb61c@|fcd22a@|fcd238@|eec454=|000000 |fce062=|000000              |fce054@|fcd246%|000000 |fcc446*|fce054@|fcd270=|000000            |fce070*|fcd246%|eec446#|fcd246@|fcc446%|eec446=|fce054*
+000000         |fce062=|fcd246+|fcc438@|fcd21c@|fcb61c@|fcc41c@|fcb61c@|fcc42a@|fcd246@|000000             |fcd246@|fcd22a@|fcb60e@|fca81c@@|d28c1c%|c48c1c%|e08c1c%|eea82a@|fca80e@|fcb60e@|fcb62a@|eec446#|000000       |fce070#|fce054@|fcd238@|fcb62a@|fcb60e@@|fca80e@|fcb62a@|eea81c@|e08c1c%|d28c1c%|eea81c@|fcb62a@|fcb60e@@|fcb61c@|fcc438@|fcd246%|fce062%|000000  |fce062@|fce054@|fcd246@|fcc438#|eec446%|fcc41c@|fcc40e@|fcb60e@|eea80e@|fcb60e@|fca80e@@|fcb60e@|eea80e@|fcb60e@|fcd20e@|fcc42a@|eeb646#|fcc438*|fcd246%|fce062%|fce070=|000000         |fce062#|eec454*|e0c454+|fcd254@|fce054@|e0b646*|eec454%|fce062*
+000000              |fce054#|000000                  |fcc42a@|fcd21c@|fca80e@|fcb60e@@@|fcc40e@|eeb62a@|fcc42a@|fcd246@|fce062%|000000         |fcd262=|fcd246@|fcd22a@|fcc42a@|fcb61c@|fcc40e@|fcb60e@@@@|fcc40e@|eeb61c@|fcc42a@|fcd246@|fcd262@|000000       |eed270=|fcd246@|fce038@|fcc42a@|e0a82a@|fcc41c@|fcd21c@|fcb61c@@|fcd21c@|fcc41c@|e0a82a@|fcc438@|fce046@|fcd254@
+000000                                 |fce054*|eeb646=|eec454#|fce046@|fcc438@|eec446#|fcd238@|fcd246@|000000             |fcd262=|000000 |eed270=|fce046@|fcd238@|eeb62a@|fcd22a@@|eeb62a@|fcd238@|fcd246@|000000           |fce062*|eec454=|000000 |eec462+|fce046@|fcd246@|eec446@@|fcd246@|fce046@|eec462+|000000 |e0c462=
+000000                                                            |fce062##|000000 |eec462=|000000                |fce070+|000000    |fce070+
+`,
+        plano: `
+                                                                                  ==   =                 +=+**
+                                                                              @%#*@@##%@#            %@**@##@%+%@==**+-        #==@#       =*+
+          -+*#=                                                           @%+-%@#*%%*#@#++@@+      *++%%*##*#*%%##%%##*++   *=+%##%##@+  +*##*    =++:
+        =+**#**  :                                        =%##@*  +   -+**#%@%**#****#**%@%*       #%%###++=+**#%%%*****+=  #%#*#+**#*#%#+***+   *##@#%%
+       -++*##%+=##**+=            =   #=++++==-        @@##@##@##@%  ++#%%%***#**+==+**#**#%@@#  =@%%#**=::::-**##%@%+++*+#@%#*+:::-**###**++  =+##*#*#*%%
+       ++*%%*%#%##%#*++           %%#%@*#@**##*++:   %#*#%******%#*%@#*##%%%#**+::::::+**#%%%#*****###*#-:::::**####======+###*+::::**#%@*+*****%#*=::-*#%%
+-++==--+#%#**++*###***++       #@%*#***#%#*#**#*++:  ####**====*####**##%%%##**-::::::-#*##%%%%= #@@%#***+=-=***#%@@+      +##*#*++#*%%#       =%#*+--=*#%#****-
+    --==#%#*-::-*#%#++*+=----:+##**+---+*#%%*+++**+%%%%#**:::::-**#%%@%%%%##****-:::::****##%%*     %%%*##***#*%@%           @@##%*%%++#        *%##*#*%#=
+         ###*==**%@*---==++++*#%#**::::-*#%%#*+++***####*#-::::=#####+   #%%%#***+++****#%%%%      =#+-%@#%%*%@- =              %% +@=            *%+@#-*
+         ==#%*%*%%             @%#**===**##*       #@%#*#***==**####%%  @@%**#%#+#**#+#%#++#%=         #+=%@=#*
+              *                  %%*###%*#@%         -@@#*%*##*%*%@@       -@@#*%@##@%*#@@
+                                 +-*@#*@@             = -@%#%%#%@           *- =@@##@@+ -
+                                                            ## -                +    +
+`
+      },
+      {
+        color: `
+000000                                                                                  |fce070+|000000  |eec462=|fcd262=|fce070+|000000                 |fce062+|eed262=|eec454#*|fce062%
+000000                                                                             |fce062%|fce054@|eec454@|e0b646#|fcc446@|fce046@|fcc446@|eeb638@|fcc438@|fce046@|fcd246@|000000             |fcd270=|fce054@|fcc446@|e0b638%|fcd238@@|eeb62a@|fcd22a@|fcd238@|e0b646#|fcc446#|fce054@|fce070%|9ae054+|8ce046%|7ed246%|7ec438#+|000000       |fce070*|fcd254+|000000 |fcd254#|fce054@|000000        |7ec438*|8cd246#|8ce046*
+000000          |7ec446+#|7ed238@|9ae054@|8cd254*|000000                                                          |fce07e=|fce054*|fcd254+|000000 |eec454#|fcd238@|fcd22a@|fcb61c@@|fcd21c@|fcb61c@|fcb60e@|fcd21c@@|e0b62a@|eeb638#|fcd246@|fce046@|fce054@|000000       |fce062%|fcd246#|fcc446*@|fcc41c@|fcb60e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcd21c@|eec42a@|c4c446%|c4d246@|b6d246@|8ce046@|8cd246@|70c438@@|70b638%|000000   |fcd262=|000000 |fcc446@|fcd22a@|fcb61c@@|fcc41c@|eeb61c@|fcc42a@|fcd246@|000000   |70c438@@|8cd246@@|7ed238@|000000    |9ae054+|8cd246*|c4d254*|9ac446-
+000000        |70b638*|70c438@|7ec438@|7ed238@|8ce046@|7ed238@|7ec438@|000000  |8cd254-|000000                                         |fce062@|eec446#|eec454@|fcd246@|fce054@|000000      |7ec446=|7ec438%@|9ad238@|fcd246@|fcd238@|fcd22a@|fcb61c@|eea81c@|fcc41c@|fcb60e@|ee9a0e@|fcb60e@|fca80e@@|fcb60e@|eea80e@|fcb60e@|fcd20e@|fcd21c@|fcc438@|000000        |e0c454%|fcc42a@|fcc41c@|fcc40e@|fcb62a@@|ee9a1c@|e09a1c%|d28c1c%|d29a1c%|fca80e@|e0b60e@|fca80e@|fcc40e@|fcd22a@|fcd238@|c4c446@|70c438@|7ec438@|7ed246@|7ed238@|70b62a%|70b646#|000000 |eed262+|fcd238@|fcd21c@|fcb61c@|fcb62a@|fcb61c@|ee9a0e@|eea81c@|fcb60e@|fcb61c@|fcb62a@|fcd22a@|fcd246@|c4c446@|70c438@|7ed246@|7ed238@|70c438@@|000000   |fce062+|e0d246@|c4c438@|fcd22a@|eec42a@|d2c438@|fce054@
+000000       |70b646*|70b62a%|70c438@|7ed238@|8cd246@|7ed238@|e0d246@|9ac438@|a8d270=|9ad246@|8ce046@|7ed238@|7ec438@|70c438@|70b638#|000000               |fce062#|eed254*|7ec438*|7ed246#|8cd246#|9ae054**|7ed238*|7ec438*|7ec446+|000000        |fcd262+|fce046@|fcc438@|eeb62a@|fcd22a@|fcc41c@|fcb61c@|fcd21c@|fcc42a@|eeb638@|fcd238@|fce046@|fcd262=|000000 |70b638%|70c438@|9ad246@|c4d246@|d2d246@|e0b62a@|eeb61c@|fcb60e@@@|fca838%|fcb62a@|e09a1c%|d29a1c%|d28c1c%|ee9a1c@|c4a81c@|fca80e@@|eea80e@|fca80e@|fcc41c@|fcd22a@|fce046@|fce054@|fce070*|000000  |eee070=|fcd254@|fcd238@|fcd21c@|fcc40e@|fca80e@|fca81c@|c47e1c%|a8620e%%|9a620e%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|fcd246@|c4d246@|7ec438@|62b62a%|70c438@|7ec438@|70c438@|b6d246#|fcd254%|fcc42a@|fcb60e@|fca80e@|eea81c@|a8700e%|a8620e%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|c4b646@|7ed238@|7ec438@|62b62a%|70b638%|000000  |fce070=|fcd246#|fcc438%|fcb61c@|fcb60e@|fca80e@@|fcb60e@|eeb61c@|fcc42a@|fcd254@
+000000       |70b646%|70b62a%|7ec438@|d2d246@|fcd238@|eeb61c@|fcc41c@|fcb61c@|fcc42a@|fcd238@|9ad238@|a8d246@|8cd246@|70c438@@|70b638%|000000          |fcd262+|fce046@|fcc438@|eeb638@|fcd22a@|fcc42a@|c4b638@|e0d246@|e0e054@|7ed238@@|8ce046@|8cd246@|7ed238@|70c438@|70b638%|70b646=|000000   |fce054@|fcd246@|fcd238%|fcb62a@|fcc40e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|fcc446@|fcd246*|e0d246@|b6d246@|70c438@|a8d246@|e0d246@|fcd238@|fcd22a@|fcc40e@@|fca80e@|fca82a@|e0a82a@|a8700e%|a8620e%%%%|a8700e%|d2a82a@|eeb61c@|fcb60e@@|fcc40e@|fcc42a@|eec438@|b6c446@|70c438@|7ec438@|70c438@@|a8c438@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb62a@|b6701c%|a8620e%|9a620e%%|a8620e%%|fca81c@|fca80e@|fcb60e@@|fcc42a@|fcd254@|d2d254*|8cd246*|7ed246*|7ec446*+|7ed246+|9ad254*|e0c454@|fcc42a@|fcb60e@|fca80e@|e09a1c@|a8620e%|9a620e%|a8620e%|a8701c%|eea81c@|fca80e@|fcc40e@|fcc42a@|fce054@|9ad246@|70c438@|7ec438@@|70c438@|7ec438@|a8c446@|fcc438@|fcc40e@|fca80e@|c49a1c%|a8700e%|a8620e%|b68c1c%|fca80e@|fcb60e@|fcc42a@|fcd254#
+8cd254=|7ec438%#**|7ed238+|7ed246=|70c446%|c4c446@|fcd238@|fcc41c@|fcb60e@|fca81c@|e09a1c%|e08c0e%|fcb62a@|fcb60e@|fcc41c@|eec438@|8cc438@|7ed246@|7ed238@|70b62a%|70b646%|000000       |fcd254@|fcd238@|fcc42a@|fcb62a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcc41c@|d2c42a@|c4c438@|c4d246@|8cc438@|7ed238@|8cd246@|7ed238@|70c438@|62b62a%|7eb646=|000000  |eec446@|fcb62a@|fcb60e@@|fcb61c@|eea82a@|d28c2a%|c47e1c%%|d28c2a%|fca81c@|fca82a@|fcb60e@|fcc40e@|fcc42a@|eec438@|8cc438@|7ed246@|8cc438@|d2c438@|fcc438@|fcc41c@|fcb60e@@|fca80e@|fcb61c@|b6701c%|a8620e%|9a620e%%%|a8620e%%|b67e1c%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd22a@|fcd246@|eed254@|d2e062#|000000 |eee062#|fce054@|fcd238@|fcc42a@|fcb60e@|fca80e@@|fcb638%|e09a1c%|c48c1c%|c47e1c%|d28c1c%|eea82a@|fcb62a@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|000000       |fcd270*|fcd246@|fcd238@|fcb61c@@|fca80e@|eea81c@|e09a0e%|fcb61c@|fcb62a@|fcc40e@|fcd22a@|fcd238@|000000        |fcc438@|fcc41c@|fcb60e@|e09a2a%|b6701c%|a8701c%|c48c1c%|fca81c@|fcb60e@|fcc42a@|b6c446@|7ec438@@|7ed246@|7ed238@|70b646+
+000000    |7ed246=|7ec438+|7ec446*|7ec438*|d2d254@|fcc42a@|fcb60e@|fca80e@|b6701c%|9a620e%%|b6701c%|fca80e@|fcb60e@|fcc42a@|d2c446@|70b62a%|70c438@|7ed246@|70c438@|7ed246++==|8cd254=|7ed238-|d2d254=|eec446@|fcb61c@|fcb60e@|fca80e@|c49a1c%|b67e1c%|b6701c%|c47e1c%|d2a81c@|fca80e@|fcc40e@|fcc42a@|eec446@|9ac446@|70b62a%|70c438@@|7ed238@|7ec438@|70b646%|b6d254%|e0d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca82a@|a8700e%|a8620e%|9a620e%%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd22a@|fcd246@|eed254@|fce054@|fcd246@|fcd238@|fcc41c@|fcb60e@|fca80e@@@|eea82a@|a8701c%|a8620e%%%%|a8701c%|e0a838@|fca80e@@|fcb60e@@|fcb62a@|eec438@|fcc446+|000000     |fcd262+|fcd238@|fcd22a@|fcc41c@|fcb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@@|fca80e@|fcd21c@|fcd238@|eec454#|000000           |fcd262*|fcd238@|fcc42a@|fcb61c@|fcd21c@|fcb61c@|fcc41c@|fcd21c@|fcc446@|000000 |fce062=|000000        |fce062*|fcd246#|fcc438@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcc446@|fcd254+
+000000         |eec446@|fcc41c@|fcb61c@|fcb62a@|d28c0e%|d28c1c%|fca81c@|fcb61c@|fcc41c@|fcd238@|d2d254#|8cd246+|7ec446+|70c438+|7ed246*|7ec438*##%%@|d2d254@|fcd238@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|e0d246@|70c438@@@@@|7ec438@|9ac438@|e0d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|eeb62a@|b67e1c%|a8620e%|9a620e%%|a8620e%|c48c2a%|fcb61c@|fca80e@|fcb60e@|fcb61c@|eec438@|eec462+|000000   |e0b646#|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca82a%|fcb638#|fcb61c@|e0a82a@|e09a1c%%|eea82a@|fca82a@|fcb60e@|fcb62a@|fca81c@|fcc40e@|fcd21c@|fcd238@|fcd246@|eed262=|000000     |fce070*|fcd254+|000000 |fcc454*|fcd238@|fcc42a@|eeb61c@|fcd21c@|fcc41c@|fcb61c@|fcd22a@|fcc438@|e0b654=|fcd254+|fce070*|000000              |fcd254+|fce054@|eec454=|000000 |fcd254#|fce062%|000000            |fce062%|fcd246#|eec446#|fce046@|eec446+|fcd246*|fce062%
+000000          |fcd262=|fcd238@|fcc41c@|fcb61c@|fcc41c@|fcb61c@|fcd22a@|fcd246%|000000             |fcd246@|fcd22a@|fcc41c@|fcb61c@|fca82a@|d28c1c%|c48c1c%|d28c1c%|eeb638%|fca80e@|fcb60e@|fcc42a@|e0b646@|000000       |fce062+|fcd254*|fcc438#|eeb62a@|fcb60e@@|fca80e@|fcb638%|ee9a1c@|e09a1c%|d28c1c%|eea81c@|fca81c@|fcb60e@@|fcb61c@|fcd238@|fcd246@|fce062@|000000  |fce062%|fce054@|fcd238@|fcc438@%|fcb638@|fcc40e@@|fca80e@|fcb60e@@|fca80e@|fcb60e@|fca80e@@|fcc40e@|fcd21c@|eeb638@|eec454=|fcc446+|fce062*|fce070+|000000        |fce070=|fce062+|e0c454+=|fce054@|fcc446%|eec454%|fcd254%|fce062#
+000000              |fce054#|000000                  |fcc438@|fcd21c@|fcb60e@@@|fca80e@|fcc40e@|fcc42a@|fcc446#|fcd246%|fce062%|000000         |fcd254@|fcd246@|fcd238@|fcb638@|fcb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@@|eeb61c@|fcd22a@|fcd246@|eed262+|000000        |fcd254@|fce038@|fcd22a@|eeb62a@|fcb61c@|fcd21c@|fcc41c@|fcb61c@|fcc41c@|fcd21c@|eeb62a@|eeb638@|fcd246@|fce054@|fcd270+
+000000                                 |fce062%|fcc446*|e0b646*|fcd246@|fcd238@|eeb646*|fcc438%|fce046@|fcd262+|000000              |fcd254%|fce046@|fcc438@|eeb62a@|fcd22a@|fcc42a@@|fcd238@|fcd254@|000000           |fce062#|fcd254*|e0b646+|000000 |fcd246@|fce046@|fcc438@|eec446@|fcc446@|fce046@|fcd254@
+000000                                                            |fce062@|eec462=|eec454+|eed262=|000000                 |fce070+
+`,
+        plano: `
+                                                                                  +  --+                 +-++%
+                                                                             %@#+#@###@%             -@#*%%#%%++@%=**=-       *= *@        =*+
+          -+*#=                                                          =*= +%%*#%#*%%*+%@@       %#+#%#*#*#*#%#*###**++   = %%##%*%@   ++*#*    =+=:
+        =+**#**  :                                         @*##@      -+**%@%#*##+#**#+*%%#        *#####+==+***#%%#+***+= =%%#**++*##%@#+**++   =%#%#*%
+       -++*#*%*-##**+=               *+=++++==-        =@%*%%*%#*%@- ++*##***##+#+==++****#%@@+  =%%%#**-::::-***##%#+++*+*%##*+:::-**##***++  =####**#*%%
+       ++*#%*%*%%*#**++          +@#*%#*%%**#**++:   @%####*#*#*###+##+#%%%%#**+::::::+**####*+*++*###**-:::::***###+======###*+::::+*#%%*++****##*=::-*###
+-++==--+#%#**==**##***+=       @%###*#+##*##****++:  ####**=--=**##%#***####***-::.:::-**##%%%%* #@%#****+=-=***#%%%       *@%##*++#*#%%        ##*+-:=*##*****-
+    --==#%#*-::-*#%#++*+=----:-##**=---+*###*+++**+*%%%#**:::::-**#%%%%@@%##*+**::::::+****##=     =%%#*#****#*%%*           +@#*%*#%# =        *###*#*##+
+         ##**==**%%*---==++++*%%#**::::-*#%%%+++++**#%##**-::::=**###=   +##%#++*+++**#**#%@%=     *+ +@%*%##%#-+*              =@= #%            #**@=+%
+          -%%*%*%#             %%#**===**##*       +***##**+==****#%%@  #@@%*###+**+#**%%#-=*+        =+=-@#**#
+              #                  #%**#*%#*#%         %@%##%*#*##*%%=        #@%**%#*%%**%@+
+                                 #+=%%+#@=              %@##@##@%           #*= %@###@%
+                                                            %-=-                 +
+`
+      }
+    ]
   },
   {
-    cols: 143, alto: 12,
-    color: `
-000000                                                                         |fce062%|fcd262=|000000  |fce054*|fce070*|000000                |fce062@|eec454=+|fcd254#|fce062#
-000000                                                                     |fce054@|fcd254@|e0b646#|eec446%|fce038@|fcd238@|eeb638@|fcc438@|fce038@|fcd246@|000000             |fce046@|fcc438@|eeb638@|fcd22a@|fcc42a@|fcb62a@|fcd22a@|eec438@|eec446=|fce054#|eee070=|9ae054%|8cd246%|7ec438%*|7ec446-|000000     |fce062+|fcd254=|000000 |fcd246@@|e0b654+|fcd254+|fce070=|000000    |7ec438*|8ce046%|8cd254+
-000000         |7ec446*|7ed238%|8cd246@|8ce046@|000000                                            |fce070=|000000        |fce070=|fcd254=|000000 |fcc446@|fcd22a@|fcc41c@|eea81c@|fcc40e@@|fca80e@|fcc40e@@|e0b61c@|fcc438@|fce046@|fcd254@|000000       |fcd262+|fcd246@|fcd238@|fcc438@|fcc41c@|fcb60e@@|fca80e@|fcb60e@|fca80e@|fcb60e@|fcd21c@|eec438@|d2c462#|a8d246@|9ad246@|8cd246@|7ed238@|70c438@|70b638%|000000    |fcc446@|fcd21c@|fcb61c@|fcc40e@|fcb60e@|fcb61c@|fcd22a@|fcd254%-|fce062=|7ec438@|70c438@|8cd246@@|7ec438@|000000   |a8e054=|9ae054%|a8d246#|eed254+
-000000       |70b638#|70c438@|7ec438@|8cd246@@|7ed238@|7ec446#|000000 |8cd246*|7ed246*|7ec446=|000000                                |fce062%|fcd254#|e0b654+|fcd246@|fcd238@|eeb638@|fcd238@|fcd246@|000000     |70c438#|7ec438@|7ed238@|d2c446@|fcd238@|fcd22a@|fcc41c@|fcb62a@|fcb61c@|fca80e@@|fcb60e@|fca80e@|fcb60e@|ee9a0e@|fcc40e@@|fcb61c@|eec446#|fcd246*|fce054*|000000    |fce062+|fcd246#|fcb62a@|fcb60e@@|fca81c@|e0a82a@|c48c1c%|c47e1c%|c48c1c%|e0a81c@|eeb60e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|a8c446@|70c438@|7ed238@|7ed246@|70c438@|70b646+|000000 |fcd246@|fcd22a@|fcc41c@|fcb62a%|fca81c@|d28c1c%%|fca81c@|fcb62a@|fcc40e@|fcd22a@|e0c446@|70b638%|7ed246@|7ed238@|70c438@|7ec446#|000000   |fcd246@|fcc42a@|fcb61c@|fcc41c@|fcb62a@|fcd238@
-000000      |7eb654=|70b62a%|70c438@|a8d246@|d2d246@|a8c438@|fcd238@|e0c438@|d2d246@|b6e046@|8cd246@|7ed238@|70c438@|70b638%|000000          |fce062*|000000 |eec454=|fce046@|eec446@|b6c446@|c4d246@|a8d254@|8cd246@|8ce046@|7ed238@|7ec438@#|70b646=|000000    |fce062*|fcd246=|fcc454#|fcd22a@|fcc41c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fcb61c@|fcc42a@|fcd238@|fcd254%|000000 |70b638%|7ec438@|c4d246@|e0d246@|eec438@|fcb62a@|fcb60e@@|fca80e@|fcb62a%|e09a2a%|b67e1c%%%|c48c1c%|eea81c@|e0a81c@|fca80e@|fcc40e@|fcd21c@|fcd238@|fcc446@|d2c454%|7ed246==|7ec438+|d2c454@|fcc438@|fcc41c@|fcb60e@|fca80e@|eea82a@|a8620e%|9a620e%%|a8620e%%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|eed246@|9ac446@|70c42a%|70b62a%|7ec438@|8cc438@|eed246@|fcd22a@|fcc40e@|fca80e@|eea81c@|a8620e%|9a620e%%|a8700e%|eea81c@|fcb60e@|fcc41c@|fcd246@|b6d246@|70c438@|70b62a%|70c438%|7ed246==|d2d254#|fcd238@|fcc41c@|eeb60e@|e09a0e%%|eea81c@|eeb60e@|fcc41c@|fcd246@
-000000      |70b646-|70b62a%|d2d246@|e0c42a@|fcc41c@|fcb60e@@|fca80e@|fcc41c@|e0c42a@|e0d238@|b6d246@|7ed238@|70c438@|62b62a%|000000         |fcd238@|fcd21c@|fcb61c@|fcc40e@|fcb60e@|fcc41c@|fcd22a@|b6c438@|a8c438@|a8d246@|8cd246@@|7ec438@|70c438@|70b638%|000000   |eec446@|fcc42a@|fcc40e@|fcb61c@|fcb62a@|eea80e@|eea81c@|ee9a0e@|fca82a@|fca80e@|fcb60e@|fcb61c@|fcd238@|fcd246@|c4d246@|7ed246@|a8c446@|fcd246@|fcc438@|fcc41c@|fcb60e@@|fca81c@|c48c1c%|a8620e%|9a620e%%%|a8620e%|b6700e%|fcb61c@|fca80e@|fcb60e@@|fcc41c@|fcc438@|e0d246@|c4d246@|8cc446%|a8d246%|fcd254@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|c47e2a%|a8620e%%%|c48c1c%|fcb62a@|fcb60e@@|fcc42a@|eec438@|eed262=|000000      |eec446@|fcc41c@|fcb60e@|fcb61c@|d29a1c%|c47e1c%%|e09a2a%|fcb61c@|fcb60e@|fcc41c@|e0c438@|8cd254=|7ed246=|7ec438++*|b6d246#|fcd246@|fcc41c@|fca80e@|d28c1c%|a8620e%|9a620e%|b67e1c%|fca80e@|fcb60e@|fcc438@|b6d246%|7ec438*+|7ed246=
-000000 |7ec438*#%%@|7ed246@|c4d246@|fcc42a@|fcb60e@|fca80e@|b67e1c%|a8620e%|b6701c%|fca81c@|fcb60e@|fcc42a@|b6c446@|70c438@|7ed246@|70c438@|7ec454+|000000      |fcd246@|fcc42a@|fcc41c@|eeb61c@|ee9a0e@|e08c0e%|e08c1c%|eeb61c@|eeb60e@|fcc40e@|fcd22a@|d2c446@|70c438@@|7ed238@@|70c438@|70b646*|fce070*|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca81c@|d28c1c%|a8620e%%%|a8700e%|e0a82a@|fca80e@|fcb60e@|fcb61c@|fcc42a@|e0c446@|8cc438@|c4c446@|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca80e@|eea80e@|d28c1c%|a8620e%%|9a620e%%|a8620e%|a8701c%|fcb61c@|fca80e@|fcb60e@@|fcc42a@|fcc438@|fcd254#|000000    |eed270+|fcc438@|fcd21c@|fcc41c@|fcb62a@|fcb60e@|fca81c@|fca80e@|fcb61c@|fca81c@|fcb60e@@|fcb62a@|fcd246#|fce062%|000000       |fce062+|fcd246+|fcc446@|fcc41c@|fcb60e@@@@|fcc42a@|fcc446#|fcd238#|fce054%|000000      |fcd270=|fcd238@|fcc42a@|fcb62a@|ee9a0e%@|fcb61c@|fcb62a@|fcc42a@|fcd246@|c4d262=|000000 |7ed246-=
-000000        |fcc446@|fcc40e@|fcb61c@|d28c1c%|b67e1c%|c48c1c%|fca82a@|fcb60e@|fcc42a@|b6c446@|70c438#%|7ed246%|7ec438@@@@|70c438@|a8d246@|fcd246@|fcd22a@|fcc40e@|fca80e@|d29a1c%|a8620e%|9a620e%%|b67e1c%|fca80e@|fcb60e@|fcc42a@|fcd246@|9ac438@|70b62a%%%|7ec438@|70c438@|a8c446@|fcd246@|fcc42a@|fcc40e@|fca80e@|fca81c@|b6701c%|a8620e%|9a620e%%|a8620e%|d29a1c%|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|fce062*+|fcd246*|fcc446%|eeb61c@|fcb60e@@|fca80e@|fcb638#|eea81c@|c48c1c%%%|d29a2a%|fca81c@%|fca80e@|fcc40e@|fcd21c@|fcd238@|fcd246@|eed270=|000000    |fce070*|fcd254+|eec454=|fcc438@|fcd21c@|fcb61c@|fcc40e@|fcb60e@|fcb61c@|fcd21c@|eeb62a@|fcc438@|fce046@|fcd262+|000000          |fce054@|fcd246@|e0b638#|fcd246@@|e0b646*|fcd254#|fce062=|000000          |fcd254@|fcc438@|fcc42a@|fcd22a@|eec438@|fcd246@
-000000        |fce054=|fcc446#|fcd22a@|fcb60e@|fcc40e@|fcb61c@|fcd22a@|fcc446#|fcd246+|000000           |eec446@|fcc41c@|fcb60e@|fca82a%|d28c1c%|c47e1c%%|eea82a@|fca80e@|fcb60e@|fcc42a@|e0c446@|000000      |fce062=|fcd246+|fcc438@|fcb61c@|fcb60e@|fca80e@|fcb62a%|e08c1c%|d28c1c%%|e09a2a%|fcb61c@|fcb60e@@|fcd22a@|fcd246@|fcd262#|000000   |fcd254@|fcd238@|fcd22a@|fcc42a@|fcb61c@|fcc40e@|fca80e@@@@|fcb60e@|eea80e@|fcb60e@|fcc41c@|fcc42a@|eeb646#|fcc446=|fce054=|000000        |fce062%|eec446=|eec454*|fce046@|fcc438@|eec446@|fce054@|fcd254+
-000000          |fcd254=|000000 |fce054#|000000               |fce062*|fcd246*|fcc438@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc42a@|fcc446#|fcd246#|fce062#|000000       |fce070+|fce046@|fcd238@|fcc438%|fcc41c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcd22a@|eec454*|000000     |fce062+|000000  |fcc438@|fcd22a@|fcc41c@|eeb61c@|fcc41c@|fcc40e@|fcb61c@|fcc41c@|fcd22a@|eeb62a@|fcc438@|fcd246@|fce054@
-000000                              |fce054@|fcc446%|e0b638#|fce046@|fcc446@|eec446#|fce054#|000000             |fcd254@|fcd238@|eeb638@|fcc42a@|fcd22a@|eeb62a@|fcd238@|fcd246@|000000 |fcd254+|fce070*|000000        |fce062@|fcd246%|e0b646+|eec446%|fce038@|fcd238@|eec438@|fcc446@|fce054@|fcd254*
-000000                                                     |fce062#|fce054#|000000                  |fce062#
+    cols: 144, alto: 11,
+    marcos: [
+      {
+        color: `
+000000                                                                         |fce062*|000000 |e0c454+|eec454+|fce062*|fce070=|000000                |fce062#|eec454+#|fcd254#|fce062*
+000000                                                                     |fce054@|fcd254@|eec446@|eeb638@|fce038@|fcd238@|eeb62a@|fcc42a@|fce038@|eec446%|000000 |fcd246+|fce062#|000000          |fcd246@|fcd238@|eeb62a@|fcd22a@|fcc41c@|fcb61c@|fcd22a@|eeb62a@|fcc438#|fce046@|eed262@|8ce046@|8cd246@|7ed238@|7ec438%|70c438*|000000     |fce062#|fcd246*|e0b646*|fcd238@@|e0b646=|fcd254+|000000    |7ec438+|7ed238%|8ce046@|8cd246#
+000000        |70c438+|7ec438@|7ed238@|8cd246@@|8cd254=|000000                                           |fce070=|000000       |9ac446+|fce062%|fcd254%|fcc438+|eec446#|fcd22a@|fcc41c@|fca80e@|fcc40e@@|fca80e@|fcc40e@|fcb60e@|eea81c@|fcc41c@|fcd238@|fcd246@|000000       |eed262+|fcd238@|fcd22a@|fcc42a@|fcb62a@|fcb60e@|fca80e@|fcb60e@@|eea80e@|fcb60e@|fcc40e@|eeb62a@|eed246@|d2d246@|a8d246@|8cd246@|7ed238@|70c438@|70b638%|000000  |fce054#|fcd246*|fcc446%|fcc41c@|fcb60e@@|fca80e@|fcb60e@|fcc42a@|fcc446#|fcd246+|eed262+|70b638%|70c438@|8cd246@|7ed238@|7ec438@|000000   |c4e062*|a8d246@|b6c446@|eed246%|8cb646+
+000000       |70b638%|70c438@|7ed238@|8cd246@|7ed238@|a8d246@|8cc446#|8cd254*|8ce046@|7ed238@|7ec438%*|000000                 |8cc446-|8cd246-|000000            |fce062#|fcd246@|eeb638%|fcc438@|fcd238@|eeb62a@|fcd22a@|fcd238@|e0c454=|fcd246+|fce062%|000000 |70b638+|70c438@@|7ed238@|c4c446@|fcc42a@|fcc41c@|fcc40e@|fcb61c@%@|eea81c@|fca80e@|ee9a0e@|eeb61c@|fc9a0e@|fcb60e@@@|fcc42a@|fcd238@|fce046@|fce070#|000000   |fce062#|fcd246@|fcc42a@|fcb60e@|fca80e@|fcb61c@|c48c2a%|a8701c%|a8620e%|b6701c%|d28c1c%|e0a81c@|fca80e@|fcb60e@|fcc42a@|eec446@|8cc438@|70c42a%|70c438@|7ec438@@|70b638#|9ac446=|eec438@|fcc41c@|fcb60e@|fca81c@|d28c1c%|b67e1c%%|e09a1c%|fcb61c@|fcb60e@|fcc42a@|eec446@|7ec438@|7ed246@|70c438@|70b638%|7ec446=|000000  |fcd246+|fcc438@|fcc41c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|fcd254+|fce062=
+000000      |7eb654=|70b62a%|7ec438@|b6d246@|fcd238@|e0b62a@|fcd21c@|fcb62a@|fcd238@|a8d238@|8cd246@@|70c438@@|70b638#|000000         |fce054@|fcd246%|eeb638%|fcd22a@|eec42a@|c4c438@|eed246@|a8d246@|7ed238@|8cd246@@|7ed238@|70c438@@|70b646-|000000   |fcd254@|fcd238@|fcc42a%@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc42a@|fcc454#|b6c446*|9ac438@|7ec438@|d2d254@|fcd246@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|eea82a@|b6701c%|a8620e%%%|a8700e%|d28c1c%|e0b61c@|fca80e@|fcb60e@@|fcc42a@|e0b638@|9ac446%|7ec438%%@|b6c446@|fcc438@|fcc41c@|fcb60e@|fca80e@|e0a81c@|a8620e%|9a620e%%%|a8620e%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fce054%|b6d254#|7ec446##|7ec438#|7ed246#|e0d254#|fcd246@|fcc41c@|fcb60e@|eea81c@|a8700e%|9a620e%%|a8701c%|fca80e@|fcb60e@|fcc41c@|fcd246@|b6d246@|70c438@@|7ec438@%%|d2c446@|fcc42a@|fcb60e@|d2a81c%|b67e1c%|b6701c%|c49a1c%|fcb60e@|fcc41c@|fcc446@
+8cd254=|7ec438##*++|7ec446*|8cc438@|fcd238@|fcc41c@|eeb60e@|eea81c@|e08c0e%|ee9a1c%|fcb61c@|fcc41c@|fcd238@|a8c446@|7ed246@|7ec438@|62b62a%|7eb654-|000000      |fce054@|fcd238%|fcc438@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcc40e@|eec41c@|d2c42a@|e0d238@|b6d246@|7ec438@|7ed246@@|70c438@|62b62a%|000000  |fcd254*|fcc438@|fcb61c@|fcb60e@|fca80e@|eea82a%|d28c1c%|c47e1c%|c48c1c%|d29a2a%|fcb61c@|fca80e@|fcb60e@|fcc41c@|fcd238@|c4d246@|7ed238@|70c438@|c4c446@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|b67e1c%|a8620e%|9a620e%%%|a8620e%%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd21c@|fcd238@|fcd246@|eee062@|9ad254=|e0e062=|fce054*|fcd246%|fcb62a@|fcb60e@@|fca81c@|eea82a@|c48c1c%|c47e1c%|d28c1c%|eea82a@|fcb61c@|fcb60e@|fcc40e@|fcd22a@|fcd254@|000000       |fcd254@|fcd238@|fcc42a@|fcb62a@|fcb61c@|ee9a0e%|e09a0e%|fcb61c@|fcb62a@|fcc41c@|fcd238@|fcd254@|000000      |fcd254*|fcc42a@|fcb60e@|eea82a@|b67e1c%|b6701c%|d28c2a%|fcb60e@|fcc41c@|eec438@|9ad246%|7ec438@|7ed246@@|70b646=
+000000     |7ed246=|7ec446=|d2d254*|fcc438@|fcb60e@|fca80e@|a8701c%|9a620e%|a8620e%|ee9a1c@|fcb60e@|fcc42a@|d2c446@|70b62a%|70c438@|7ec438@|7ec446%|7ec438*|7ec446*|7ec438*|7ed246*|70c438+|b6d254*|eec438@|fcb60e@@|e0a82a@|b67e1c%|a8700e%|b6701c%|c49a1c%|fca80e@|fcb60e@|fcc42a@|e0c446@|7ec438@|70b62a%|70c42a%|7ec438@@|7ec446%|8cc438#|e0c446@|fcc42a@|fcb60e@@|fcb61c@|a8701c%|a8620e%|9a620e%%|a8620e%|d29a1c%|fc9a0e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|d2d254@|fce054@|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@|eea80e@|eea82a@|b67e1c%|a8620e%%%|a8701c%|d29a2a%|fcb62a@|fcb60e@@|fcc41c@|fcc42a@|eec446@|000000     |fce054@|fcd246@|fcd238@|fcc438@|fcc41c@|fcb60e@@|fca80e@|fcb60e@@@|fcd22a@|fcc446@|000000           |fcd254@|fcd22a@|eeb62a@|fcc41c@@|fcb62a@|fcd22a@|fcd246@|000000         |fce054+|fcc446@|fcc41c@|fca80e@|fcb60e@@|fcc42a@|fcd246*|fce054+
+000000        |fcd254%|fcd238%|fcc42a@|fcb61c@|fca80e@@|fcc41c@|fcc42a@|fcd246@|e0d262=|000000     |7ed246-=|7ec438=|7ec446+|eed254*|fcc438@|fcc41c@|fcb60e@|eea81c@|a8701c%|9a620e%|a8620e%|c48c2a%|fca80e@|fcb60e@|fcc42a@|eed246@|a8d246*|7ec438**|7ec446*|70c438+|8cd246*|eed254@|fcd246@|fcc42a@|fcb60e@@|fca80e@|e09a2a@|b67e1c%|a8700e%%|c47e1c%|eea82a@|fca80e@|fcb60e@|fcc41c@|fcc438@|eec462+|000000   |eec446%|fcc42a@|fcc41c@|fcc40e@|fcb61c@%|fcb60e@|fca81c@|fca80e@@|fcb61c@|fca80e@|fcb60e@@|fcb61c@|fcc438%|fcd238@|fce054@|fce070+|000000       |fce054@|fcc446@|eeb638@|fcd238@|fcc42a@|fcc438@|fce038@|eec446#|000000 |fce062=|000000              |fce054+|fcd254=|000000               |fcc454=|fce054*|000000 |fce054=
+000000          |fce046#|eeb638*|fcd246@|eec438*|fcd246#|fcd254*|000000            |fcd254@|fcd238@|fcc42a@|fcc41c@|fca80e@@@|fcb60e@|fcb62a@|fcc42a@|fcd246@|fcd262%|000000        |fcd246@|fcd22a@|fcc41c@|fcb61c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@@|fcc41c@|fcc42a@|fcc446#|fcd254*|fce070+|000000  |fce070*|fce054@|fcd246%|fcc438+|eec446%|fcd22a@|fcc41c@|fca80e@|fcc40e@@|fca80e@|fcc40e@|fcc41c@|eeb61c@|fcc42a@|fce046@|fcd254%|000000             |fce062+
+000000                              |fcd254@|fcd238@|eeb62a@|fcd22a@|fcc42a@@|fcd238@|fcd254%|000000            |fcd254%|fcd238@|fcb62a@|fcc41c@|fcd21c@|fcb61c@|fcd22a@|fcc438@|eeb638*|fcd254#|fce062=|000000        |fce054@|fcd254@|eeb646@|eeb638@|fce038@|fcd238@|eeb638@|fcc438@|fce046@|fcc454#
+000000                                 |fce062=|000000                   |fcd262#|fce054#|eec454*|eed254*|fce062*|000000               |fce062#|000000  |eec462-
 `,
-    plano: `
-                                                                         %-  **                @==*#
-                                                                     @%+*@%##@%             @%*%##%#-*=**+=:     +- @%-==    =*=
-         =**#                                            =        =- #%%*##*%#*#@%       =%%##*****#%#**#**++    #%*###%*-=++***   -*++
-       =+**#*= ==-                                #*=%%#%@     =+*#%%#*#*****+##*++*    +*##**+=-=+**#%%*+**+- %%#**==**#%#+**+=   %%#%#%
-      :++#%*%*###*++          + -@#*####**=:    +=*%#*%*%*#%# ++#%##****+---=***#%%%*:--####*+:::::+*##%%*++**%%#*+::::**#%#+++-:*%#*+=**#%
-      :+###*#*##%#*++         %%*#*#%**#***++   #%#*#+++**#*#%#**%%##**=::::::***##%##**%%##**-:::=**###-      ###*=--+*###----=+%#*=::-*#%*=--
- ==++**###*-:-*###+*+-      %%#*+==**#%#++**+-+%%#**=::::+**###+#%%%#**=::::::****##*    =%%#***+**#####       ++#%*#*#%**#      -%##++*#%%= :-
-        ##*=-=*##*=+*******%%#*=:::-*#%%*+++*+*%##**-::::+**#%%+++***#*++===+***#%%%-    *+=%%*###%*%@=          @#+%%=*=          %##%#@
-        =*%*#*%*+           ###*=--+*###      =+###**===+**#%%#   %@%#*#***+#+#%#+--        %=+@##@+
-          - *               ++#%*#*#%+*#       +@%###*#*#*%%+     =  %@#*%#*%%*#%@
-                              @#+@#+#             %%*#%#%% =*        @#-*@%##@+
-                                                     **                  #
+        plano: `
+                                                                         + -=*=                #=*#+
+                                                                     @@#*@%##@# =#          %%*%##%**@%##*+-     #*=%%-+    -*#+
+        -**##-                                           =       -%#=*%%*##*%#*%%%       +%%##****+##*###**++  *+#%*#*#%*++++#*+   +###-
+       ++*#*#==#*+-                 ::            #%*#%*%%-+# -++**#%#***+++*+***#%@*   #%##**=::-=**###+++**=-###*=--=*###+*++:  =##*###==
+      :+*#%*%#%##*++=         @#*%#*%#*##*++:   %%*##*#*#*%%*+*+%%%%#***-::::=**###*+++*####*+:::::+*##%%*===+*%#**::::**#%#++**+##*+--=*##
+-+===-=+%#*+=+##%***+:      %###***#####***++  +##***=-=+**#%%#*+*##***-::.:::***#%%@%--*###**+=-=+**#%%       %%##*++*##%%      +##+--=*##****:
+     --+##*:::+*##++*+====-+##*+-:-=*###+++**+=###**:::::=+*#%%#%%%#**+*-::::+**####     @%%##***#*#%#           %%*%##%%         =##*##%++
+        ###***#%%=     :---+##*+:::=*##%====-=%%%#**+-::-**###=   ##%#******#+##*#%@+       @%*@##@* =              +-               -* =
+          *+%+**            %%##***###%#        %%#*#+#***##+++  +@#=*%%*##*%#*%@#             +
+                              @%*%##@#            #%##%*%#=*=        @%*#@%##@+
+                                 -                   *#=++               #  -
 `
+      },
+      {
+        color: `
+000000                                                                         |fce070+|e0b654-|eec462*|fcd254+|fce062#|000000                 |fce062*|fcd254*|e0b646*|fcd254#|fce062%
+000000                                                                    |fcd262+|fce054@|fcc446@|e0b638#|fcc438@|fce038@|fcc438@|fcc42a@|fcd238@@|d2b646*|eec446+|fce054%|fce062@|000000        |fce062=|000000 |fcd254#|fcd238@|fcb62a@|fcc41c@|fcd21c@|fcb61c@|fcd21c@|fcc42a@|e0c438#|fcd246%|fce054@|8ce046@|8cd246@|7ed238@|7ec438%|70c438*|000000     |fce062#|eec446=#|fce038@|fcc438%|eec446*|fce054#|000000    |7ec438+|7ed238%|8ce046@|8cd246#
+000000        |70c438+|7ec438@|7ed238@|8cd246@@|8cd254=|000000                                        |fce070=|000000          |d2d254=|fce062*|fcd246+|eec454=|fcc438@|fcd21c@|fcc41c@|fca80e@|fcc40e@|fcb60e@@|fcc40e@|fca80e@|fcb61c@|fcd21c@|fcd22a@|fcc454*|000000        |fcc446@|fcd22a@|fcc41c@|fcb61c@|fcb60e@|fca80e@|fcb60e@|fca80e@|eea80e@|fcb60e@|fcc40e@|fcb62a@|e0c454%|b6d238@|a8d246@|8cd246@|7ed238@|70c438@|70b638%|000000  |fcd246+|fcc446+|fcc438@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc42a@|fcc438#|fce054#|e0d254*|70b638%|70c438@|8cd246@|7ed238@|7ec438@|000000   |c4e062*|b6d254@|9ac438@|fcd254%|a8c438+
+000000       |70b638%|70c438@|7ed238@|8cd246@|7ed238@|9ad238@|a8c446#|8cd254*|8ce046@|7ed238@|7ec438%*|000000              |fce062=|000000  |8cc446-|8cd246-|000000             |fce046@|fcc438@|eeb638@|fce038@|eeb62a@|fcc42a@|fcd238@|eec462*|000000 |fce054+|000000 |70b638+|70c438@@|8cd238@|eec446@|fcd238@|fcd21c@|fcc41c@|fcb61c@%|fca80e@|eea81c@|ee9a0e@|fca80e@|eea81c@|fca80e@|fcb60e@|fca80e@|fcb61c@|fcd22a@|fcd238@|fcd254@|fce070=|000000   |fce062#|fcd246@|fcc42a@|fcb60e@|fca80e@|fca81c@|c48c2a%|a8701c%|a8620e%|b6701c%|d28c1c%|eea81c@|fca80e@|fcc40e@|fcc42a@|fcc446@|9ac438@|70c42a@|70c438@|7ec438@@|70b638#|b6c454*|fcc438@|fcc41c@|fcb60e@|fcb62a@|d28c1c%|b67e1c%|c47e1c%|d29a2a%|fca81c@|fcb60e@|fcc42a@|e0c438@|8cc438@|7ed246@|70c438@|70b638%|7ec446=|000000  |fcd246*|eec438@|fcc41c@|fca80e@|fcc40e@|fcb61c@|fcd22a@|eec454+
+000000      |7eb654=|70b62a%|9ac438@|a8d246@|fcd238@|eec42a@|fcc41c@|fcc42a@|e0c438@|c4d246@|8cd246@@|70c438@@|70b638#|000000        |fce070=|fce054%|eec438*|fcc438@|fcd22a@|d2b62a@|e0c438@|eed246@|8cd246@|7ed238@|8cd246@@|7ed238@|70c438@@|70b646-|000000   |fcd254@|fcd238@|fcc42a@|fcb61c@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcd22a@|fcc446@|9ab646#|7eb638@|7ec438@|d2d254@|fce046@|fcd238@|fcc41c@|fcb60e@|fca80e@@|eea82a@|b6701c%|a8620e%%%|a8700e%|c49a1c%|eeb61c@|fca80e@|fcb60e@@|fcb62a@|e0c446@|c4d246%|9ac446%|7ec438%|9ac446@|d2d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|e0a81c@|a8620e%|9a620e%%%|a8620e%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|b6d254%|7ec446##|7ec438#|7ed246#|d2d254%|fcd246@|fcc41c@|fcb60e@|eea81c@|a8700e%|9a620e%%|a8701c%|fca81c@|fcb60e@|fcc41c@|fcc446@|a8d246@|70c438@@|7ec438@@|7ec446%|e0d254@|fcc42a@|fcb60e@|d2a81c@|c47e1c%|b6701c%|d28c1c%|fca80e@|fcc41c@|fcc438@
+8cd254=|7ec438##*++|7ec446*|7ec438@|eec438@|fcc41c@|fca80e@|eea81c@|e08c0e%|e09a1c%|fcb61c@|fcc41c@|fcd238@|b6d246@|7ed246@|7ec438@|62b62a%|7eb654-|000000     |fce070=|fcd246#|fcc438#|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc40e@|eeb61c@|eec42a@|eed246@|a8c446@|7ec438@|7ed246@@|70c438@|62b62a%|000000  |fce054%|fcd238@|fcb61c@|fcb60e@|fca80e@|eea82a@|d28c1c%|c47e1c%%|d29a2a%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|eed254@|8cd246@|7ec438@|d2c446@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|b67e1c%|a8620e%|9a620e%%%|a8620e%%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fce054@|fce062*|000000  |fcd254=|eec446%|fcb62a@|fcb60e@@|fcb62a%|eea81c@|c48c1c%|c47e1c%|d28c1c%|eea81c@|fcb61c@|fcb60e@|fcc41c@|fcc42a@|eec454%|000000       |eec454%|fcd238@|fcc41c@|fcb62a@|fcb61c@|e09a0e%|ee9a1c@|fca81c@|fcb61c@|fcc41c@|fcd238@|fcd254@|000000      |eec454#|fcc42a@|fcb60e@|eea82a@|b67e1c%|b6701c%|d28c2a%|fcb60e@|fcc41c@|eec446@|a8d246%|7ec438@|7ed246@@|70b646=
+000000     |7ed246=|7ec446=|e0d254#|fcc438@|fcb60e@|fca80e@|a8701c%|9a620e%|a8620e%|ee9a1c@|fcb60e@|fcc42a@|d2c446@|70b62a%|70c438@|7ec438@|7ec446%|7ec438*|7ec446*|7ec438*|7ed246*|70c438+|b6c454%|fcc438@|fcc40e@|fcb60e@|e0a82a@|c47e1c%|a8700e%|b6701c%|c49a1c%|fca80e@|fcb60e@|fcc42a@|e0c446@|8cc438@|70b62a%|70c42a%|7ec438@@|7ec446%|8cc438*|eec446@|fcc42a@|fcb60e@@|fcb61c@|a8701c%|a8620e%|9a620e%%|a8620e%|d29a1c%|fca80e@|fcb60e@|fcc40e@|fcc42a@|e0c446@|b6c446@|e0d246@|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@|fca81c@|fca82a@|b67e1c%|a8620e%%%|a8701c%|e09a1c%|fcb62a@|fca80e@|fcb60e@|fcc41c@|fcc42a@|fcc446@|000000     |fce054@|fcd238@|fcc438#@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcd22a@|eec446%|fcd246=|fce062+|000000         |fcc454+|fcd238@|fcc42a@|fcc41c@|fcd21c@|eeb62a@|fcd22a@|fcd246@|000000          |fcc438@|fcc41c@|fcb60e@@|fcc40e@|fcc438@|fcd246#|fce062*
+000000        |fcd254#|fcc438@|fcc42a@|fca80e@@|fca81c@|fcb61c@|fcc42a@|fcd246@|d2d270=|000000     |7ed246-=|7ec438=|7ec446+|eed254*|fcd238@|fcc41c@|fca80e@|eea81c@|a8701c%|9a620e%|a8620e%|c48c2a%|fca80e@|fcb60e@|fcc42a@|eec446@|8cc438*|7ec438**|7ec446*|70c438+|8cd246+|fce062#|fcd246%|fcc42a@|fcb60e@@|fca80e@|e09a2a@|b67e1c%|a8700e%%|c47e1c%|eea82a@|fca81c@|fcb60e@|fcc41c@|fcc438@|fcd254=|000000   |eec446*|fcb62a@|fcc41c@|fcc40e@|fcb60e@|fcb62a%|fcb60e@|eea81c@|fca80e@|eea80e@|fcb61c@|eea81c@|fcb60e@|fcc40e@|fcb61c@|eeb638@|fcd238#|fcd246#|fce062*|000000      |fce070+|fce046@|eec438%|fcc438@|fcd238@|fcb62a@|fcc438@|fcd238@|e0b646*|fcc454+|fce070+|000000               |fce062*|000000               |fce054*|fcd246=|000000 |fce062*
+000000         |fce070+|fcd246*|eec446*|fcd246@|eeb638*|fcd246@|fcd262=|000000            |fcd254@|fcd238@|fcc42a@|fcb61c@|fcb60e@|fca80e@|fca81c@|fcb60e@|fcb62a@|fcc42a@|fcd246%|fce062#|000000       |fcd254%|fcd238@|fcd22a@|fcc42a@|fcb61c@|fcb60e@|fca80e@|fcb60e@@|fca81c@|fcb60e@|fcc41c@|fcb62a@|fcd238#|fce054%|fce070=|000000   |fce054@|fcd246@|fcc438%|eeb638#|fcc42a@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcc41c@|eeb62a@|fcc438@|fcd246@|fce054@|000000             |fce062=
+000000                              |fcd254%|fcd238@|eeb638@|fcc42a@|fcd22a@|eeb638%|fcd238@|fcd246@|000000            |fcd246@|fcd238@|eeb62a@|fcd22a@|fcc41c@|fcb61c@|fcd22a@|eeb638@|fcc438%|fce054@|000000         |fcd262#|fce054@|fcc446@|e0b646@|fcd238@|fce038@|eeb62a@|fcc438@|fcd246@|fcd254@
+000000                                                     |fce062%|eec446+|eec454*|fce054*|fce062=|000000               |fcd262+|fce062#|000000 |eec462=
+`,
+        plano: `
+                                                                         =:+=#                 +*=*%
+                                                                    =@#+%@##@%==%@        = *@##%*%#+#@##*+-     *=*@*=#    -*#+
+        -**##-                                        =          =*=-%%#*%**%*#%%+        #%#*#*#***##*###*++  ==#%*#*##*#++*#*+   +#*%-
+       ++*#**++#*+-              =  ::             @##@##@+ + -+**#%%#****+*****#%@@=   *%%#**=::-=**#%%*++**=+###*=--=*###**++:  *#%*#*%=
+      :+*#%#%####**+=        -%+#@*#%#*##*++:   %%%*%*#*#*#%%=+*%%%##***-::::=***###****%%##*+:::::+*#%%%*===+*%#*+::::*####++**+%##+--=*##
+-+===-=+##**=+##%#**+:     =**##*#*#*#%****++  %%#***===+**#%%%*+####**-::::::**##%%%*  -*##**+=-=**##%#       #%###++*##%@      *%#+--=*#%****-
+     --*%#*:::+*##++*+====-*##*+-:-+*###*++**+=###*#:::::=**#%##%@%%#***-::::+**#%%%     @%*#%*#*#*#%*-=         =@##%*%%          %#*###**
+        *##***#%%-     :---*%#*+:::=*###====-=*###**+-::-**###=   +#%%**#**+#*####***      +@*#@#%@=++               *               += *
+         =++@=%=            %%###**#####       #%%###*#**###*#=   @@#+#%*#%*#%*#@@             =
+                              #@#%%*%@            @%*%##%##@         *@%*%@##@%
+                                                     %=+*-               =# -
+`
+      },
+      {
+        color: `
+000000                                                                        |fce070+|000000 |eec454*|e0c454=|fce062#|fcd262=|000000               |fce062=|eec454==|fce054%|e0c454=|eec454*|fce054#
+000000                                                                    |fce062@|fcd254%|eec446*|e0b646*|fcd246@|fcd238@|eec438@|fcc42a@|fce038@|eec438@|e0b638*|fcd246%|fce054@|fce062#|000000        |fce062*|fcd246+|eec454+|fcd238@|fcc42a@|fcb61c@|fcd21c@|fcb61c@|fcc41c@|fcd22a@|c4c438%|eed246*|fce054#|a8e054@|8cd246@|7ed238@|7ec438%|70c438*|000000     |fce054+|000000 |fcd246@|fcd238@|eec446*|fcd246#|fce054%|000000    |7ec438+|7ed238%|8ce046@|8cd246#
+000000        |70c438+|7ec438@|7ed238@|8cd246@@|8cd254=|000000                                                   |c4d254=|d2d246+|c4d246+|eec454*|fcd22a@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|eea80e@|fcc41c@|fcd21c@|fcc438@|eec454=|fcd254=|fce062=|000000      |eec446@|fcc42a@|fcc40e@|fca80e@|fcb61c@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc42a@|eec446%|9ac438@|9ad246@|8cd246@|7ed238@|70c438@|70b638%|000000   |eec454+|fcc42a@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb62a@|fcc42a%|fce054@|c4c462*|70b638%|70c438@|8cd246@|7ed238@|7ec438@|000000   |a8d254*|c4e054@|9ac446@|e0d246%|d2c446+
+000000       |70b638%|70c438@|7ed238@|9ae046@|7ed238@|7ec438@|b6d254#|8cd254*|8ce046@|7ed238@|7ec438%*|000000                 |8cc446-|8cd246-|000000             |fcd254@|fcd238@|eeb638@|fcd238@|fcc438@|eeb62a@|fcd238@|fcd246@|000000   |70b638+|70c438@@|b6d246@|fcd246@|fcd238@|fcc41c@|fcb61c@@|fcb60e@|fca80e@|fca81c@|ee9a0e@|fca80e@|eea81c@|fcb60e@|eeb61c@|eeb60e@|fcc41c@|fcd22a@|fcd238@|fcd254%|000000    |fce070+|fcd246@|fcc42a@|fcb60e@|fca80e@|fcb61c@|c48c1c%|a8701c%|a8620e%|b6701c%|c48c1c%|eea81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|c4c446@|70c438@@|7ec438@@|70b638#|e0d254%|fcd238@|fcc41c@|fcb60e@|fca81c@|d28c1c%|b67e1c%|c47e1c%|d29a2a%|fcb60e@@|fcc42a@|e0c446@|a8c446@|7ed246@|70c438@|70b638%|7ec446=|000000  |fcd246%|e0c42a@|fcc41c@|fcb60e@@|fcb61c@|fcd22a@|fcd262*
+000000      |7eb654=|62b62a%|a8d246@@|fcc438@|fcc42a@@@|d2c438@|d2d246@|8cd246@@|70c438@@|70b638#|000000        |fce062*|fcd246*|e0b646+|fcd238@|fcd22a@|d2b638@|fcd238@|e0d246@|8ce046@|7ed238@|8cd246@@|7ed238@|70c438@@|70b646-|000000   |eed262*|fcd238@|fcc42a@|fcb61c@|fcc40e@|fcb60e@@|fca80e@|fcb60e@@|fcb61c@|fcd22a@|fcd238@|a8c454@|70b62a%|7ec438@|c4d246@|e0d246@|fcc438@|fcb61c@|fcb60e@|fca80e@@|eea82a@|b6701c%|a8620e%%%|a8700e%|c49a1c%|fca81c@|fca80e@|fcb60e@@|fcc42a@|fcd238%|eed254%|c4d254%|7ec438@|a8d246@|eed254@|fcd238@|fcc41c@|fcb60e@|fca80e@|e0a81c@|a8620e%|9a620e%%%|a8620e%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|e0d246@|a8d246@|7ec446##|7ec438#|7ed246#|c4d254@|fcd238@|fcc41c@|fcb60e@|eea81c@|a8700e%|9a620e%%|a8701c%|fca81c@|fcb60e@|fcc41c@|eec446@|9ad246@|70c438@@|7ec438@@|8cc446%|eed254%|fcc42a@|fcb60e@|e0a81c@|b67e1c%%|d28c1c%|fca80e@|fcc41c@|fcd246@|d2d270=
+8cd254=|7ec438##*++|7ec446*|7ec438@|e0c438@|fcc41c@|fca80e@|eea81c@|e08c0e%|e09a1c%|fcb61c@|fcc41c@|eed238@|b6d246@|7ed246@|7ec438@|62b62a%|7eb654-|000000      |fcd246+|fcc446#|fcc41c@|fcb60e@|eea80e@|fcb60e@|fca80e@|fcb60e@|eeb61c@|fcd22a@|fcd246@|8cc438@|7ec438@|7ed246@@|70c438@|62b62a%|000000  |fcd254@|fcd238@|fcc41c@|fcb60e@|fcb61c@|eea82a@|d28c1c%|c47e1c%%|e09a2a%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd238@|eed246@|9ac446@|a8c438@|e0c446@|fcc438@|fcc41c@|fcb60e@|fca80e@@|b67e1c%|a8620e%|9a620e%%%|a8620e%%|fca81c@|fca80e@|fcb60e@@|fcc42a@|fcc438@|fcd254#|e0d262=|000000   |eec446@|fcc42a@|fcc40e@|fcb61c@|fcb62a%|ee9a1c@|c48c2a%|c47e1c%|c48c2a%|eea81c@|fcb62a@|fcb60e@|fcc41c@|fcc42a@|eec454#|000000       |e0c454+|fcc438@|fcc41c@|fca80e@|fcb61c@|e09a0e%|eea81c@|fca80e@|fcb61c@@|fcd238%|fce054%|000000      |eed254%|fcc42a@|fcb60e@|eea82a@|b67e1c%|b6701c%|d28c1c%|fcb60e@|fcc41c@|fcd246@|a8d246%|7ec438@|7ed246@@|70b646=
+000000     |7ed246=|7ec446=|d2d254%|fcc438@|fcb60e@|fcb61c@|a8701c%|9a620e%|a8620e%|ee9a1c@|fcb60e@|fcc42a@|d2c446@|62b62a%|70c438@|7ec438@|7ec446%|7ec438*|7ec446*|7ec438*|7ed246*|70c438+|d2c454@|fcc438@|fcc40e@|fca80e@|e0a82a@|b67e1c%|a8700e%|b6701c%|d29a1c%|fca80e@|fcb60e@|fcc42a@|eed246@|9ac438@|70b62a%|70c42a%|7ec438@@|7ec446%|c4d246*|eed246@|fcc42a@|fcb60e@@|fcb61c@|a8701c%|a8620e%|9a620e%%|a8620e%|d29a1c%|fca80e@|fcb60e@@|fcc42a@|d2c446@|9ac446@|b6c446@|fcd246@|fcd22a@|fcc41c@|fcc40e@|fca80e@|fca81c@|eea82a@|b67e1c%|a8620e%%%|a8701c%|e09a1c%|fca81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|fcd254#|000000   |fce070+|fce054%|fcd238#|fcc446#|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcc438@|fcc446*|fcd246*|fce062*|000000        |fcd254=|eec462=|fcd238@|fcc42a@|fcb61c@|fcd21c@|fcb62a@|fcc42a@|fcd238@|fcd262*|000000        |fcd270=|fcd238@|fcb61c@@|fcb60e@|fcc41c@|fcb62a@|fcd238%|fcd262*
+000000        |fce054+|fcc438@|fcc41c@|fca81c@|fca80e@|fcb61c@@|fcc41c@|fcc446@|000000      |7ed246-=|7ec438=|7ec446+|d2d254#|fcd238@|fcc41c@|fca80e@|e09a1c@|a8701c%|9a620e%|a8620e%|c48c2a%|fca80e@|fcb60e@|fcc42a@|e0c446@|70c438*|7ec438**|7ec446*|70c438+|8cd246+|eee062+|fcd246#|fcc42a@|fcb60e@@|fca81c@|e09a2a@|b67e1c%|a8700e%%|c47e1c%|eea82a@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd246*|fce062=+|fcd254*|fcc446+|eeb62a@|fcb61c@|fcc40e@|fcb60e@|eea81c@|fcb61c@|fca80e@|fca81c@|eea81c@|fcb61c@|fca81c%|fcb60e@|fcc40e@|fcc41c@|eeb62a@|fcc446+|fcd254+|fce062=|000000      |fce062%|fcd246#|e0b646*|fcd238@|fcd22a@|eeb62a@|fcd238@|fcc438@|e0b646*|fcd254%|fce062=|000000            |fce062=|000000  |fce054*|000000               |fce054#|000000 |fcd254=|fce062+
+000000         |fce062+|eec446=|fcd246%@|fcc438#|fcd246@|000000             |eec454#|fcd238@|fcc41c@|fca81c@|fcb61c@|fca80e@|fcb61c@|fca80e@|fcb60e@|fcb62a@|fcd246*|fce062*|000000       |fcd254@|fcd246@|fcd22a@|fcb62a@|fcc41c@|fcb60e@|fca81c@|fcb60e@@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd238@|fce054@|000000    |fcd262%|fce046@|fcd238@|fcc42a#|eeb62a@|fcd21c@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcd21c@|fcc42a@|eeb638#|fcd246%|fce054@|fce070+|000000           |fce070=
+000000                              |eed262+|fcd238@|fcc438@|fcc42a@|fcd22a@|eeb62a%|fcc438%|fce046@|fcd262=|000000          |fcd262+|fce046@|fcc438@|eeb62a@|fcd22a@|fcb61c@|fcc41c@|fcd22a@|eeb638@|fcd246@|fcd254@|000000          |fce046@|fcd246@|eec438@@|fce038@|fcc438@|eeb638@|fcd246@|fce054@|eed262=
+000000                                  |fce062=|000000                 |fcd262=|fce054#|eec454*|eec446+|fce054%|000000                 |fce062#|fcd262=
+`,
+        plano: `
+                                                                        = =-#=               =--%-+#
+                                                                    %#+=@%##@#=#@#        *==%##%*%%*+###*+-     = %%+*%    -*#+
+        -**##-                                                   -==+%%*#%*##*%%#--=      #%#*#*#***%##****++   =%#*#*%##%=+*#*+   +%*#=
+       ++*#***+#*+-                 ::             @%*%##@%   -+*#%%%#*#+*+*+***#%%#    +%%#**=::-=**#%%#++**=#%%**=--=*###**++:  ###*#*%+
+      :+*#%%#%#%#**+=        **=%%*%%#*##*++:   +%%*#***#*#%%*+*#%##****-::::=***#####*#%%%#*+:::::+*#%%%#===+#%#*+::::*###*++**+###+--=*#%-
+-+===-=+##*+=+##%#**+:      =*##*#*#*%%****++  @%#***=-=+***#%%**#%##**-::::::***##%*-   ####*+=-=**###+       =%#*#++*####      #%*+--=*#%****-
+     --*%#*:::+*%#++*+====-#%#*+-:-+*##%*++**++%##**:::::=**###**%%%#***-::::+**#%%%*   +%**%#*#*#*%#++*        --%%#%##@+        -%##*###*
+        +##****#%      :---*%#*+:::=*###====-=+*##**+-::=**###+=+++*###*#**+#**%#*===      %#=%%#%%=#-            =  *               * =+
+         +-#%*@             *%#*#***##++       @%%##***#*###%@    #@%**%#*%#*%#+#@+           =
+                              =@##@*#@=          =@#*%##%*%@          @%##@%*%@=
+                                  =                 =#==#                 #-
+`
+      },
+      {
+        color: `
+000000                                                                         |e0c462=|e0c454=|fcd254=|fce062#|000000                |fce062+|eed254+|e0c454=|fce054%|fcd254*|e0b654=|fcd254+|fce062*
+000000                                                                    |fce062#|fcc454+|e0b646=|fcc446%|fce046@|fcc438@|eeb638@|fcd238@@|e0b638%|eec438@|fcd246@|fce054@|000000         |fce070%|fcd254#|eeb638+|fcc438@|fcd22a@|fcb61c@|fcd21c@|fcc41c@|fcb61c@|fcd22a@|e0c438@|c4d246*|fce054+|b6e054@|8cd246@|7ed238@|7ec438%|70c438*|000000       |fce046@|fcc438@|eec446#|fcd246@|fcd254*|000000    |7ec438+|7ed238%|8ce046@|8cd246#
+000000        |70c438+|7ec438@|7ed238@|8cd246@@|8cd254=|000000                                         |fce070=|000000         |8cc446=|8cc438+|a8d254*|fcd246@|fcd22a@|fcc41c@|eea81c@|fcc40e@@|fca80e@|fcc40e@|fcb60e@@|fcd21c@|fcc41c@|eec446#|fcc446+|fcd254*|fce062#|000000     |fcd254=|eec446*|fcc42a@|fcc40e@|fcb60e@|fcb61c@|fca80e@|fcb60e@|fca80e@|fcb60e@|eea80e@|fcc40e@|fcd22a@|fcc446@|8cc438@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000   |fcd254%|fcd22a@|fcb61c@|fcb60e@@@|fcc41c@|fcb61c@|fcd238@|fcd254@|000000 |70b638@|70c438@|8cd246@|7ed238@|7ec438@|000000   |9ad254*|d2e054@|a8c446@|b6c446%|fcd254*
+000000       |70b638%|70c438@|7ed238@|9ae046@|8cd246@|7ec438@|a8d246%|9ad254*|8ce046@|7ed238@|7ec438%*|000000                 |8cd246--|000000           |fce062=|000000 |fcd254#|fcd246@|fcc438@|fcc42a@|fcd238@|eeb638@|fcd238@|fcd246@|000000   |70b638+|70c438@|7ec438@|e0d254@|fcd246@|fcd22a@|fcc42a@|fcb60e@|fcb61c@|fcb60e@|eea81c@|fca81c@|ee9a0e@|fca81c@|eea80e@|fcb60e@|e0b61c@|fcb60e@|fcc40e@|fcd22a@|fcc438@|eed262=|000000     |fcd246@|fcc42a@|fcc40e@|fca80e@|fcb62a@|c48c1c%|a8701c%|a8620e%|b6701c%|c49a1c%|fca80e@@|fcb60e@|fcc41c@|fcd238@|e0d246@|70c438@@|7ec438@@|70b638#|eed254@|fcd238@|fcc41c@|fcb60e@|fca81c@|d28c1c%|c47e1c%%|d28c2a%|fcb61c@|fcb60e@|fcc42a@|eed246@|a8c446@|7ed246@|70c438@|70b638@|7ec446=|000000  |fcd254%|eec42a@|fcb61c@|fcb60e@@|fcb61c@|fcc42a@|fcd254#
+000000      |7eb654=|62b62a%|a8c446@|c4d246@|d2c438@|fcd22a@|fcb62a@|fcd22a@|c4c42a@|d2d246@|8cd246@@|70c438@@|70b638#|000000        |fce062*|fcd246=|eeb638#|fcd238@|fcc42a@|e0c438@|fce046@|b6d246@|9ad246@|8cd238@|8cd246@@|7ed238@|70c438@@|70b646-|000000    |fcc438@|fcd22a@|fcb60e@@@|fca80e@|fcb60e@@|fcc41c@|fcb62a@|fcc42a@|fcd238@|d2c446@|70b62a%|70c438@|9ad246@|c4d246@|eeb638@|fcb61c@|fcb60e@@|fca80e@|eea838@|b67e1c%|a8620e%%%|a8700e%|c49a1c%|fca80e@@|fcb60e@@|fcc42a@|fcd246@|fce054@|e0d254%|7ec438@|9ad246@|fcd254@|fcd238@|fcc41c@|fcb60e@|fca80e@|e0a81c@|a8620e%|9a620e%%%|a8620e%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|d2d246@|9ad246%|7ec446##|7ec438#|7ed246#|c4d254@|fcd238@|fcc41c@|fcb60e@|eea81c@|a8700e%|9a620e%%|a8701c%|fca81c@|fcb60e@|fcc41c@|fcc446@|9ac446@|70c438@@|7ec438@@|8cc446%|fcd246@|fcc42a@|fcb60e@|e09a1c@|b67e1c%%|d28c1c%|fca80e@|fcc41c@|fcd246@|eed270=
+8cd254=|7ec438##*++|7ec446*|9ac438@|d2d238@|fcc41c@|fcb60e@|eea81c@|e08c0e%|e09a1c@|fcb61c@@|e0d238@|b6d246@|7ed246@|7ec438@|62b62a%|7eb654-|000000       |fcc438@|fcc41c@|fcb60e@|fca80e@|fcb60e@@@|fcb61c@|fcd22a@|eec446@|7ec438@@|7ed246@@|70c438@|62b62a%|000000  |fcd254@|fcd238@|fcc41c@|fcb60e@|fcb61c@|eea81c@|d28c1c%|c47e1c%|c48c1c%|e09a1c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|e0d246@|b6d246@|d2d246@|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@|fca81c@|b67e1c%|a8620e%|9a620e%%%|a8620e%%|fcb61c@|fca80e@|fcb60e@@|fcc42a@|fcc438@|e0c454#|8cd246=|000000  |c4d254=|eec446@|fcc42a@|fcc40e@|fcb61c@|fcb62a@|ee9a1c@|d28c1c%|c47e1c%|c48c1c%|eea82a@|fcb62a@|fcb60e@|fcc41c@|fcb62a@|fcc454*|fcd262=|000000      |eec462=|fcc42a@|fcc41c@|fcb60e@|fcb61c@|ee9a0e%|fca81c@|fca80e@|fcb60e@@|fcc438%|fce054*|000000      |eed254@|fcc42a@|fcb60e@|eea81c@|b67e1c%|b6701c%|d28c1c%|fca80e@|fcb61c@|fcd246@|a8d246%|7ec438@|7ed246@@|70b646=
+000000     |7ed246=|7ec446=|c4c454%|fcc438@|fcb60e@|fcb61c@|a8701c%|9a620e%|a8620e%|ee9a1c@|fcb60e@|fcc42a@|d2c446@|62b62a%|70c438@|7ec438@|7ec446%|7ec438*|7ec446*|7ec438*|7ed246*|70c438+|eed254@|fcd238@|fcc40e@|fca80e@|eea81c@|b67e1c%|a8700e%|b6701c%|d29a1c%|fca80e@|fcb60e@|fcc42a@|eed246@|8cc438@|70b62a%|70c42a@|7ec438@@|7ec446%|fce054*|fcd246@|fcc42a@|fcb60e@@|fcb61c@|a8701c%|a8620e%|9a620e%%|a8620e%|d29a1c%|fca80e@|fcb60e@@|fcc42a@|d2c446@|7ec438%|8cc438@|d2c438@|fcc42a@|fcc41c@|fcc40e@|fcb60e@|fca81c@|eea82a@|b67e1c%|a8620e%%%|a8701c%|d29a2a%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fce054@|000000   |fce062*|fcd254*|fcc446+@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@@|fcc41c@|fcc438@|fcd246*|fce054%|fce070+|000000        |fce054*|fcc446=|fcc438@|fcd22a@|fcb61c@|fcc41c@@|eeb62a%|fcd246@|fce062@|000000        |fcd262+|fcd22a@|fcb61c@|fcc41c@|fca80e@|fcc41c@|fcb61c@|fcd238@|fcd262+
+000000        |fcd254=|fcc42a@|fcb61c@|fca81c@|eea80e@|fcb61c@|fca80e@|fcc41c@|fcc446@|000000      |7ed246-=|7ec438=|7ec446+|d2d254%|fcd238@|fcc41c@|fca80e@|e09a1c@|a8700e%|9a620e%|a8620e%|c48c1c%|fca81c@|fcb60e@|fcc42a@|eec446@|7ec438***|7ec446*|70c438+|7ec446+|b6d246+|e0c446%|fcc42a@|fcb60e@@|fca81c@|e09a2a@|b67e1c%|a8700e%%|c48c1c%|eea82a@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd246%|fce062*%|fce054%|fcd246%|fcc438@|fcb61c@|fcb60e@@|fca80e@|fcb62a@|fca80e@@|fca81c@|fcb60e@|fcb61c%|fca80e@|fcc40e@|fcc41c@|fcc42a@|eec454#|000000        |fce054#|fcc446+|eeb646#|fce038@|fcc42a@@|fcd238@|eeb638@|eec446@|fce054@|000000                |fcd254=|fce062*|000000              |fce054*|000000 |fce054*
+000000         |fce054=|000000 |fcd246@|fcc438#|fcd238%|fcd254@|000000             |eec462=|fcc438@|fcc41c@|fca80e@|fcc41c@|eea80e@|fcb61c@|fca80e@|fcb60e@|fcb61c@|fcc454#|fce062=|000000      |fce070=|fce054@|fcd238@|fcc438%|fcb61c@|fcc40e@|fca80e@|fcb61c@|fca80e@|fcb61c@|fca80e@|fcc41c@|fcb61c@|fcc42a@|fcd238@|fcd254@|000000     |fcd246@|fcd238@|fcc42a@|eeb62a@|fcc41c@|fcc40e@|fca80e@|fcc40e@@|fca80e@|fcc41c@|fcd22a@|eec446#|fcc446+|fce054%|fce062%|000000              |fce062+
+000000                               |fcd238@|fcd22a@|eeb62a@|fcd22a@|fcc438@*|fce046%|fce062*|000000          |fce062@|fcd246@|eeb638%|fcc42a@|fcd22a@|fcb61c@|fcd21c@|fcc42a@|eeb62a@|fcd246@|fcd262#|000000       |fce062=|000000  |fcd254%|fce046@|fcc438@|eeb638@|fcd238@@|eeb638@|eec438@|fcd246@|fce062@
+000000                                                    |fce062#|fcd254+|eec454*|fcd254*|fce062#|000000                 |fcd262+|fce062#
+`,
+        plano: `
+                                                                         --=#                +=-#+-++
+                                                                    #+-#@##%@*#@@         ##-%%#%##@#++%#*+-       @%*%*    -*#*
+        -**##-                                         =         --+%@%*%#*%#*%%*=*#     -+#%*#*#*#*#%%**#*++   #%#*#*#*%% +*#*+   =%#*+
+       ++*##**+#*+=                 ::           = *@##@*%@   -+*%@%#*##**+**#**%%%=     %%#**=::-=**#%%%++**=%%%**=--=*##%#*++:  %######*
+      -+###%#%*%#**+=        *=+@##@##*##*++:    %%###*#*##%@#+*#####***-::::=***#%@@#*#%%%#*+:::::**#%%#*===+#%%**::::*###*++***%#*+--=*#%=
+-+===-=*##*+=+####**+:       #%#*##*#%#*****+  @%%#**=-=+**##%%##%%%#**-::::::***###*-  -#%#*#+=-=*####+-      -##**+**###*      %%*+--=*#%****-
+     --*%#*:::+#%#++*+====-%%#**-:-+*#%%*++****%%#**:::::=*####+*#%%#***-::::+**#%%@@   +*=#%#*#*#*%#*#+        +=#%#%#*@@        +%*#*##%+
+        =##**#*#%      :---#%#*+:::=*#%%====-==####*+-::=**##%#+#%##*##*#******%%#+        #++@##@##@                =*              * *
+         = @*#%             -%%*#*#*##*-      -@%###*#*#*###@@     @@%*#%*##*%%*+#%              =
+                               %%#%#=%*          @@*#%#%##@#       -  #@%#%@##@%
+                                                    *+++#                 =#
+`
+      },
+      {
+        color: `
+000000                                                                         |eec462=|000000 |fce062#|fcd262=|000000                 |fcd254+|eec454*|fcc454+|fce062%|000000 |eec454=|fce062*
+000000                                                                   |fce070=|fcd254+|000000  |fcd246@|fcd238@|fcc438@|fcc42a@|fce038@|fcc438@|e0b638@|fcd238@|fce046@|fcd262%|000000         |fce070+|fce054@|fcc438#|eeb638@|fcd22a@|fcb61c@|fcc41c@@|eeb61c@|fcd22a@|fcd238@|b6d254#|e0d262=|b6e054@|8cd246@|7ed238@|7ec438%|70c438*|000000      |fcd254*|fce046@|fcc446%|fcc438#|fce046@|eed262=|000000    |7ec438+|7ed238%|8ce046@|8cd246#
+000000        |70c438+|7ec438@|7ed238@|8cd246@@|8cd254=|000000                                         |fce062=|000000         |7ec446=|7ed238+|c4d246@|fcd238@|fcd22a@|fcb61c@@|fcc40e@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fcd21c@|eeb62a@|eec446*|fcd246#|fce054@|fce062#|000000     |fce054*|fcd246*|fcb62a@|fcc40e@|fcb60e@|fca81c@|fcb60e@@|fca80e@|fcb60e@|eeb61c@|fcc41c@|fcd22a@|fcd238@|a8c446@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000   |fcd246@|fcd22a@|fcb61c@|fcb60e@@@@|fcb61c@|fcd238@|fcd254%|000000 |70b638%|70c438@|8cd246@|7ed238@|7ec438@|000000   |8cd254*|c4d254@|b6d246@|a8c446%|fce054*
+000000       |70b638%|70c438@|7ed238@|8cd246@|a8d246@|7ec438@|9ac446%|9ad254*|8ce046@|7ed238@|7ec438%*|000000                 |8cc446-|8cd246-|000000           |fce062*|fcc446=|e0b654+|fce046@|fcc438@|eeb62a@|fcd238@|eeb638@|fcc438@|fce046@|fcd254#|000000  |70b638+|70c438@|8cc438@|eed254@|fcd246@|eed238@|eeb61c@|fcb60e@@|fca80e@|fca82a@|fca80e@|ee9a0e@|eea81c@|fca80e@|eeb61c@|e0a80e@|fcb60e@|fcc40e@|fcc42a@|eec446@|000000      |eec446@|fcc42a@|fcc40e@|fca80e@|fca82a@|c48c1c%|a8701c%|a8620e%|b6701c%|c49a2a%|fca80e@@|fcb60e@|fcc42a@|fcd238@|e0d246@|7ec438@|70c438@|7ec438@@|70b638#|e0d254@|fcd238@|fcc41c@|fcb60e@|fca81c@|d28c1c%|c47e1c%%|d28c1c%|fcb61c@|fcb60e@|fcc42a@|fcd246@|a8c446@|7ed246@|70c438@|70b638%|7ec446=|000000  |fcd254%|fcc42a@|fcb61c@|fcc40e@|fcb60e@|fcb61c@|eec42a@|fcd254@
+000000      |7eb654=|62b62a%|9ac438@|d2d246@|c4c42a@|fcd22a@|fcb62a@|fcd22a@|d2c42a@|c4d246@|a8d246@|8cd246@|70c438@@|70b638#|000000        |fce062=|000000 |fcd246@|fcd238@|eec438@|fcc438@|fcd238@|9ac438@|a8d246@|9ad246@|8cd246@@|7ed238@|70c438@@|70b646-|000000    |eec446%|fcd22a@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb62a@|fcc42a%|fcd238@|eed246@|7ec438@|70c438@|8cd246@|b6c446@|eec438@|fcc41c@|fcb60e@@|fca80e@|eea838@|b67e1c%|a8620e%%%|a8700e%|d29a1c%|fca80e@@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fcd254@|c4d254@|7ec438%|9ac446@|e0d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|eea81c@|a8620e%|9a620e%%%|a8620e%|eea82a@|fca80e@|fcb60e@|fcc41c@|fcc438@|b6c446@|7ec446###|7ec438#|7ed246#|c4c454%|fcc438@|fcc41c@|fcb60e@|eea81c@|a8700e%|9a620e%%|a8701c%|fca81c@|fcb60e@|fcc41c@|fcd246@|a8d246@|70c438@@|7ec438@@|8cc446%|fcd254@|fcc42a@|fca80e@|ee9a1c@|b67e1c%|b6701c%|d28c1c%|fca80e@|fcc41c@|fcd246@|eee070=
+8cd254=|7ec438##*++|7ec446*|a8c438@|e0d238@|fcb61c@|fcb60e@|ee9a1c@|e08c0e%|e09a1c@|fcb61c@|fcc41c@|e0c438@|b6d246@|7ed246@|7ec438@|62b62a%|7eb654-|000000       |fcc438@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb60e@|eea80e@|fcc41c@|fcd238@|c4c446@|7ec438@@|7ed246@@|70c438@|62b62a%|000000  |fcd254@|fcd238@|fcc41c@|fcb60e@|fca81c@|eea81c@|d28c2a%|c47e1c%|c48c1c%|e09a1c%|fcb62a%|fca80e@|fcb60e@|fcb61c@|e0c438@|d2d246@|d2d254@|eed254@|fcd246@|fcd22a@|fcc41c@|fcb60e@|fca80e@@|b67e1c%|a8620e%|9a620e%%%|a8620e%%|fcb61c@|fca80e@|fcb60e@@|fcb61c@|eec438@|c4c454#|7ed246=|000000  |e0d254#|fcd238@|fcc41c@|fcc40e@|fca80e@|fcb61c@|e09a2a@|d28c1c%|c47e1c%|c48c1c%|eea82a@|fca81c@|fcb60e@|fcb61c@|fcb62a@|fcd246#|fce054*|000000      |fcd254=|eeb638@|fcb61c@|fcb60e@|fca81c@|ee9a0e@@|eea81c@|fcb60e@@|fcc438@|fcd254=|000000      |fcd254%|fcc42a@|fcb60e@|eea81c@|b67e1c%|b6701c%|d28c1c%|fca80e@|fcc41c@|fcd246@|a8d246%|7ec438@|7ed246@@|70b646=
+000000     |7ed246=|7ec446=|c4c454#|fcc438@|fcb60e@|fcb61c@|a8700e%|9a620e%|a8620e%|eea81c@|fcb60e@|fcc42a@|c4c446@|62b62a%|70c438@|7ec438@|7ec446%|7ec438*|7ec446*|7ec438*|7ed246*|7ec446+|eed254@|fcd238@|fcc40e@|fca80e@|eea81c@|b67e1c%|a8700e%|b6701c%|e09a1c%|fca80e@|fcb60e@|fcc42a@|fcd246@|8cc438@|70b62a%|70c42a%|7ec438@@|7ec446%|fce062%|fcd246@|fcc42a@|fcc40e@|fca80e@|fca81c@|a8701c%|a8620e%|9a620e%%|a8620e%|d29a1c%|fca80e@|fcb60e@|fcc40e@|fcc42a@|e0c446@|7ec438%|70c438#|b6c446@|fcc42a@|fcc41c@|fcb60e@@|fca81c@|eea82a@|b67e1c%|a8620e%%%|a8701c%|d29a2a%|fcb61c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fce054@|fce070*|000000  |fce062=|fcd254=|eec454+|fcc438@|fcd21c@|fcb60e@@@@|fca80e@|fcb60e@|fcc41c@|fcc438%|fcd238%|fce054@|000000         |fce054%|fcd238*|eeb62a%|fcd22a@|fcc41c@@|fcd21c@|eeb638%|fcd238%|fce054@|000000        |fcd254#|fcd238@|fcb61c@|fcc41c@|fcb60e@|fcb61c@|fcc41c@|fcd238@
+000000        |fcd254+|fcc42a@|fcb60e@|fcb61c@|eea80e@|fcb61c@|fcb60e@|fcc41c@|fcc446#|000000      |7ed246-=|7ec438=|7ec446+|e0d254%|fcd238@|fcc41c@|fca80e@|e09a1c@|a8700e%|9a620e%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcc42a@|fcd246@|9ad246#|7ec438**|7ec446*|70c438+|7ec446+|8cd246*|e0c446@|fcc42a@|fcc40e@|fcb60e@|fca81c@|e09a1c@|b67e1c%|a8700e%%|c48c1c%|eea82a@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|fce070+|fce062%|fce054@|fcd238@|fcc42a@|fcb61c@|fcb60e@@|fca80e@|fca82a@|fca80e@|eea80e@|fca81c@|fca80e@|fcb61c@|fcb62a@|fcc40e@|fcd21c@|fcd22a@|eec454@|000000       |fce070+|fce054*|eeb646-|fcc446@|fcd238@|eec438@|fcc42a@|fcd238@|eeb638@|fcd246@|fce062%|000000              |fce062+|000000  |fce062*|000000             |fce062=|fcd246=|eec446-|fce054#
+000000           |fce046@|eec438#|fcd238@|fcd254*|000000              |fcc438@|fcc41c@|fca80e@|fcb61c@|fca80e@|fcb61c@|fca80e@|fcc40e@|fcc41c@|eec446%|000000       |fce062+|fce054#|fcd238*|fcc438@|fcc41c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcb62a@|fcd22a@|fcd238@|fcd262#|000000     |fcd254#|fcd238@|fcd22a@|fcb61c@@|fcd20e@|fcb60e@@|fcc40e@|fca80e@|fcc41c@|fcd22a@|fcc446@|eec454=|fcd246+|fce054*|000000              |fce062+
+000000                             |fce062+|eec446=|fcc438@|fcd22a@|fcc438@|fcc42a@|fcd22a@|eeb646*|fcd246*|fce062#|000000          |fce054@|fcd246%|eeb638%|fcd22a@|fcc41c@|fcb61c@|fcd21c@|eeb61c@|fcc42a@|fce046@|000000        |fce070*|fcd254=|000000  |fcd246@|fcd238@|eec438@|fcc42a@|fce038@|fcc438@|e0b646@|fcd246@|fce054@
+000000                                   |fce062=|000000                |fce062*|eec454+=|fce054%|eed262=|000000              |fce070=|000000   |fce062*|fcd262=
+`,
+        plano: `
+                                                                         - #-                 +++% -+
+                                                                   ==  %%##@#*%@#         =@*#@##%*%%*-%#*+-      +@**@-    -*#+
+        -**##-                                         =         --#@%#*%#*%*#%#+#@#     *+###****###%%**#*++   %%*#*###%# +*#*+   =%#*+
+       ++*##*++#*+-                 ::           *-=@##@##@#  -+*%%%**#***+****#%%#      ###**=::-=**##%%++**=%%#**=--=*#%%**++:  #%*#*##%
+      :+*%*%#%*##**+=        = %@##%*####*++:    #%#*#*#*###%%++*#####**-::::=***#%@@#**%%%#*+:::::**####+===+#%#**::::*##%#++***%#*+--=*#%=
+-+===-=*##*+=+####**+:       %%***#*#%*****++  %%%#**=-=+**####%%@%%#**-::::::***###*:  *%%#*#+=-=**###*+      -###*++*###=      #%*+--=*#%****-
+     --*%#*:::+#%#++*+=====%%#**-:-+*#%%*++**+#%%#**:::::=*####+=*####**-::::+***#%%@*  =-=%%*#***#%##@         #**%##%*#%        *%*#*##%
+        =##*+**#*      :---#%#*+:::=*#%%+===--=###**+-::=**##%@+%@%#**#***+**#*#%%#       ++-#@#%%*%%              +  *             ==-#
+           @+%+              #%*#*#*##*       +#+###*#*#*##%%*     *@%**%#*%*#%%-+*              +
+                             +-#@#%%=+#          @#+%%#%*%@        *=  @%##@#*%@
+                                   =                *=-%-              =   *-
+`
+      },
+      {
+        color: `
+000000                                                                          |fcd262=|fce062#|000000   |fce070+|000000              |fce062*|eec454**|fce054@|fcd262=
+000000                                                                      |fcd254*|fce046@|fcc438@|eeb638@|fcd238@@|eeb638@|fcc438@|fce038@|fcd246@|000000           |fce054@|fcd238@|eeb638%|fcd22a@|fcc41c@|fcb61c@|fcd21c@|eeb62a@|fcc42a@|fcd238@|d2d254@|000000 |9ae054@|8cd246@|7ed238@|7ec438%|70c438*|000000      |fcd254@|fcd246@|eec446#|fcd246@@|000000     |7ec438+|7ed238%|8ce046@|8cd246#
+000000        |70c438+|7ec438@|7ed238@|8cd246@@|8cd254=|000000                                                   |7ec446=|8cd246*|eed246@|fce038@|fcc42a@|eeb62a@|fcc41c@|fcc40e@|fca80e@|fcc40e@@|fca80e@|fcc40e@|fcc41c@|e0b62a@|fcc438#|fcd246@|fce054@|fce070+|000000     |fce054%|fcd246#|fcc438@|fcb61c@|fcb60e@|fca80e@|fcb60e@|fca80e@@@|fcc41c@|eec41c@|fcd22a@|fcd238@|e0d246@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000  |fcd262+|fcd246@|fcc42a@|fcb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcd238@|eed270=|000000 |70b638@|70c438@|8cd246@|7ed238@|7ec438@|000000   |8cd254*|b6d246@|e0d246@|a8c446%|e0d254*
+000000       |70b638%|70c438@|7ed238@|8cd246@|a8d246@|7ec438@|7ec446#|a8e054*|8ce046@|7ed238@|7ec438%*|000000                 |8cc446-|8cd246-|000000           |fce070*|fcd246*|e0b638=|fcd246@|fcd238@|eeb62a@|fcd22a@|fcc438@|eeb638%|fcd246@|fce054@|000000  |70b638+|70c438@|9ac438@|e0d246@@|e0c438@|fcb61c@|fcb60e@@|fca80e@|fcb62a@|fca80e@|ee9a0e@|ee9a1c@|fca80e@|e0b61c@|fca80e@|fcc40e@@|fcb62a@|eec446#|fcd254=|000000     |eec446@|fcc42a@|fcb60e@|fca80e@|fca82a@|c48c1c%|a8701c%|a8620e%|b6701c%|c49a2a%|eea81c@|fcb60e@@|fcc41c@|eed246@|d2d246@|8cc438@|70c438@|7ec438@@|70b646#|fce054#|fcd246@|fcc41c@|fcb60e@|fca80e@|c48c2a%|c47e1c%%|e08c1c%|fcb61c@|fcb60e@|fcc42a@|fcd246@|9ac446@|7ed246@|70c438@|70b638@|7ec446=|000000  |fcd262*|fcd22a@|eeb61c@|fcc40e@|fcb60e@|fcc41c@|eeb62a@|fcd246%
+000000      |7eb654=|62b62a%|8cc438@|e0d246@|c4c42a@|fcc42a@@@|eec438@|b6d238@|a8e046@|8cd246@|70c438@@|70b638#|000000          |fcd238@@|eeb638@|fcd238@|eec438@|a8c438@|c4e054@|8cd246@@@|7ed238@|70c438@@|70b646-|000000  |fce062=|fcd246+|fcc446*|fcc42a@|fcc41c@|fca80e@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|fcc438%|fcd238%|fcd254@|9ac438@|70c438@|8cd246@|c4c446@|fcc438@|fcc41c@|fcc40e@|fcb60e@|fca81c@|eea82a@|b67e1c%|a8620e%%%|a8700e%|d29a1c%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|e0d246@|9ad246@|7ec438%|8cc438@|c4d246@|fcc438@|fcc41c@|fcb60e@|fca80e@|eea81c@|a8620e%|9a620e%%%|a8620e%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|a8c446%|7ec446###|7ec438#|7ed246#|c4c454%|fcc438@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8701c%|eea81c@|fcb60e@|fcc41c@|fcd246@|b6d246@|70c438@@|7ec438@@%|fcd246@|fcc41c@|fca80e@|e0a81c@|b67e1c%|b6701c%|d28c1c%|fcb60e@|fcb61c@|fcd246@|eee070=
+8cd254=|7ec438##*++|7ec446*|a8c446@|eed238@|fcb61c@@|ee9a1c@|e08c0e%|ee9a1c@|fca80e@|fcc41c@|e0c438@|a8d246@|7ed246@|7ec438@|62b62a%|7eb654-|000000      |fcd262+|fcd238@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcc42a@|a8c438@|8cc438@|7ec438@|7ed246@@|70c438@|62b62a%|000000  |eec454*|fcc438@|fcc41c@|fcb60e@|fcb61c@|fca81c@|d28c2a%|c47e1c%|c48c1c%|e09a1c%|fcb62a%|fca80e@|fcb60e@|fcb61c@|d2b638@|b6c438@|c4d254@|eed254@|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca80e@@|b67e1c%|a8620e%|9a620e%%%|a8620e%%|fcb61c@|fca80e@|fcb60e@@|fcc41c@|fcc438@|d2d254@|9ad246+|000000 |b6d254=|eed254@|fcd238@|fcc41c@|fcb60e@|fca80e@|fcb61c@|e09a2a@|d28c1c%|c47e1c%|d28c1c%|eea82a@|fca80e@|fcb60e@|fcb61c@|fcc42a@|fcd246@|fce062#|000000      |fce054*|fcc438%|fcb61c@|fcb60e@|eea81c@|ee9a0e@@|fca82a@|fcb60e@|fcc40e@|eeb62a@|000000       |fcd262#|fcc42a@|fcb60e@|eea81c@|b67e1c%|b6701c%|d28c1c%|fca80e@|fcc41c@|fcd246@|a8d246@|7ec438@|7ed246@@|70b646=
+000000     |7ed246=|7ec446=|d2d254%|fcc438@|fcb60e@|fca81c@|a8700e%|9a620e%|a8620e%|eea81c@|fcb60e@|fcc42a@|c4c446@|62b62a%|70c438@|7ec438@|7ec446%|7ec438*|7ec446*|7ec438*|7ed246*|7ec438+|eed254@|fcd238@|fcc40e@|fca80e@|eea81c@|b67e1c%|a8700e%|b6701c%|d29a1c%|fca80e@|fcb60e@|fcc42a@|fcd246@|7ec438@|70b62a%|70c42a%|7ec438@@|7ec446@|e0d254@|fcd246@|fcc42a@|fcc40e@|fca80e@|fca81c@|a8701c%|a8620e%|9a620e%%|a8620e%|d29a1c%|fca80e@|fcb60e@|fcc40e@|fcc42a@|eed246@|a8d246%|9ac446#|c4c446%|eeb62a@|fcb61c@|fcb60e@@|fca80e@|eeb638%|b67e1c%|a8620e%%%|a8701c%|d29a2a%|fca81c@|fca80e@|fcb60e@|fcb61c@|fcc42a@|fcd238@|fce054%|fce062*|000000    |eec454%|fcd22a@|fcc41c@|fca80e@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb61c@|fcc42a@|fcd238@|fcd254@|000000         |fce062#|fcd246%|eeb638%|fcc42a@|fcc41c@|fcb61c@|fcd21c@|fcc438@+|fce054#|000000        |fcd254%|fcc438%|fcb61c@|fcb60e@@|fcb61c@|fcc41c@|fcd246@
+000000        |eed262*|fcc42a@|fcb60e@|fcb61c@|ee9a0e@|fca81c@|fcb60e@|fcc41c@|fcd254*|000000      |7ed246-=|7ec438=|7ec446+|d2c454%|fcc438@|fcc41c@|fca80e@|e09a2a@|a8701c%|9a620e%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcc42a@|fcd246@|9ad246#|7ec438**|7ec446*|70c438+|7ec446+|a8d254%|e0c446@|fcc42a@|fcc40e@|fcb60e@|fca81c@|e09a1c@|b67e1c%|a8700e%%|c48c2a%|fca82a@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|000000 |fce070+|fce054@|fcd238@|fcd22a@|fcc42a@|fcb61c@|fcb60e@@|eea81c@|fcb61c@|ee9a0e@|fcb61c@|eea80e@|fcb60e@|fcb61c%@|fcc41c@|fcd22a@|fcd246@|000000       |fce062+|fcd254=|000000 |fcd246@|fcd238@|eeb638@|fcd22a@|fcc438@|eeb638@|fcd246@|fcd262*|000000              |fce062+|000000  |fcd254=|fce070=|000000            |fce054+|000000 |fcd254+|fce062*
+000000          |fcd262+|fcd238%|eec438#|fcd246@|eec446+|fcd254+|000000            |fcd254=|eec438@|fcc41c@|fcb60e@|fca81c@|fca80e@|fcb60e@|fca81c@|fcb60e@|fcc41c@|fcc438@|000000       |fce070=|fcd254+|fcc446+|fcb62a@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@@|fcb60e@|fcb61c@@|fcd22a@|fcd238@|000000       |fcd246@|fcd22a@|fcc41c@|eea81c@|fcc40e@@|fca80e@|fcc40e@|fcb60e@|fcb61c@|fcd22a@|fcd238@|eec462=|000000 |fcd262=|000000             |fce062=
+000000                             |fce062#|fcd246*|eeb638%|fcd22a@|fcc42a@@|fcd22a@|eec446#|fcc446=|fce062+|000000         |fce070*|fce054%|fcc438+|eec438@|fcd22a@|fcb61c@|fcc41c@|fcd21c@|eeb61c@|fcd238@|fcd246@|000000        |fce070=|fce062#|fcc454+|000000 |fcc446@|fce038@|fcc438@|eec438@|fcd238@@|e0b638%|eec446@|fcd254@|fce070+
+000000                                                   |fce070=|fcd254+|eec454=|fcd254+|fce054@|000000 |eec462=|000000              |fce062=|000000   |fce062*
+`,
+        plano: `
+                                                                          =*   +              *+=%-
+                                                                      +@%#%@*#@%           @%*%##%*%@% ##*+-      @%*%@     -*#+
+        -**##-                                                   -=%@%*#%*##*%#**@@=     %####*#***##%%%*#*++  =@%*#*#*#%= +*#*+   =#%++
+       ++*##*++#*+-                 ::           **-%%#%%*%@  -+*%%#*##*#*++***###*-     ###**=::-=**##%%*+**=*%#**=--=*#%%**++:  +%*#*###
+      :+*%*%#%###**+=          @%#%#*%*##*++:  ==+#%*#*#*####@*+*##%##**-::::=**#%%%%***#%##*+:::::**###*+===+*###*::::*#%%#++***%%*+--=*#%=
+-+===-=*%##+=+*###**+:      =%%*#*#*%#*****++  +%%#**=-=+**##**%%%%%#**-::::::***####- -%%%#**+=-=***##%#      +###*++**##       *#*+--=*#%#***-
+     --*%#*:::*#%*++*+====-%%#**-:-+*#%%+++**+%%%#**:::::=+*#%%*+*###***-::::+***##%%*    *%%*#*#*###%%         #%*%##%#=#        #####*%%
+        +%##+*##*      :---*%#*+:::=*#%%+===--*#%#**+-::=**##%% +@@%#*##*#+**#*#%%%       +- @%#@%#@+              +  ==            + =*
+          +%*@==            -###****#%#       =+=#%#*#***##%%       %@#*%#*%#*%%= =             =
+                             #+*@##@*-+         *%=#@##%*%%        =#= %@##%@*#@+
+                                                   ====% =              =   *
+`
+      },
+      {
+        color: `
+000000                                                                          |fce062#|000000  |eec462=|fce062+|000000               |fce062*|eec454*#|fcd254#|fce062%
+000000                                                                      |fcd254@|fcd246@|eec438@|eeb638@|fce038@|fcc438@|eeb62a@|fcd238@|fce046@|fcd254#|000000           |fcd262%|fcd246@|eeb62a@|fcc42a@|fcd22a@|fcb61c@|fcd21c@|fcc42a@|fcb62a@|fcd238@|eed246@|000000 |8ce046@|8cd246@|7ed238@|7ec438%|70c438*|000000      |fce054@|fcc438%|eec446#|fce046@|fcd246%|000000     |7ec438+|7ed238%|8ce046@|8cd246#
+000000        |70c438+|7ec438@|7ed238@|8cd246@@|8cd254=|000000                                          |fce062+|000000        |7ec446=|c4d254%|fce046@|fcd238@|fcc42a%|eeb62a@|fcc41c@|fcc40e@|fca80e@|fcc40e@|fcb60e@@|fcc40e@|fcb61c@|e0b62a@|fcd238@|fce046@|fcd254@|000000      |fcd254@|fcd246@|fcc42a%@|fcc40e@|fca80e@|fcb61c@|fca80e@|fcb60e@|fca80e@|fcb60e@|eeb61c@|eec42a@|fcd238@|eed246@|8cd238@|8cd246@|7ed238@|70c438@|70b638%|000000  |fce062%|fcd246@|fcc42a%|fcb61c@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcd238@|000000  |70b638@|70c438@|8cd246@|7ed238@|7ec438@|000000   |9ad254*|9ad246@|eed246@|a8c438%|c4c446+
+000000       |70b638%|70c438@|7ed238@|8cd246@|9ad246@|9ad238@|7ec446#|9ad254*|8ce046@|7ed238@|7ec438%*|000000                 |8cc446-|8cd246-|000000           |fce070=|fce054%|eec438*|eec446%|fce038@|fcc42a@@|fcd238@|e0b638#|fcc438%|fce054@|fcd270=|000000 |70b638+|70c438@|9ad246@|b6d246@|c4d246@|e0b62a@|fcb61c@|fcc40e@|fcb60e@|fca81c@|fcb61c@|ee9a0e@|fca80e@|ee9a0e@|fcb60e@|d2a81c@|fca80e@|fcc40e@|fcb60e@|eeb62a@|fcc446*|fcd246*|fce062+|000000   |fce062+|fcc446@|fcc42a@|fcb60e@|fca80e@|fcb62a@|c48c1c%|a8701c%|a8620e%|b6701c%|c49a1c%|e0b61c@|fcb60e@@|fcc41c@|eec438@|c4d246@|8cc438@|70c438@|7ec438@@|70b638#|fce062+|fcd246%|fcc41c@|fcb60e@|fca80e@|d28c2a%|b67e1c%%|e09a1c%|fca81c@|fcb60e@|fcc42a@|fcd246@|9ac438@|7ed246@|70c438@|70b638%|7ec446=|000000  |fcd254=|fcd238@|fcb61c@|fcb60e@@|fcc41c@|eeb62a@|fcd246#|eed262=
+000000      |7eb654=|62b62a%|70c438@|eed246@|e0c42a@|eec42a@|fcc41c@|fcc42a@|fcd238@|9ad238@|a8e046@|8cd246@|70c438@@|70b638#|000000         |fcd254+|fce046@|fcc438@@|fcd238@|d2c438@|b6d238@|d2e054@|7ed238@|8cd246@@|7ed238@|70c438@@|70b646-|000000  |fce070+|fce054#|fcc446*|fcc438@|fcc41c@|fcb60e@@@@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd246*|fcd254@|a8c446@|70c438@|9ad246@|e0d246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca81c@|eea82a@|b67e1c%|a8620e%%%|a8700e%|d29a1c%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|c4c446@|7ec446%|7ec438%@|a8c438@|fcc438@|fcc41c@|fcb60e@|fca80e@|eea81c@|a8620e%|9a620e%%%|a8620e%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|c4d246%|8cc446#|7ec446##|7ec438#|7ed246#|b6c446@|fcc438@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8701c%|eea81c@|fcb60e@|fcc41c@|fcd246@|b6d246@|70c438@@|7ec438@@%|e0c446@|fcc41c@|fcb60e@|e09a1c@|b67e1c%|b6701c%|c48c1c%|fcb60e@|fcc41c@|fcd246@|eee062=
+8cd254=|7ec438##*++|7ec446*|a8c446@|fcd238@|fcb61c@|fcb60e@|ee9a1c@|e08c0e%|ee9a1c@|fca81c@|fcc41c@|eec438@|9ac438@|7ed246@|7ec438@|62b62a%|7eb654-|000000      |fcd254@|fcd238@|fcc41c@|eeb60e@|fcb60e@|fca80e@|fcb60e@@|fcc41c@|e0c42a@|a8c438@|a8d246@|7ec438@|7ed246@@|70c438@|62b62a%|000000  |eec454+|fcc438@|fcc41c@|fcb60e@|fcb61c@|fca81c@|d28c2a%|c47e1c%|c48c1c%|e09a1c%|fcb62a%|fcb60e@@|fcc41c@|e0b638@|9ac438@|9ad246@|c4d246@|eed238@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|b67e1c%|a8620e%|9a620e%%%|a8620e%%|fcb62a@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|e0d246@|c4d254%|000000 |c4d254+|fcd254@|fcd238@|fcc42a@|fcb60e@|fca80e@|fca81c@|e0a82a@|d28c1c%|c47e1c%|d28c1c%|eea82a@|fcb61c@|fcb60e@@|fcd22a@|fcd246@|fce062%|000000      |fce054#|fcd238%|fcb61c@@|fca80e@|eea81c@|ee9a0e%|fcb62a@|fca80e@|fcc40e@|fcc42a@|e0c462+|000000      |fce054*|fcc42a@|fcb60e@|eea81c@|b67e1c%|b6701c%|d28c1c%|fca81c@|fcc41c@|fcc446@|9ac446@|7ec438@|7ed246@@|70b646=
+000000     |7ed246=|7ec446=|c4d254%|fcc438@|fcb60e@|fca81c@|a8701c%|9a620e%|a8620e%|eea81c@|fcb60e@|fcc42a@|d2c446@|70b62a%|70c438@|7ec438@|7ec446%|7ec438*|7ec446*|7ec438*|7ed246*|7ec438+|fce054#|fcd238@|fcb60e@|fca80e@|eea81c@|b67e1c%|a8700e%|b6701c%|d29a1c%|fca80e@|fcb60e@|fcc42a@|eec446@|70c438@|70b62a%|70c42a%|7ec438@@|7ec446%|c4d246@|fcd246@|fcc42a@|fcc40e@|fca80e@|fca81c@|a8701c%|a8620e%|9a620e%%|a8620e%|d29a1c%|fc9a0e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|e0d254%|d2d254#|fcd246#|fcc438@|fcb61c@|fcb60e@|fca80e@@|eeb638@|b67e1c%|a8620e%%%|a8701c%|d29a2a%|fca80e@@|fcb60e@|fcb61c@|fcb62a@|fcc446%|fcd254*|fce070=|000000    |fcd246@|fcd22a@|fcc41c@|fcb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb61c@|fcc42a@|fcd238@|fcd254#|000000         |fcd262+|fce046@|fcc42a@|fcb62a@|fcd21c@|eeb61c@|fcc41c@|fcc42a@|eec454=|fce054+|000000        |fcd254#|fcc438%|fcc41c@|fcb60e@@@|fcc41c@|fcc446%
+000000        |eed262#|fcc42a@|fcb61c@@|eea80e@|fca81c@|fcb61c@|fcc42a@|fcd246*|eee062=|000000     |7ed246-=|7ec438=|7ec446+|c4c446%|fcc438@|fcc41c@|fcb60e@|e0a82a@|a8701c%|9a620e%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcc42a@|fcd246@|9ad246*|7ec438**|7ec446*|70c438+|7ed246+|c4d254@|fcd246@|fcd22a@|fcc40e@|fca80e@|fca81c@|e09a2a@|b67e1c%|a8700e%%|c48c2a%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|000000  |fcd254%|fcd238@|fcd22a@|fcc41c@|fcb61c@@|fcb60e@|fca80e@|fcb61c@|eea80e@|fca80e@|eea81c@|fcb60e@|fcb61c@@|fcc41c@|fcd22a@|fcd246@|fcd262%|000000        |fcd262+|fce046@|fcc438@@|fcd238@|eeb62a@|fcc438@|fce046@|000000                |fce054=|000000  |fce062+|000000            |fce054+|000000 |fcd246*|fcd262=
+000000          |fce062%|fcd246#|fcc438%|fcd246@|eeb638=|fce054*|000000            |fce054+|fcc438#|fcb61c@|fcb60e@|fca81c@|fca80e@@|fcb61c@|fcb60e@|fcc41c@|fcd238@|000000         |eec446*|fcc42a@|fcc41c@|fcb60e@|fcb61c@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcd22a@|eec446@|000000    |fce062=|fcd254=|000000 |fcc454#|fcd22a@|fcd21c@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|eea81c@|fcc41c@|fcd238@|fcc446@|000000               |fce062*
+000000                             |fce062*|fcd246%|eeb638#|fcc42a@|fcd22a@|eeb638@|fcd22a@|fcd246@|000000           |fce062%|fcd246*|eec454=|fcd238@|fcd22a@|eeb61c@|fcc41c@@|fcb62a@|fcd238@|fcc446#|000000 |fce062+|000000       |fce062@|fcd254#|e0b646*#|fcd238@@|eec438@|fcc438@|fce038@|fcc446@|e0b646+|eed254#|fce062*
+000000                                                   |fce062+|eec454=|000000 |fce054%|fcd254*|e0c454+|fcd254+|000000              |fce062*|000000 |eec462=|000000 |fce062+
+`,
+        plano: `
+                                                                          *  -+               ++**#
+                                                                      %@##@%*%@*           %%##%*%##%% ##*+-      @**@#     -*#+
+        -**##-                                          +        -#@%**%#*%**%**%@%      @%###*#***#*#%%***++  #%#*#*#*%%  ++#*+   +#%*=
+       ++*##*=+#*+-                 ::           -%+*@##%+*@= -+*##*###*#+*+*+*##*+++   +###**=::-=**####*+**==##**=--=*#%%**++:  =%##*##*-
+      :++%####%*#**+=         =@##@*#%*##*++:  +*+#%*#*#*###*%*+#%%%#***-::::=**#%%%#++**###*+:::::**###*+===+*##**::::+*%%#++**+##*+--=*#%-
+-+===-=*%#*+=+*##***+:      %%#*#***%#*#***++  =###**=-=+**###*##%%##**-::.:::**##%%#* =%%%#**+=-=***#%%#      ##*#*++#*##=      *##+--=*#%****-
+     --*%#*:::+###++*+====-*%#*+-:-+*###+++**+#%%#**:::::=+*#%%#**##****-::::+***###+-    %%#*#*#*#*%%*         =@##%*%%-+        #*#*#*%#
+        *%*#+*##*=     :---*##*+:::=*##%+===-=#%%#**+-::-***#%%  #%%%###+#+***#*#%%%        =@##@##@                =  +            = +-
+          %**%-*            +*##***#*%%         +#%*****#*#%#    =- *%%*#%*##*%@#               *
+                             *#+%%#%%           #+-%%*%##@* =       %#=+@%##@#=**
+                                                   +- #+-=              * - +
+`
+      },
+      {
+        color: `
+000000                                                                         |fce070=|fce062*|000000 |eec454+|eed254+|fce062#|000000                |fce054*|eec454##|fce062@
+000000                                                                     |fcd262*|fce054@|fcc446@|e0b638@|fcd238@|fce038@|eeb62a@|fcc42a@|fcd238@@|000000  |fcd262+|fce070+|000000        |fcd270=|fcd246@|fcc42a@|eeb62a@|fcd22a@|fcb61c@|fcc41c@|fcc42a@|eeb638@|fcd238@|fce046@|d2d270*|8ce046@|8cd246@|7ed238@|7ec438%|70c438*|000000     |fcd262+|fce054%|eec446*|fcc438@|fce038@|eec446*|eec454=|fce062=|000000   |7ec438+|7ed238%|8ce046@|8cd246#
+000000        |70c438+|7ec438@|7ed238@|8cd246@@|8cd254=|000000                                         |eec462-|000000         |7ec446=|eee062@|fce054@|fcd238%|eeb638*|fcc42a@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcb60e@|fcc40e@|eea81c@|fcc42a@|fcd22a@|fcd246@|fcd262*|000000      |fcd254@|fcd238@|fcd22a@|fcc42a@|fcc41c@|fca80e@|fcb61c@|fca80e@|fcb60e@|eea80e@|fcb60e@@|e0c42a@|fcd246@|eed246@|9ad246@|8cd246@|7ed238@|70c438@|70b638%|000000  |fce054%|fcd238%|fcc438%|fcc42a@|fcb60e@|fca80e@|fcb60e@@|fcd21c@|fcc446@|fcd246=|eed262=|70c438@@|8cd246@|7ed238@|7ec438@|000000   |b6d254#|9ae046@|e0d246@|d2c446%|a8c446+
+000000       |70b638%|70c438@|7ed238@|8cd246@|8cd238@|a8d246@|7ec446#|8cd254*|8ce046@|7ed238@|7ec438%*|000000                 |8cc446-|8cd246-|000000            |fce054@|fcd246%|e0b638#|fcd238@|fcc438@|fcc42a@|fcd238@|fcc446@|eec438+|fce046%|fce062#|000000 |70b638+|70c438@|7ec438@|9ad238@|b6c446@|eeb62a@|fcc41c@|fcc40e@|fcb60e@|fcb62a%|fcb61c@|ee9a1c@|fca80e@|ee9a0e%|fcb61c@|e0a80e@|fcb60e@@@|fcb62a@|fcd238#|fce054%|fce062#|000000   |fce062*|fcd246@|fcc42a@|fcb60e@|fca80e@|fcb62a@|c48c2a%|a8701c%|a8620e%|b6701c%|d28c1c%|e0a81c@|fcb60e@@|fcc41c@|eec446@|a8c438@|7ec438@|70c438@|7ec438@@|70b638#|d2d246-|eec446@|fcc41c@|fcb60e@|fca81c@|d28c1c%|b67e1c%%|e09a1c%|fcb62a@|fcb60e@|fcc42a@|eec446@|7ec438@|7ed246@|70c438@|70b638%|7ec446=|000000  |fcd246=|fcd238@|fcc41c@|fcb60e@@|fcc41c@|eec42a@|fcd246+|fce062=
+000000      |7eb654=|62b62a%|70c438@|d2d246@|eed238@|e0b62a@|fcd21c@|eeb62a@|fcd238@|9ad238@|9ad246@|8cd246@|70c438@@|70b638#|000000         |fcd254@|fcd246@|eeb638%|fcc42a@|fcd22a@|b6c438@|d2d246@|c4e046@|7ed238@|8cd246@@|7ed238@|70c438@@|70b646-|000000  |fce070+|fce054@|fcd238#|fcc438%|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@@|fcc40e@|fcc42a@|fcc446*|e0d246#|a8c446@|70c438@|c4d254@|fcd246@|fcd238@|fcd21c@|fcc40e@|fca80e@|fca81c@|eea82a@|b6701c%|a8620e%%%|a8700e%|d28c1c%|e0b61c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|eec446@|9ac446@|7ec438%%|70c438@|9ac438@|fcc438@|fcc41c@|fcb60e@|fca80e@|eea82a@|a8620e%|9a620e%%%|a8620e%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|eed254%|a8d254#|7ec446##|7ec438#|7ed246#|c4d254%|fcc438@|fcc41c@|fcb60e@|fca81c@|a8700e%|9a620e%%|a8701c%|eea80e@|fcb60e@|fcc41c@|fcd246@|b6d246@|70c438@@|7ec438@%%|d2c446@|fcc42a@|fcb60e@|d29a1c%|b67e1c%|b6701c%|c49a1c%|fcb60e@|fcc41c@|fcc446@
+8cd254=|7ec438##*++|7ec446*|a8c446@|fcd238@|fcc41c@|fcb60e@|eea81c@|e08c1c%|ee9a1c@|fcb61c@|fcc41c@|fcc438@|9ac438@|7ed246@|7ec438@|62b62a%|7eb654-|000000      |fcd254@|fcd238@|fcb62a@|fcb61c@|fcb60e@@|fca80e@|fcb60e@|fcc41c@|d2c42a@|c4c438@|b6d246@|7ec438@|7ed246@@|70c438@|62b62a%|000000  |fcd254+|eec438@|fcc41c@|fcb60e@|fcb61c@|eea82a@|d28c2a%|c47e1c%|c48c1c%|d29a1c%|fcb61c@@|fcb60e@|fcc41c@|fcc438@|9ac438@|7ed238@|9ac438@|e0c446@|fcc42a@|fcc41c@|fcb60e@|fca80e@@|b67e1c%|a8620e%|9a620e%%%|a8620e%%|fca82a@|fca80e@|fcb60e@|fcc40e@|fcc41c@|fcd238@|fcd246@|e0d254@|9ad254=|d2d262+|fce054@|fcd246@|fcc42a@|fcb60e@@|fca81c@|eea82a@|c48c1c%|c47e1c%|d28c1c%|eea82a@|fcb61c@|fcb60e@|fcc41c@|fcd22a@|fcd246@|fce062+|000000      |fcd254@|fcd238@|fcc42a@|fcb61c@|fca81c@|ee9a1c@|e09a0e%|fcb61c@|fcb62a@|fcc41c@|fcd238@|eec454%|000000      |fcd254*|fcc42a@|fcb60e@|eea82a@|b67e1c%|b6701c%|d28c1c%|fcb61c@|fcc41c@|fcc438@|8cc446%|7ec438@|7ed246@@|70b646=
+000000     |7ed246=|7ec446=|c4d254#|fcc438@|fcb60e@|fca80e@|a8701c%|9a620e%|a8620e%|eea81c@|fcb60e@|fcc42a@|d2c446@|70b62a%|70c438@|7ec438@|7ec446%|7ec438*|7ec446*|7ec438*|7ed246+|7ec438+|eee054+|fcc438@|fcb60e@|fca80e@|e0a81c@|b67e1c%|a8700e%|b6701c%|c49a1c%|fca80e@|fcb60e@|fcc42a@|e0c446@|70c438%|70b62a%|70c42a%|7ec438@@|7ec446%|a8d246@|eed246@|fcc42a@|fcc40e@|fcb60e@|fcb61c@|a8701c%|a8620e%|9a620e%%|a8620e%|d29a1c%|fc9a00@|fcb60e@|fcc40e@|fcd22a@|fcd246@|eed262@|fce054%|fcd246@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|eea82a@|b67e1c%|a8620e%%%|a8701c%|d29a2a%|fcb62a@|fcb60e@@|fcb61c@|fcb62a@|eec446%|000000     |fcd262*|fcd246@|fcd22a@|fcb62a@|fcb61c@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb61c@|fcd22a@|fcd238@|eed270=|000000          |fcd246@|fcc42a@|eeb62a@|fcd21c@|fcb62a@|fcc41c@|fcd22a@|eec454*|000000         |fce054*|fcc446%|fcc42a@|fca80e@|fcb60e@@|fcc42a@|fcc446#|fce062=
+000000        |fcd254%|fcd22a@|fcb62a@|fcb61c@|fca80e@@|fcc41c@|fcc42a@|fcd246#|eed262=|000000     |7ed246-=|7ec438=|7ec446+|d2d254#|fcc438@|fcc41c@|fcb60e@|eea82a@|a8701c%|9a620e%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcc42a@|fcd246@|a8d246*|7ec438**|7ec446*|70c438+|8cd246*|e0d254@|fcd238@|fcc42a@|fcc40e@|fcb60e@|fca81c@|e09a2a%|b67e1c%|a8700e%%|c47e1c%|fca81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|fcd254#|000000   |fcc438@|fcd22a@|fcc41c@@|fcb61c@@|fca80e@|fcb61c@|fca80e@@|fcb62a@|fca80e@|fcb60e@|fcb61c@|fcb62a@|fcd22a@|fcd246@|fcd254@|000000        |fcd254@|fcd246@|eeb638@|fcd238@|fcd22a@|eeb62a@|fcd238@|fcd254@|000000                |fce062*|000000  |fce062=|000000            |fcd254=|000000 |fce054#
+000000          |fce054%|fcc446#|fcd238@|fcc446%|fcc438+|fce054%|000000            |fce054#|fcd238#|fcb62a@|fcc41c@|fca80e@|fcb61c@|fca80e@|fcb61c@|fcb62a@|fcc42a@|fcd238@|fcd262*|000000        |fcc446@|fcd22a@|fcc41c@|fcb61c@@|fca80e@|fcb60e@|fca80e@|fcb61c@|fca80e@|fcc40e@|fcc42a@|eec446%|fcd246=|fce062=|000000  |fce062#|fcd254#|fcc446+|eec454+|fcc438@|fcd22a@|fcc41c@|fca80e@|fcc40e@|fcb60e@@|fcc40e@|fcb61c@@|fcd238@|fcd246@|000000              |fce062==
+000000                             |fcd270=|fce046@|fcc438@|fcb62a@|fcd22a@|eeb62a@|fcc42a@|fcd238@|000000           |fce062*|fcd246=|eed262+|fcd238@|fcc42a@|eeb61c@|fcd21c@|fcb61c@|fcc42a@|fcd238@|e0b654*|fcd254+|fce070*|000000       |fce062*|fce054@|fcc446%|e0b646*|fcc438@|fce038@|fcc438@@|fcd238@|fcd246@|e0b662=|e0b654=|fce062+
+000000                                 |fce062=|000000                    |fce054@|eec454+*|fce062+|000000              |fce062=+|000000 |eec462=|000000 |fce070+
+`,
+        plano: `
+                                                                         -* ==*                *+*%
+                                                                     +@%*%@##@%  ==        -@#*%*#%*%@+##*+-     =%+#@=-=   -*#+
+        -+*##-                                         -         -%@#+#%**%*##*#%%+      %%%##*#*#+#*#%%#**++  %#*##*#*%#-=++#*+   +##*-
+       ++*#*#==#*+-                 ::            @#+%##@#=#* -+****##**#+*+*+##*#*%#   *%##**=::-=**###*++*+=-##**=--=*###+*++:  -%#**##+=
+      :++#%*%*%*#*++=         %%*%%*##*##*++:  =%*###*#***%#+**+#%%%#***-::::=**####*+++*###*+:::::**##%#+===+###**::::+*#%#++*++##*+--=*##
+-+===-=*%#*+=+*##***+:      %%##***##*##***++  =###**=-==**###***###***-::.:::**##%%%%-=%%#***+=-=+**#%%+      %%##*++#*#%#      +##+--=*##+***:
+     :-*#**:::+###++*+====-+##*+-:-=*###++++*+####**:::::=+*#%%%#%##****-::::+**###*     +%%###*#*#*%%-          %%*%*#%+         **%*#*%+-
+        #%##+*###=     :---*##*+:::=*##%====-=%%%#**+-::-**##%*   %%%#*#**+***#*#%%%        %%*%%*%%                *  =            - *
+          %+%#=#            #*##***##%%*        #%#*#*#*#*##*--  **==%%#*%**%*#%%              --
+                             -@##%*%%           +-=%#*%*#%==+       +@*=%@##%%--=
+                                 =                    @=++              =+ - +
+`
+      }
+    ]
   },
   {
     cols: 127, alto: 10,
-    color: `
-000000                                                                 |fce062%|000000 |eec462=|fcd254+|fce062%|000000              |fce054#|fcd254#|eec454*|fcd246#|fce062#
-000000                                                             |fcd254@|fce046@|eec438@|eeb638@|fcd22a@|fcc42a@|fcb62a@|fcd22a@|fcc438@|e0c462=|fcd254+|fce062*|000000        |eed262=|fcd238@|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcd21c@|eeb62a@|fcd238%|fce054@|9ad262*|8cd246@|7ed246@|7ec438@|70c438*|000000    |fcd262=|fce046%|eeb646*|fcd238@|fcc438@|eec438%|fce054%|000000   |7ec438+|7ed238%|8ce046@|8cd246*
-000000       |70c438#|7ec438@|7ed238@|8ce046@|7ed238@|000000                                   |fcd254*#|eec454+|fcd254#|fce062*|000000     |7ec446+|a8d246#|fce054@|fcd246%|fcc438#|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@@|fca80e@|fcc41c@|fcd22a@|fcc454#|000000      |eec462=|fcc438@|fcc41c@|fcb61c@|fcb62a@|eea81c@|eea80e@|fca80e@|eea80e@|fcb60e@@|eec42a@|fcd246@|c4d246@|7ed238@@|7ec438@|70b638%|000000  |fcd254%|fcc438%|fcc42a@|fcb60e@@|fca80e@|fcb60e@|fcc42a@|fcd238%|fcd246@|9ac446@|70c438@|8cd246@|7ec438@|7ec446@|000000   |c4d246@|b6c438@|fcd238@|d2b638#|fce054*
-000000      |70b638%|70c438@|9ad238@|a8d246@|a8c438@|d2d246@|c4c454#|b6e046@|8cd246@|7ec438@|70c438@|70b638+|000000           |fcd254**|9ac446*|b6d246#|9ae046#|9ae054*|8cd246*|7ec438*|7ec446+|000000      |eed262=|fcd238@|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcd21c@|eeb638@|fcd238#|fce054@|000000 |70b638%|70c438@|9ad246@|b6d246@|e0b638@|fcb61c@|fcc40e@|fcb60e@|fcb62a%|eea81c@|d28c1c%%|e09a1c%|d29a1c@|eeb60e@|fca80e@|fcb60e@|fcd22a@|fcd238@|fcd254@|d2d270=|000000  |eed262%|fcd238@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%|a8620e%|b6701c%|eea81c@|fcb60e@@|fcc42a@|eec446@|9ac438@|70b62a%|70c438@|7ec438@|9ac446%|eed246@|fcc42a@|fcb60e@|fca80e@|b67e1c%|a8620e%%|c48c1c%|fca80e@|fcb60e@|fcc438@|a8c446@|7ec438@|70b62a%|70c438%|000000  |fcd254#|fcc438@|fcb61c@|fca80e@@|fcb60e@|fcc41c@|fcd238%|fcd262+
-000000      |62b62a%|c4d246@|e0c42a@|fcc41c@|fcb60e@@|fcc41c@|eec42a@|d2d238@|b6d246@|7ed238@|70c438@|70b638%|000000       |fcc454+|fcd22a@|fcb61c@@@|fcc41c@|fcd238@|a8c438@|a8d238@|9ad246@|8cd246@|7ed238@|70c438@|70b638%|000000   |fcc438@|fcc41c@|fcb61c@@|fca80e@@@|fca81c@|fcb60e@@|fcc438@|fcd246@|c4c446@|7ed238@|c4d246@|fcd246@|fcc42a@|fcc40e@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%%|a8620e%|a8700e%|eea81c@|fca80e@|fcb60e@@|fcc42a@|fcc438@|c4d246@|9ad246@|8cc446%|e0d254@|fcd238@|fcc41c@|fcb60e@|fca80e@|e09a2a@|a8700e%|9a620e%|a8620e%|c47e1c%|fca82a@|fcb60e@|fcc40e@|fcc42a@|eec454%|000000     |fcd262+|fcc438@|fcc40e@|fcb61c@|d29a2a%|b67e1c%%|e09a2a%|fca80e@|fcc40e@|fcc438@|b6c454#|7ec438++**|c4d246%|fcc438@|fcb60e@|eea80e@|a8620e%|9a620e%|c47e1c%|fca80e@|fcc41c@|e0d254@|7ec446+|7ec438=|7ed246=
-000000 |7ec438+*##|7ed246%|c4d246@|fcc42a@|fcb60e@|eea81c@|a8701c%|a8620e%|d28c2a%|fcb60e@|fcc41c@|c4c446@|70c438@|7ec438@|70b638@|8cd254=|000000    |d2d262=|fcc438@|fcc41c@|fcb61c@|e0a81c@|d28c0e%%|e0a81c@|fcb60e@|fcc41c@|fcc438@|9ac446@|70c438@@|7ed238@|70c438@|70b646*|eed262%|fcd246@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@@|fcc42a@|eec446@|a8c446@|e0d246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@|e09a1c%|a8620e%%|9a620e%|a8620e%|a8700e%|eea82a@|fca80e@|fcb60e@@|fcc42a@|eec446@|fcd254=|000000   |fcd262+|fcd238@|fcc41c@|fcb62a@|fcb61c@|fca80e@@@|fca81c@|fcb60e@|fcb61c@|fcc438@|fcd254*|fce062=|000000      |fce054+|fcc446*|fcc42a@|fcb60e@@@|fcc41c@|fcc438@*|fce054*|000000      |fcd254#|fcc42a@|fcc41c@|fca80e@|eea80e@|fcb61c@|fcc42a@|fcd22a@|eed254%|000000  |7ed246-
-000000       |fcd254@|fcc42a@|fcb61c@|e09a0e%|e08c0e%|fcb61c@@|fcc42a@|d2c446%|7ec446=|70c438+|7ec446+|7ec438**#|70c438#|a8d246#|fcd246@|fcc42a@|fcb60e@|fca80e@|b6701c%|9a620e%%|b67e1c%|fca80e@|fcb60e@|fcc42a@|e0d246@|70c438%%%%|8cc446%|e0d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|e09a1c%|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc40e@|fcc42a@|fcc454@|000000  |fcc454=|eeb638@|fcc41c@|fcc40e@|fcb60e@|fcb62a%|fca81c@|e09a1c%|e08c1c%|ee9a1c@|eea82a@|fcb60e@|fcb61c@|fcb60e@|fcd22a@|fcd246@|fcd254@|000000      |fcd254+|fcd238@|fcc42a@|fcc41c@@|fcb61c@|fcd22a@|eeb638%|fcd238#|fce054@|000000          |fcd254*|e0b646=|fcd254#*|e0c454-|fce062=|000000         |fcd262=|fcd246#|eec438*|fcd246@|eec446+|fce054+
-000000        |fcd254+|fcd238@|fcb638@|fcd238@|fcc438#|fcd254*|000000           |fcd246@|fcc42a@|fcb61c@@|ee9a0e@@|fcb61c@|fcb62a@|fcc41c@|fcd238@|fcd262*|000000      |fcd254+|fcc438@|fcc41c@|fcb61c@@|fca80e@|fca81c@|fca80e@|fca81c@|fcb60e@|fcb61c@|fcc42a@|fcd246#|fce070+|000000  |fce062#|fce054@|fcd238#|fcc438#|fcc42a@|fcc40e@|fca80e@|fcb60e@@@|fcc40e@|eea80e@|fcc41c@|fcd238@|fcc446%|000000           |fce062#|fcd254*|eec454=|fcd262=
-000000                          |fcd254+|fcd238@|eeb62a@|fcc42a@@|fcc438@|fce046@|000000           |fcd262+|fcd238@|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcd22a@|eeb638%|fcd238#|fce054@|000000       |fcd254@|fce046@|eec438%@|fcd22a@|fcc42a@|fcc438@|fcd238@|fcd246@|000000 |fcd254=|fce062+
-000000                                               |fcd254##|eec454+|fcd254=|000000              |fce062%
+    marcos: [
+      {
+        color: `
+000000                                                                 |fce062*|000000 |eec454*|fcd254+|fce062*|000000              |fce062+|fcd254*|eec454#|fcd254#|fce062+
+000000          |8cd246=|000000                                                  |fcd262#|fce046@|eec438@|eeb638@|fce038@|fcc42a@|fcb62a@|fcd22a@|fcc438@|e0b646-|fcd246*|fce054%|000000       |fcd254=|eed262=|fcd238@|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcd21c@|eeb62a@|fcd238@|fcd246@|b6d254%|8cd246@|7ed238@|7ec438@|70c438#|000000    |fcd262=|fce046%|eeb638#|fcd238@|fcc438@|eec438*|fce054#|000000   |7ec438*|7ed238@|8ce046@|8cd246#
+000000       |70c438#|7ec438@|7ed238@|8ce046@|7ed238@|000000                                    |fcd254+|eec454*|fcd254*|fce062=|000000     |7ec446+|b6d254%|fce054@|fcd238@|fcc438#|fcc42a@|fcc40e@|fca80e@|fcb60e@@@@|fca80e@|fcc41c@|fcd22a@|fcc446%|000000      |eec462+|fcc438@|fcc41c@|fcb61c@|fcb62a@|eea80e@@|fca80e@|eea80e@|fcb60e@@|eec42a@|fcd238@|d2d246@|7ed238@|7ed246@|7ec438@|70b638%|000000 |fcd262+|fcd246@|fcc42a%@|fcb60e@|fca80e@@|fcb60e@|fcc42a@|fcd238#|fcd254%|7eb638@|70c438@|8cd246@|7ec438@|7ec446@|000000   |d2d246@|c4c438@|fcd238@|b6b638#|fce062=
+000000      |70b638%|70c438@|9ad238@|a8d246@|a8c438@|d2d246@|a8c454*|9ae046@|8cd246@|7ec438@|70c438@|70b638+|000000           |fcd254+|eed254*|7ec438*|8cd246#|8ce046#|9ae054*|8cd246*|7ec438*|7ec446+|000000       |fcd238@|fcc42a@|fcb62a@|fcd21c@|fcb61c@|fcd21c@|eeb62a@|fcd238%|fce054@|000000 |70b638%|70c438@|9ad246@|b6d246@|eeb638@|fcb61c@|fcb60e@@|fcb62a%|eea81c@|d28c1c%%|e09a1c%|d29a1c%|eeb60e@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|000000   |d2d262%|fcd246@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%|a8620e%|b6701c%|eea81c@|fcb60e@@|fcc42a@|d2c446@|9ac438@|70b62a%|70c438@|7ec438@%|e0d246@|fcc42a@|fcb60e@|fca80e@|b67e1c%|a8620e%%|c48c1c%|fca80e@|fcb60e@|fcc438@|b6c446@|7ec438@|70b62a%|70c438%|000000  |fcd254%|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcc42a@|fcd238%|eed262=
+000000      |70b638%|d2d246@|e0c42a@|fcc41c@|fcb60e@@|fcc41c@|e0c42a@|c4d238@|9ad246@|7ed238@|70c438@|70b638%|000000       |fcd262+|fcd238@|fcb61c@|fcc41c@@|fcc42a@|fcd238@|9ad238@|8cc438@|8cd238@|8cd246@|7ed238@|70c438@|70b638%|000000  |eec462=|fcc438@|fcc41c@|fcb61c@@|fca80e@@@|fca81c@|fcb60e@@|fcc42a@|fcd246@|d2d246@|7ed238@|b6d246@|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%%|a8620e%|a8700e%|eea81c@|fca80e@|fcb60e@@|fcc42a@|e0c438@|c4d246@|8cc438@|8cc446@|e0d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|e09a2a%|a8700e%|9a620e%|a8620e%|b67e1c%|fca82a@|fcb60e@|fcc40e@|fcc42a@|fcd254*|000000     |e0d262+|fcc438@|fcc40e@|fcb60e@|d29a2a%|b67e1c%%|e09a2a%|fca80e@|fcc40e@|fcc438@|b6c454*|7ec438+**#|9ad246%|fcc438@|fcb60e@|eea80e@|a8620e%|9a620e%|c47e1c%|fca80e@|fcc41c@|eed246@|7ed246+|7ec438=|7ed246-
+000000 |7ec438**#%|7ed246%|9ad246@|fcc438@|fcb60e@|eea81c@|b6701c%|a8700e%|d29a2a%|fcb60e@|fcc42a@|d2c446@|70c438@|7ec438@|70b638%|000000     |e0d262=|fcc438@|fcc41c@|fcb62a@|eea81c@|d28c0e%%|eea81c@|fcb60e@|fcc41c@|fcd238@|9ac446@|70c438@|7ec438@|7ed238@|70c438@|70b646*|e0e062#|fcd246@|fcc41c@|fcb60e@|fca80e@|e09a1c%|a8620e%%%|b67e1c%|fca81c@|fcb60e@@|fcc42a@|d2d246@|9ac446@|d2d246@|fcd238@|fcc41c@|fcc40e@|fcb60e@|fca80e@|d29a1c%|a8620e%%|9a620e%%|a8620e%|eea82a@|fca80e@|fcb60e@@|fcc42a@|fcc446%|fcd254+|000000   |eec454*|fcc42a@|fcc41c@|fcb61c@@|fca80e@@@|fca81c@|fcb60e@|fcb61c@|fcc438%|fcd246#|fce062*|000000      |fce054+|fcc446*|fcc42a@|fcb60e@@@@|fcc42a@|fcc438*|fce054*|000000      |fcd254#|fcc42a@@|eea80e@|ee9a0e@|fcb61c@|fcc42a@|fcd238@|e0d254*|000000  |7ed246=
+000000       |fcd246@|fcc41c@|fcb62a@|e08c0e%|d28c0e%|fca81c@|fcb61c@|fcc42a@|c4c446#|7ec446+|70c438+|7ed246*|7ec438*##|70c438#|7ec438%|e0d254@|fcc42a@|fcb60e@|fca80e@|a8701c%|9a620e%%|b67e1c%|fca80e@|fcb60e@|fcc42a@|e0d246@|70c438@@@|7ec438@|8cc446@|d2d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%|a8620e%|b6701c%|fca81c@|fcb60e@@|fcc42a@|fcd254#|000000  |fcc446+|eeb62a@|fcb61c@|fcc40e@|fcb60e@|fcb62a%|fca81c@|e09a1c%|d28c1c%|ee9a1c%|eea82a@|fcb60e@|fcb61c@|fcb60e@|fcc42a@|fcd238@|fcd254@|000000    |fce062=|000000 |eed262=|fcd238@|fcc42a@|fcc41c@@|fcb61c@|fcd22a@|eeb638%|fcd246#|fce062*|000000          |fce054+|e0b646=|fcd246%#|000000 |fce054#|000000          |fcd246#|eeb638#|fcd238@|fcc438+|fcd246%
+000000        |fcd262=|fcd238@|fcb62a@|fcc42a@%|fcd246@|000000           |fcd246@|fcc42a@|fcb61c@@|e09a0e%%|fcb61c@@|fcc41c@|fcd238@|000000       |eec454+|fcc42a@|fcc41c@|fcb61c@@|fca80e@|eea81c@|fca80e@|fca81c@|fcb60e@|fcb61c@|fcc42a@|fcd246%|fce062#|000000  |fce062@|fcd246@|fcd238@|fcc438#|fcc42a@|fcc40e@|fca80e@|fcb60e@@@|fcc40e@|eea80e@|fcd22a@|fcd238@|eec454*|000000           |fce062+|fcd254*|eec454+|fcd262+
+000000                          |fcd262=|fcd238@|fcc42a@@@@|fcd238@|fcd262+|000000        |fce062+|fcd254+|eec462=|fcd238@|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcd22a@|eeb638@|fcd246%|fce062#|000000       |fcd262%|fce046@|eec438@|eeb638@|fcd238@|fcc42a@@|fcd238@|fcd246@
+000000                                               |fcd262*|fcd254#|eec454*|fcd254*|000000              |fce062#|000000 |eec462=
 `,
-    plano: `
-                                                                 % -+%              ##=#*
-                                                             %@##@##@%-=*        -%##%#%##@+#**=    =#=%%*%   -*#+
-       =**#*                                   **=**     -+@#*#%*#**#*%%*      -%%##*+**###%#***+  ####**###%**#**   %#%++
-      ++*#*#+%#*+-           +*=++++=-      -@##%#%#*@ ++######**==++**#%%%-  #%%#*=:::-*####*++**###*-::=*##**++  *##**###=
-      +###*#####*+=       =%####%**##*+=   %%##****###%#*#%%#**+:::::***##%#*+%%##*+:::-*####     =##*+--+*##+-===*##+::-*##---
- -==++#%#+::=*##+*+-    -%##+==**#%*+**+-#%%#*+:::-**###*%%%#**+:::::***###=   +%%##****###*=      =+%##*#%+*      *##*+##%#  :
-       %##+=*#%#--=====*%%#*-::-*#%%++++*%%%#*+:::-**###  -####**+=+*#*#%@@      =@##%#@**%          +-#*-=         -*+%=+
-        +%#%*+           %%##++##%%+      =%%##****###*=  *@#*#%*#*##*%@#           #*-=
-                          +@#%%#@           =@##%#%**%       @@*#@##@% -+
-                                               *#==              %
+        plano: `
+                                                                 * ++*              ++*#+
+          -                                                  *@##@##@#:+%       --%##%*%*%@##**=    -%+%%=#   =*#+
+       =**#*                                    =++=     -#@%*#%*#**#*%%*      =####+++***#%#***+ =%###**##*#++**+   %*%+=
+      ++*#*#=##*+-           ++=+++==-       %##%*%*#@ =+*#*##***==++**#%%%   #%%#*=:::-**###*++++###*-::=*##**++  ###**###-
+      +###*#####*+=       =%####%*****+=  -%%##****###%#*#%%#**+:::::+**####**%%#**+:::-**##+     +##*=--+*##+-===+##+::-*##--:
+ ==+++*##+-:=*##+*+     =%##*==**#%*+**+-*%##*+:::-**###*#%%#*++:::::***###=   +%%##****####*      ++%##*##+*      *%#++*#%+  -
+       %##==*#%*--===+++#%#*:::-*#%%++++*#%#**+:::-**##*  =###*+*==+*#**%%@    = =%##%#%***          +-#* *          *+%=%
+        =%#%*%           %%##++*#%%       =####*++*###%*  %@%*#%*#*##*%%+           ++==
+                          -%####%=        +==%##%*%*##       %@##@##@%
+                                               **++              # =
 `
+      },
+      {
+        color: `
+000000                                                                 |fcd262=|e0c454+|eec454+|fce062#|000000             |fce070=|eec454=-|fce054%|e0b646+|fcd254#|fce062%
+000000          |8cd246=|000000                                                  |fce054@|fcd246@|e0b638%|fcc438@|fcd238@|fcb62a@|fcc42a@|fcd238@|eeb638%|fcc438*|fce046@|fce062@|000000       |fce054*|fcc446=|fcd246@|fcd22a@|fcb61c@|fcd21c@|fcb61c@|fcd21c@|eec42a@|fcc438%|fce046@|c4d254@|8cd246@|7ed238@|7ec438@|70c438#|000000    |fce062*|fcd246*|eeb638#|fcd238@|fcc438%|fcc446#|fce054%|000000   |7ec438*|7ed238@|8ce046@|8cd246#
+000000       |70c438#|7ec438@|7ed238@|8ce046@|7ed238@|000000                                    |fce062*|e0b654=|fcd254*|fce062*|000000     |7ec446+|e0d254%|fce054%|fcd238#|fcc446%|fcc41c@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@@@|fcd21c@|fcc42a@|eec446*|fcd254=|fce062=|000000    |fcd262=|fcc438@|fcc41c@|fcb60e@|fcb61c@|fca80e@|eea81c@|ee9a0e@|eea80e@|fcb60e@@|fcc42a@|eed246@|d2d246@|8cd238@|7ed246@|7ec438@|70b638%|000000 |fce062+|fcd238#|fcc438%|fcc41c@|fcb60e@@|fca80e@|fcc41c@|fcb62a@|fcd238@|fcd254@|70b638%|70c438@|8cd246@|7ec438@|7ec446@|000000   |e0e046@|b6c438@|fcd238@|c4b638#|fce062=
+000000      |70b638%|70c438@|8cd238@|b6d246@|9ac438@|e0d246@|a8c454*|9ae046@|8cd246@|7ec438@|70c438@|70b638+|000000           |fce054#|c4c446+|8cc446*|a8d246#|8ce046#|9ae054*|8cd246*|7ec438*|7ec446+|000000     |fce054+|000000 |fcd246@|fcd22a@|eeb61c@|fcd21c@|fcb61c@|fcd21c@|fcc438@*|fce046%|eed262*|70b638%|70c438@|7ec438@|a8c446@|eeb638@|fcc41c@|fcc40e@|fcb60e@|fcb62a%|eea81c@|d29a1c%|d28c1c%|d29a1c%|e09a1c@|eeb61c@|fca80e@|fcc40e@|fcd21c@|fcd238@|eed254%|000000   |c4d262*|fcd246@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%|a8620e%|b6701c%|eea81c@|fcb60e@|fcc40e@|fcc42a@|d2c438@|7ec438@|70b62a%|70c438@|7ec438@|70c438%|d2c446@|fcc42a@|fcb60e@@|b67e1c%|a8620e%%|c48c1c%|fca80e@|fcb60e@|fcc438@|c4d246@|7ec438@|70b62a%|70c438%|000000  |fcd254%|fcc42a@|fcb61c@|fca80e@@|fcb60e@|fcc41c@|fcd238#|fcd262=
+000000      |62b62a%|d2d246@|e0c42a@|fcc41c@|fcb60e@@|fcb61c@|eec42a@|b6d238@|9ad246@|7ed238@|70c438@|70b638%|000000       |fcd254#|fcd238@|eeb61c@|fcc41c@|fcb61c@|fcc42a@|eed238@|9ad238@|a8d246@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000   |eec438@|fcc41c@|fcb60e@|fcb62a@|fca80e@@@|fcb61c@|fcb60e@@|fcc42a@|eec446%|c4d246@|8cd246@|d2d246@|fcd246@|fcd22a@|fcc40e@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%%|a8620e%|a8700e%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd238@|e0d246@|a8d246@|8cc446%|eed254@|fcd238@|fcc41c@|fcb60e@|fca80e@|e09a2a@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@@|fcc42a@|fcd246#|fce062=|000000    |fce062=|fcc438@|fcb60e@@|d29a2a%|b67e1c%%|e09a2a%|fcb61c@|fcc40e@|fcc438@|a8c446#|7ec438+**#|a8d246#|fcc438@|fcb60e@|eea80e@|a8620e%|9a620e%|c47e1c%|fca80e@|fcc41c@|eed254@|7ed246+|7ec438=|7ed246-
+000000 |7ec438**#%|7ed246%|a8d246@|fcc438@|fcb60e@|eea81c@|b6701c%|a8700e%|d29a2a%|fcb60e@|fcc42a@|d2c446@|70c438@|7ec438@|70b638%|000000     |eed262#|fcd238@|fcc41c@|fcb61c@|eea80e@|d28c0e%%|e0a81c@|fcb60e@|fcc41c@|fcc438@|8cc446@|70c438@|7ec438@|7ed238@|70c438@|70b646*|e0e062+|fcd246@|fcc42a@|fcb60e@|fca80e@|e09a1c%|a8620e%%%|b67e1c%|fca81c@|fcb60e@|fcc40e@|fcc42a@|c4c446@|7ec438@|a8c438@|fcc438@|fcc42a@|fcc40e@|fcb60e@|fca81c@|d29a2a%|a8620e%%|9a620e%%|a8620e%|eea82a@|fca80e@|fcb60e@@|fcc42a@|eec446@|000000    |fcd254%|fcd22a@|fcc41c@|fcb62a@|fcb61c@|fca81c@|fca80e@@@|fcc41c@|fcb61c@|fcd238%|fcd246@|fce062+|000000      |fce054#|fcd238*|fcc438@|fcc40e@|fca80e@|fcb60e@@|fcc41c@|fcc446#|fcd254=|000000      |fcd254#|fcc438@|fcc41c@|eea80e@|ee9a0e@|fcb61c@@|fcc438@|d2d262*|000000  |7ed246=
+000000       |fcd246@|fcc42a@|fcb61c@|e08c1c%|d28c0e%|eea82a@|fcb60e@|fcc42a@|c4c454#|7ec446+|70c438+|7ed246*|7ec438*##|70c438#|7ec438%|d2d246@|fcc42a@|fcb60e@|fca80e@|a8701c%|9a620e%%|b67e1c%|fca80e@|fcb60e@|fcc42a@|d2d246@|70c438@@@|7ec438@|8cc446@|eed254@|fcd238@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%|a8620e%|b6701c%|fca81c@|fcb60e@@|fcc42a@|fcd254%|fce062+*|fcd246#|fcc438@|fcb61c@|fcb60e@@|fca81c@@|d29a1c%|d28c1c%|e09a1c%|eea82a@|fca80e@|fcb60e@@|fcc42a@|fcd238@|fcd254@|fce070=|000000     |fcd254#|fcd238@|eeb62a@|fcc41c@@@|fcd22a@|eeb638%|fcd246@|fce070+|000000          |fce054*|eec446+|fcc446*|fce054@|000000 |fcd254+|fce062+|000000        |fce062=|fcd246*|fcc446%|fcd238%|fcc438#|fcd254%
+000000        |fcd254*|fcc438%|fcc42a@@@|fcd254%|000000           |fcc446@|fcc41c@|fcb61c@|fcb62a@|e09a0e%|e09a1c%|fcb61c@@|fcc42a@|fcd246@|fcd270=|000000      |fcd254#|fcd22a@|fcc41c@|fcb61c@@|eea81c@|eea80e@|fca81c@|fca80e@|fcb61c@@|fcc42a@|fcd246@|fce062+|000000  |fcd262=|fcd246@|fcd238@|fcc42a%|fcb62a@|fcc41c@|fcb60e@@@|fca80e@|fcc40e@|fcb61c@|fcc42a@|fcd238@|fcd254@|000000           |fce054#|eec454++|fce062*
+000000                           |fcd238@|fcc42a@|fcb62a@|fcd22a@|eeb62a@|fcd238@|fcd254@|000000          |fcd254*|fcd238@|fcb62a@|fcc41c@@@@|eeb638@|fcd246@|fcd262+|000000        |fce046@|fcd238@|eeb638@|fcd22a@@|eeb62a@|fcd238@|fce046@
+000000                              |fce062=|000000                |fce054%|eec446*|eec454*|fce054#|000000              |fce062*|fcd262+|000000 |eec462=
+`,
+        plano: `
+                                                                 ===#             =--%=*%
+          -                                                  @%*%@##@*+@@       +-%%*%*%#*@%#**=    +*+@**#   =*#+
+       =**#*                                    *-+*     -#%**%%*#*#*#%#===    =####*++**##%%***+ +###***##%%+*#**   %*%+=
+      ++*#*%=##*+-           #==++++=-     = %%*%*%#+%+++*#####*+==++**#%%#   +%%#*=:::-**###+++*+###*-::=*#%#*++  #%#***#*-
+      +###*#####*+=       #%*%#%%##*#*+=   #%##*****####*%%%#**+:::::***#%%%**%%##*+:::-*###*=    =##*=--+*##+-===*%#+::-*#%--:
+ ==++*#%#+-:=#%#+*+     #%##*==**##*+**+-+%%#*+:::-**###+*%%##*+:::::**####    #%%##****###%=      *+##*##%*=      *%#++##%+  -
+       %##==*#%+--===+++#%#*:::-*#%%+++**%%#**+:::-**###+**####**==+****#%@=     *%#%##%*%=          *=+@ =+        =+*#*#
+        *###%#           %%##++*#%%=      *%%##*+**##%%+  =@%#*%#*#*%*#@%           #==*
+                           %%#%*%%          *%#%##%#%+        @%*%%#%@
+                              =                %++#              *+ -
+`
+      },
+      {
+        color: `
+000000                                                                |fce062+|e0c454=|eec454*|fcd254+|fce062#|000000              |fcd254=|e0c454=|fce054%|eec454+*|fce054#
+000000          |8cd246=|000000                                                 |fce070+|fce054@|fcc446%|e0b646#|fcd238@|fcc438@|fcb62a@|fcd22a@|fcd238@|e0b638#|fcd246@|fce046@|fcd262*|000000       |fce054#|fcd246*|eec438%|fcd22a@|fcb61c@|fcd21c@|fcb61c@|fcc41c@|fcc42a@|d2c438%|fcd246%|e0e054@|8cd246@|7ed238@|7ec438@|70c438#|000000    |fce062*|fcc438=|fcc446%|fcd238@|eeb638#|fcd246%|fcd254*|000000   |7ec438*|7ed238@|8ce046@|8cd246#
+000000       |70c438#|7ec438@|7ed238@|8ce046@|7ed238@|000000                                    |fce062*|eec454=+|fce054*|000000     |7ec446+|eee054#|e0d246%|e0c446#|fcc438@|fcd21c@|fcb60e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fcc41c@|eec438@|fcc446+|fcd246*|fce062*|000000    |fcd246+|eec438@|fcc41c@|fcb60e@|fca81c@@|ee9a0e@@|eeb60e@|fca80e@|fcb60e@|fcb62a@|e0c446@|c4d246@|8cd246@|7ed246@|7ec438@|70b638%|000000 |fce062+|fcd246*|fcc438@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb61c@@|fcd238@|eec454@|70b638%|70c438@|8cd246@|7ec438@|7ec446@|000000   |e0d246@|c4c438@|eed238@|e0c438#
+000000      |70b638%|70c438@|7ed238@|c4e046@|9ac438@|d2d238@|b6d254#|8cd246@@|7ec438@|70c438@|70b638+|000000           |fce054#|a8c446=*|a8d246#|8ce046#|9ae054*|8cd246*|7ec438*|7ec446+|000000     |fce062*|fcd246+|eec446%|fcd22a@|fcb61c@|fcd21c@|fcb61c@|fcc41c@|fcd22a@|eec446+|fcd246*|fce062#|70b638%|70c438@|7ed238@|b6c446@|fcc438@|fcc41c@|fcc40e@|fcb61c@|fcb62a%|ee9a1c@|d29a1c%|d28c1c%|d29a1c%|eea80e@|e0b61c@|fcb60e@|fcc40e@|fcc41c@|fcc438@|000000    |b6d254=|fcc446@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|eea81c@|fca80e@|fcc40e@|fcc42a@|d2c446@|70b62a%%|70c438@|7ec438@|70c438%|d2c446@|fcc42a@|fcb60e@|fca81c@|b67e1c%|a8620e%%|d28c1c%|fca80e@|fcb60e@|fcd238@|d2d246@|7ed238@|70b62a%|70c438%|000000  |eed254#|fcc42a@|fcb60e@@|fca80e@|fcb60e@|fcc41c@|fcd246*|fce062=
+000000      |62b62a%|c4d246@|e0d22a@|fcb61c@|fcb60e@|fcb61c@@|fcc438@|a8d238@|9ad246@|7ed238@|70c438@|70b638%|000000       |fcd254@|fcc42a@|eeb62a@|fcc41c@|fcb61c@|fcd22a@|e0c438@|b6d238@|a8d246@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000  |fcd254=|eec438@|fcc41c@|fcb60e@|fca81c@|fcb61c@|fca80e@|eea80e@|fcb61c@|fca80e@|fcc40e@|fcc42a@|d2c446@|a8c438@|9ad246@|e0d254@|fcd238@|fcd22a@|fcc40e@|fcb60e@|fca80e@|e09a1c%|a8620e%|9a620e%%|a8620e%|a8700e%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd238@|fcd254@|9ad246@|8cc446%|fcd254%|fcd238@|fcc41c@|fcb60e@|fca80e@|e09a2a%|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@@|fcc42a@|fcd246%|eee062*|000000    |fce062+|fcc438@|fcb60e@@|d28c2a%|b67e1c%%|e09a1c%|fca80e@|fcc40e@|fcd238@|c4d254%|7ec438+**#|a8d246%|fcc438@|fcb60e@|eea80e@|a8620e%|9a620e%|b67e1c%|fca80e@|fcc41c@|eed254@|7ed246+|7ec438=|7ed246-
+000000 |7ec438**#%|7ed246%|a8c446@|fcc438@|fcb60e@|eea80e@|a87e1c%|a8700e%|d28c1c%|fcb60e@|fcc42a@|d2c446@|70c438@|7ec438@|70b638%|000000     |fcd262%|fcd238@|fcc41c@|fcb61c@|eea80e@|d28c0e%|e08c0e%|e0a81c@|fcb60e@|fcc41c@|eec438@|8cc438@|70c438@|7ec438@|7ed238@|70c438@|70b646*|000000 |fcc446@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%%%|b67e1c%|eea81c@|fca80e@|fcc40e@|fcc42a@|d2c446@|70c438%|7eb638@|e0c438@|fcc42a@|fcb60e@@|fca80e@|d29a2a%|a8620e%%|9a620e%%|a8620e%|eea82a@|fca80e@|fcb60e@@|fcc42a@|eec446@|000000    |fcd246@|fcd22a@|fcc42a@|fcb62a@|fcb60e@|fca81c@|fca80e@|fca81c@|fca80e@|fcc41c@|fcc42a@|fcd22a@|fcd246@|000000       |fcd262%|fcd238%|fcb62a@|fcc41c@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcc446@|000000       |fcd254*|fcc42a@|fcb61c@|eea81c@|ee9a0e%|fcb61c@@|fcc438@|d2d262=|000000  |7ed246=
+000000       |fcd246@|fcc41c@|fcb61c@|e08c1c%|d28c0e%|eea81c@|fcb60e@|fcc42a@|e0d254+|7ec446+|70c438+|7ed246*|7ec438*##|70c438#|7ec438%|d2d246@|fcc42a@|fcb60e@|fca80e@|a8701c%|9a620e%%|b67e1c%|fca80e@|fcb60e@|fcc42a@|d2d246@|70c438@@@|7ec438@|8cd246@|eed254@|fcd238@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|eee062#|fce054@|fcd246@|fcc438@|fcb61c@|fcb60e@@|fca81c@@|d28c1c%|e09a1c%%|fcb62a@|fca80e@|fcb60e@@|fcb62a@|fcd238%|fce054%|fce062*|000000     |fcd254@|fcd238@|eeb62a@|fcd21c@|fcb61c@|fcc41c@|fcc42a@|fcc438@|fcd254@|000000           |fce062*|fcd246*|eec446+|fce046@|eec446=|000000 |fce062+|000000        |fce062=|eec446=|fcd246@|fcc438#|fcd238%|fcd262*
+000000        |fce054#|fcc42a#|fcd22a@|fcb62a@|fcd22a@|fcc454*|fce054=|000000          |eec446%|fcc41c@|fcb60e@|fcb62a@|e09a0e%|ee9a1c%|fca81c@|fcb60e@|fcc42a@|fcd238%|fce062=|000000      |fcd246@|fcd22a@|fcc41c@|fcb61c@|fcb60e@|eea81c@|ee9a0e@|fca81c@|fca80e@|fcb61c@@|fcd22a@|fcd246@|000000    |fcd254@|fcd238@|fcc42a@|eeb61c@|fcc40e@@|fca80e@|fcc40e@|fca80e@|fcc40e@|fcb61c@|fcb62a@|fcd238@|fcd246@|000000           |fce054*|eec454+|eed254+|fce062*
+000000                           |fcd246@|fcd22a@|fcb62a@|fcd22a@|eeb62a@|fcd238@|fcd246@|000000          |fcd246@|fcd238@|eeb62a@|fcd21c@|fcb61c@|fcc41c@@|fcc438@|fcd246@|000000      |fce062=|000000  |fcd246@|fcd238@|eec438@|fcc42a@|fcd22a@|eeb62a@|fcc438@|fce046@|fcd254*
+000000                              |fce062=|000000                |fce054#|eec454*|fcc446*|fce062#|000000               |fce062%
+`,
+        plano: `
+                                                                +-+=#              =-#=+#
+          -                                                 =@*+%%#%%+%@+       #+*%*%###*#%#**=    *=#%*#+   =*#+
+       =**#*                                    *-=+     -#*+#%#*#*#*#%#=**    =###**++**####***+ ++##*#*##%#++**+   %##+
+      ++*%*#+##*+-           *-=+++==-     *=*%*%##%=**=+*##%#**+===+**#%#    -###*=:::-+*###+++++###*-::=*#%#*++  *#****#*-
+      +#####*%*#*+=       %%*%*%###***+=  -###***+#*##***%%%#**+:::::+**#%%%**#%##*+:::-**#%#+    +##*=--+*#%*-===*%#+::-*#%--:
+ ==+++*#*+-:=*%#+*+     #%#*+==+*##*+**+- %##*+:::-**###++###**+:::::**####    %%###*+**##%%       ####*#*%#       *##++*##-  -
+       %##==+##=--===+++#%#*:::-*###++++*%%##*+:::-**#%%*%%%*****==+**#*##%*     %%*%#%##%           ++=@= +        =-%*#+
+        #+%#%+=          ##**++**#%=      %%###*+**##%%    %@%*##*#*%##%@           *==*
+                           %%*%*%@          %%*%#%##%      -  %@##@##@*
+                              =                #++*               #
+`
+      },
+      {
+        color: `
+000000                                                                |fce062=|eec454+|e0c454=|fce062#|000000               |fce062+|eec454+|fcd254*|fce054#|e0b654=|fcd254*|fce062=
+000000          |8cd246=|000000                                                 |fce062#|fcd254#|eeb646*|eec446%|fce038@|fcc42a@@|fcd22a@|fcc438@|eeb638@|fcd246@@|000000        |fce062%|fcd246%|eeb638#|fcd22a@|fcc41c@@@|fcb61c@|fcd22a@|d2c438@|eed246#|eee054@|8cd246@|7ed238@|7ec438@|70c438#|000000    |fce054+|000000 |fcd238@|fcc438@%|fce046@|eed262=|000000   |7ec438*|7ed238@|8ce046@|8cd246#
+000000       |70c438#|7ec438@|7ed238@|8ce046@|7ed238@|000000                                  |fce062=|eec454=|fcd254=|fce062*|000000 |fcd254+|fce062=|000000    |8cc446+|c4d254#|b6d246%|d2d254@|fcc42a@|fcd21c@|fcb60e@@@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|eeb638%|fcd238#|fce054@|fce070*|000000    |fce054#|fcc438%|fcb61c@|fcb60e@|fca80e@|fca81c@|ee9a0e@@|fcb61c@|fca80e@|fcc40e@|fcc42a@|d2c446@|a8d238@|8cd246@|7ed246@|7ec438@|70b638%|000000  |fcd246+|fcc42a@|fcc40e@|fca80e@|fcb60e@@|fcb61c@@|fcd238@|e0c462*|70b638%|70c438@|8cd246@|7ec438@|7ec446@|000000   |d2d246@|d2d238@|d2c438@|fcd246%
+000000      |70b638%|70c438@|7ed238@|c4e046@|a8d238@|b6c438@|c4d254%|8cd246@@|7ec438@|70c438@|70b638+|000000          |fce054*|fcd254+|b6c446=|d2d254*|9ad246#|8ce046#|9ae054*|8cd246*|7ec438*|7ec446+|000000     |fce062*|fcd246#|eeb638#|fcd22a@|fcc41c@@@|fcb61c@|fcd22a@|fcc454#|fcd246=|fce062*|70b638%|70c438@|7ed238@|e0d246@|fcd238@|fcc41c@|fcb60e@|fcb61c@@|e09a2a@|e08c1c%|d28c1c%%|eea81c@|d2b61c@|fcb60e@|fcc40e@|fcc41c@|eec446@|000000     |fcc446@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|eea81c@|fca80e@|fcc40e@|fcc42a@|e0d246@|7ec438@|70b62a%|70c438@|7ec438@|70c438%|eec446@|fcc42a@|fcb60e@|fca81c@|c47e1c%|a8620e%%|d28c1c%|fca80e@|fcb60e@|fcd238@|d2d246@|7ec438@|70b62a%|70c438%|000000  |fcd254+|fcc42a@|fcb60e@@|fca80e@|fcb60e@|fcc41c@|fcc446#
+000000      |62b62a%|b6d246@|fcd22a@|eeb61c@|fcb60e@|fcb61c@@|fcc42a@|a8c438@|8cd246@|7ed238@|70c438@|70b638%|000000       |fcd246@|fcc42a%|fcb61c@|fcc41c@|fcb61c@|fcd22a@|d2c438@|d2d246@|a8d246@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000  |fce054*|fcc446#|fcb61c@|fcb60e@|fca80e@|fcb61c@|eea80e@@|fcb61c@|fca81c@|fcc40e@|fcc42a@|d2c446@|8cc438@|9ad246@|e0e054@|fcd238@|fcc42a@|fcb60e@@|fca80e@|e09a1c%|a8620e%|9a620e%%|a8620e%|a8700e%|e0a81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|eed254@|9ad246@|8cc438%|e0d254%|fcc438@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@@|fcc42a@|fcd246@|d2d262#|000000    |eed254*|fcd238@|fcb60e@@|d28c1c%|b67e1c%%|e09a1c%|fca80e@|fcc40e@|fcd238@|d2d254@|7ec438+**#|a8d246%|fcc438@|fcb60e@|eea81c@|a8620e%|9a620e%|b67e1c%|fcb60e@|fcc41c@|eed254@|7ec446+|7ec438=|7ed246-
+000000 |7ec438**#%|7ed246%|b6c446@|fcc438@|fcb60e@|eea80e@|b6701c%|a8700e%|d28c1c%|fcb60e@|fcc42a@|d2c446@|70c438@|7ec438@|70b638%|000000     |fce062%|fcd238@|fcb61c@|fcb60e@|ee9a0e@|d28c0e%|e08c0e%|e0a81c@|fcb60e@|fcc41c@|e0c438@|a8c446@|70c438@|7ec438@|7ed238@|70c438@|70b646*|000000 |fcc446@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%%%|b67e1c%|eea81c@|fca80e@|fcc40e@|fcc42a@|eed246@|8cc438@|7ec438@|e0c438@|fcc42a@|fcb60e@@|fca80e@|d29a2a%|a8620e%%|9a620e%%|a8620e%|eea82a@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|000000   |fce070+|fcd246@|fcd238@|fcc42a@|fcb61c@|fca80e@|fcb61c@|ee9a0e@|fca81c@|fcb60e@|fcc42a@@|fcd238@|fcd254@|000000       |fcd262*|fcd238@|fcb61c@|fcc41c@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcd238@|000000       |fce054+|fcc42a@|fcb61c@|eea81c@|ee9a0e@|fca81c@|fcb60e@|fcc438@|000000   |7ed246=
+000000       |fcd246#|fcc41c@|fcb61c@|e09a1c%|d28c0e%|eea81c@|fcb60e@|fcc42a@|eed254+|7ec446+|70c438+|7ed246*|7ec438*##|70c438#|7ec438%|d2c446@|fcc42a@|fcb60e@|fcb61c@|a8701c%|9a620e%%|b67e1c%|fca80e@|fcb60e@|fcc42a@|c4c446@|70c438@@@|7ec438@|8cc446@|e0d254@|fcd238@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|eee062#|fce054@|fcd246@|fcd238@|fcb61c@|fcb60e@@|fca80e@|eea82a@|e09a1c%|e08c1c%|e09a1c%|fcb62a@|fca81c@|fcb60e@@|fcb62a@|fcc438#|fcd254*|fce062+|000000     |fcd246@|fcc438%|fcc42a@|fcd21c@|fcb61c@|fcd21c@|eeb62a@|fcc438@|fcd254@|000000            |fce054#|eec446+|fcd246%|fcd254%|000000          |fce054=|eeb646=|fcd246@|fcc438*|fcd246@|eec454=
+000000        |fcd246*|eeb638*|fcd22a@|fcb62a@|fcd22a@|fcc446+|fce054+|000000          |eec446#|fcc41c@|fcb60e@|fca81c@|ee9a0e%|ee9a1c@|fca80e@|fcb60e@|fcb61c@|fcd246#|fce062=|000000     |fce062+|fcd246@|fcd238@|fcc41c@|fcb61c@|fca80e@|fca81c@|ee9a0e@|eea81c@|fcb60e@|fcb61c@|fcc41c@|fcd22a@|fcd254@|000000    |fcd254=|fcd238@|fcd22a@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcc41c@|eeb62a@|fcd238%|fce046@|fce062#|000000         |fce062+|fcd254+|eec454+|fce054*
+000000                          |fcd246=|eec446#|fcd22a@|fcb62a@|fcc41c@|fcc42a@#|fce046@|fcd262=|000000         |fcd246@|fcc438@|fcb62a@|fcd21c@|fcb61c@|fcd21c@|fcb61c@|fcd238@|fcd246@|000000      |fce070+|fcd254=|000000 |eec454*|fce046@|fcc438@|eeb62a@|fcd22a@|fcc42a@|eeb638@|fcd246@|fce054@
+000000                                              |fce062+|fcd254*|eec454*|fce054#|fcd262=|000000               |fce062#|fcd262=
+`,
+        plano: `
+                                                                ==-#               +=+*-+=
+          -                                                 ##=#@##@##%@        %#+%####%#*%#**=    + %%*@-   =*#+
+       =**#*                                  =-=* ==    =**#%%*##*#*%#**%*    *###**++**####***+  =##***##%++*#**   %###
+      ++*%#*###*+-          +=-++++==-     **+%####%*=*++*%%%#*#+===**####     ###*=:::-**#%#+++*+#%#*-::=*#%#*++  =%****#*
+      +#%*##*%*#*+=       @*#%#%#%#*#*+=  **##*#++#*##***%%%#**+:::::+**#%%%**#%##*+:::-**#%%*    *%#*=--+*#%#-===*%#+::-*%%--:
+ ==+++#%*+-:=*%#+*+     #%#*+==+*##*+**+- ###*+:::-**#%%*+###**+:::::**##%%   +%%##**+**##%%       *%##*#*%%       +##*+*##   -
+       ###==+##=--===+++#%#*:::-*###++++*%%##*+:::-**#%%*@@%#****==+**###**+     @##%*%#%@            #=##          =-@+@-
+        *+%#%=+          *##*++*###=     =%%##**+**##%%    =%%#*%*#*#%##@*         ===*
+                          =*%#%#*@-         @##%*%*%%      += +@##@%*%@
+                                              +++#=               *=
+`
+      },
+      {
+        color: `
+000000                                                                 |e0c454=|eed254=|fce062#|000000               |fce062*|eec454*|eec446+|fce054@|000000 |eec454=|fce062*
+000000          |8cd246=|000000                                                 |fce054#|fcd246+|000000 |fcd246@|fcd238@|eeb62a@|fcc42a@|fcd22a@|eeb62a@|fcc438@|fce046@|fcd254%|000000        |fce062+|fcd246@|fcc438%|fcc42a@|fcc41c@|fcb61c@|fcc41c@|fcb61c@|fcd22a@|e0d238@|d2d246*|e0e054%|9ad246@|7ed238@|7ec438@|70c438#|000000     |eec454=|fcd238@|fcc438@@|fcd246@|000000    |7ec438*|7ed238@|8ce046@|8cd246#
+000000       |70c438#|7ec438@|7ed238@|8ce046@|7ed238@|000000                                  |fce062=|eec454+=|fce054#|000000  |fce062+|000000    |7ec446+|9ac446#|9ad246%|e0c438@|fcd22a@|fcc41c@|eea80e@|fcc40e@|fca80e@|fcb60e@@@|fcc40e@|eeb61c@|fcc438%|fcd238@|fce054@|fce070=|000000    |fcd254%|fcd238%|fcb61c@@|fca80e@|fcb61c@|ee9a0e@@|fcb61c@|eeb61c@|fcc40e@|fcc42a@|e0c446@|8cc438@|7ed238@|7ed246@|7ec438@|70b638%|000000  |eec454*|fcc42a@|fcb60e@|fca80e@|fcb60e@@|fca80e@|fcc41c@|fcc438@|e0c462=|70b638@|70c438@|8cd246@|7ec438@|7ec446@|000000  |c4d262=|b6d246@|eed238@|c4c438@|fcd246%
+000000      |70b638%|70c438@|7ed238@|a8d246@|c4d238@|a8c438@|d2d254%|8cd246@@|7ec438@|70c438@|70b638+|000000          |fce054*|000000 |d2c454=|eed254*|7ed246#|8ce046#|9ae054*|8cd246*|7ec438*|7ec446+|000000     |fce062=|fcd246@|eec438#|fcc42a@@|fcb61c@|fcd21c@|eeb61c@|fcd22a@|fcd246@|000000 |fce062=|7ec438%|70c438@|9ad246@|fcd254@|fcd238@|fcc41c@|fcb60e@|fca81c@|fcb61c@|e0a82a@|e08c1c%|d28c1c%%|eea81c@|e0b61c@|fcb60e@@|fcb61c@|eec438%|fcd246+|000000   |fce062=|fcc446@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|eea81c@|fca80e@|fcc40e@|fcd22a@|eed246@|9ac438@|70b62a%|70c438@|7ec438@|7ec446@|eed246@|fcc42a@|fcb60e@|fca80e@|c47e1c%|a8620e%%|c48c1c%|fca80e@|fcb60e@|fcd238@|d2d246@|7ec438@|70b62a%|70c438%|000000  |fcd254=|fcc42a@|fcb60e@@|fca80e@|fcb60e@|fcc41c@|fcc446%
+000000      |62b62a%|a8c446@|fcd238@|eeb61c@|fcb60e@@|fcb61c@|fcc42a@|b6c446@|8cd246@|7ed238@|70c438@|70b638%|000000      |fce062+|fcd246%|fcb62a%|fcc41c@@@@|d2c438@|e0d246@|8cc438@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000  |fce054%|fcd238#|fcb61c@|fcb60e@|fca80e@|fcb61c@|ee9a0e@|fca80e@|fcb61c@@|fcc41c@|fcc42a@|e0c446@|7eb638@|9ad246@|c4d246@|eec438@|fcc42a@|fcb60e@@|fca80e@|e09a2a%|a8620e%|9a620e%%|a8620e%|a8700e%|e0a81c@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|c4d246@|7ec438@%|b6d246%|eec438@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|d2d262#|000000    |eed262#|fcd238@|fcb60e@|fca80e@|d28c1c%|b67e1c%%|e09a1c%|fca80e@|fcb60e@|fcd238@|d2d254%|7ec438+**#|a8c446%|fcc438@|fcc40e@|eea81c@|a8620e%|9a620e%|b67e1c%|fcb60e@|fcc41c@|eed246@|7ed246+|7ec438=|7ed246-
+000000 |7ec438**#%|7ed246%|b6c446@|fcc438@|fcb60e@|eea80e@|b6701c%|a8700e%|d29a1c%|fca80e@|fcc42a@|d2c446@|70c438@|7ec438@|70b638%|000000     |fce054*|fcd238%|fcb61c@|fcb60e@|e09a0e@|e08c0e%%|eea80e@|fcb60e@|fcb61c@|eec438@|b6d246@|70c438@|7ec438@|7ed238@|70c438@|7eb646*|000000 |fcc446@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8700e%|a8620e%%|b67e1c%|fca80e@@|fcb60e@|fcc42a@|fcd246@|a8c446@|a8c438@|e0c438@|fcc42a@|fcb60e@@|fca80e@|e09a2a%|a8620e%%|9a620e%%|a8620e%|eea82a@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|fce062*|000000  |fce062*|fcd246%|fcd238%|fcb61c@|fcb60e@|fca80e@|fcb61c@|ee9a0e@|fca81c@|fcb60e@|fcb62a@|fcc41c@|fcd22a@|fcd254%|000000       |fcd262=|fcd238@|fcb61c@@|fcb60e@@@|fcc41c@|fcd238@|fcd262=|000000      |fcd262=|fcc42a@|fcb60e@|fca81c@|ee9a0e@|fca81c@|fcb60e@|fcc438@|000000   |7ed246=
+000000       |fcd246#|fcc41c@|fcb61c@|e09a1c%|d28c0e%|eea81c@|fcb60e@|fcc42a@|e0d254*|7ec446+|70c438+|7ed246*|7ec438*##|70c438#|7ec438%|d2c446@|fcc42a@|fcb60e@|fcb61c@|a8701c%|9a620e%%|b67e1c%|fcb60e@@|fcc42a@|c4c446@|70c438@@@|7ec438@|7ec446@|c4d246%|eec438@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|eee070+|fce062#|fcd246@|fcd22a@|fcc41c@|fcb60e@|fcb61c@|fcb60e@|eea82a@|e09a1c%|e08c1c%|e09a1c%|fcb61c@|fcb62a@|fcb60e@|fcc40e@|fcc42a@|eec446%|fcd254=|000000     |fce062#|fcd246@|eeb638#|fcc42a@|fcc41c@|fcb61c@|fcd21c@|eeb62a@|fcd238@|fcd254#|000000            |fce054%|fcc446+*|fce054@|000000           |eec446+|fcd238%|fcc438#|fcd246@|000000 |fce062=
+000000        |fcd246+|eec438#|fcd22a@|fcc42a@|fcc438@+|fce054*|000000          |fcd246*|fcb61c@|fcb60e@|eea81c@|ee9a1c@|ee9a0e@|eea81c@|fcb60e@|fcb61c@|fcd246#|000000      |fce062#|fcd246@|fcd238@|fcb61c@|fcb60e@|fca80e@|fcb61c@|ee9a0e@|eea80e@|fcb61c@@|fcc41c@|fcc42a@|eec454%|000000     |fcc446@|fcd22a@|fcc41c@|eea80e@|fcc40e@|fca80e@|fcb60e@@@|fcc41c@|fcc438@*|fcd246%|fce062%|000000         |fce062*|eec454==|fce054%
+000000                          |fce054*|eeb638*|fcd22a@|fcc42a@|fcc41c@|fcc42a@|eeb638#|fcd246#|fce062+|000000        |fce062*|fcd246@|fcc438%|fcc42a@|fcc41c@|fcb61c@|fcc41c@|fcb61c@|fcd238@|fcd254#|000000       |fce062#|fcc446=|e0b654-|fcd238@@|eeb638@|fcc42a@|fcd238@|eeb638@|fcc446@|fce054@
+000000                               |fce062=|000000              |fce062*|eec454++|fce054@|000000 |eec462=|000000           |fce070=|000000   |fce062#
+`,
+        plano: `
+                                                                 --#               ++=% -*
+          -                                                 *= %%#%@*#@#        +@*#%#%*%%+##**=     -@##@    =*#+
+       =**#*                                  ==-#  =    -+*#%%*#*#**%*#%@=    %###**++#*#%#****+  +%#**#*#%-+*#**  -#%*#
+      ++*##*###*+-          * -*++++=-     =%+%%#%*%% =++*%%%#*#+===**###*=   =%##*=:::-**#%%*++**%%#*-::=*#%#*++  =%****##
+      +*%*#####**+=      =%*%##%#%**#*+=  ####*#+*###%#+#%###**+:::::+*##%%#*+*###*+:::-**#%%*    *%#*=--+*#%#-===*%#*::-*%%--:
+ ==++*#%#+-:=*##+*+     *###+==+####+**+- %##*+:::-**#%%**###**+:::::**##%%*  *%###*#+*##%%#       =%####*#%=      =#**+*##   -
+       *#*+=+#%+--===+++####:::-*###+++**####*+:::-**#%%+#@%%****+=+#*###*-     *%+%%#%*%*            %=+@           =%+% =
+        +*%#%=*          +##*++*##*      *@###*#++###%#     %%#*%*##*%#+#%         +=-#
+                          *+%##%+#+        *@*#%#%*%*       #=:%%#%@*#@
+                               =              *==% -           =   #
+`
+      },
+      {
+        color: `
+000000                                                                |eec462-|000000 |fce062*|fcd262=|000000  |fce062+|000000            |fce062=|fcd254*|eec454#|fce054%|fcd262+|000000 |fce062=
+000000          |8cd246=|000000                                                 |fce054=|000000 |eec454+|fce046@|fcc438@|eeb62a@|fcd22a@|fcc42a@|eeb62a@|fcd238@|fcd246@|000000          |fcd246@|fcc438@|fcb62a@|fcd21c@|fcb61c@|fcd21c@|fcb61c@|fcc42a@|fcd238@|b6d254#|c4d254#|9ae046@|7ed238@|7ec438@|70c438#|000000     |fcd254*|fcd238@|eec438%|fcd238@|fcd246@|000000    |7ec438*|7ed238@|8ce046@|8cd246#
+000000       |70c438#|7ec438@|7ed238@|8ce046@|7ed238@|000000                                   |fcd254=|eec454+|fce054*|000000       |7ec446+|7ed238#|a8d246@|fcd238@|fcd22a@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@|fcc40e@|e0b61c@|fcc42a@|fcd238@|fcd254@|000000     |fcd254@|fcd238@|fcc41c@|fcb61c@|fcb60e@|fca81c@|ee9a0e%|eea80e@|fcb61c@|eeb61c@|fcc41c@|fcc42a@|fcd246@|8cc438@|7ed238@|7ed246@|7ec438@|70b638%|000000  |fcd254%|fcd22a@|fcb60e@|fcb61c@|fca80e@|fcb61c@|fca80e@|fcc41c@|fcc438@|fcd254=|8cc438@|70c438@|8cd246@|7ec438@|7ec446@|000000  |e0d262+|a8d238@|fcd238@|c4c438@|fcd246%
+000000      |70b638%|70c438@|7ed238@|9ad246@|d2d246@|9ac438@|e0d254%|8cd246@@|7ec438@|70c438@|70b638+|000000          |fce054+|000000 |fcd254=|e0d254*|7ed246#|8ce046#|9ae054*|8cd246*|7ec438*|7ec446+|000000      |fce054@|fcc438%@|fcd22a@|fcb61c@|fcd21c@|eeb62a@|fcc42a@|fcd238@|000000  |7ec438%|70c438@|a8d246@|fcd246@|fcd238@|fcc41c@|fcb60e@@|fca80e@|eea82a@|d28c1c%%%|e0a81c@|eea80e@|fcb60e@@|fcb61c@|fcc438%|fcd254#|fce062*|000000  |fce062*|fcd246@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|a8c446@|70b62a%|70c438@|7ec438@|7ec446@|eed246@|fcc42a@|fcb60e@|fca80e@|c47e1c%|a8620e%%|c48c1c%|fca80e@|fcc40e@|fcc438@|c4c446@|7ec438@|70b62a%|70c438%|000000  |fcd254+|fcc42a@|fcb60e@|fca80e@@|fcb60e@|fcb61c@|fcc446@
+000000      |70b638%|9ac438@|fcc438@|fcb61c@@|fcb60e@|fcc41c@|eec42a@|d2d246@|7ed246@|7ed238@|70c438@|70b638%|000000      |fce062*|fcd246#|eeb638%|fcd21c@|fcb61c@|fcc41c@|fcb61c@|e0c438@|eed246@|7ec438@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000  |fcd254@|fcd238@|fcc42a@|fcb61c@|fca80e@|fcb61c@|ee9a0e@|fca81c@|fca80e@|fcb61c@|fcc41c@|fcd22a@|eed246@|8cc438@|7ed238@|a8d246@|e0c446@|fcc42a@|fcb60e@@|fca80e@|d29a2a%|a8620e%|9a620e%%|a8620e%|a8700e%|e0a82a@|fca80e@|fcb60e@|fcc40e@|fcc42a@|eec446@|9ac438@|7ec438@%|9ac438@|eec438@|fcc41c@|fcb60e@|fca80e@|e09a2a%|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fca80e@|fcc40e@|fcd22a@|fcd254@|c4d262+|000000    |eed262%|fcd238@|fcb60e@|fca81c@|d28c1c%|b67e1c%%|e09a1c%|fca80e@|fcb60e@|fcd238@|e0d254#|7ec438+**#|9ac446%|fcc438@|fcc40e@|eea81c@|a8620e%|9a620e%|c47e1c%|fca80e@|fcc41c@|eed246@|7ed246+|7ec438=|7ed246-
+000000 |7ec438**#%|7ed246%|a8c446@|fcc438@|fcb60e@|eea81c@|b6701c%|a8700e%|d29a1c%|fca80e@|fcc41c@|d2c446@|70c438@|7ec438@|70b638%|000000     |fce062=|fcc438%|fcb61c@|fcb60e@|e09a1c@|e08c0e%|d28c1c%|eea80e@|fcb60e@|fcb61c@|eed238@|b6c446@|70c438@|7ec438@|7ed238@|70c438@|7eb646*|fce054+|fcd246@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8700e%|a8620e%%|b67e1c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|c4d254@|d2d246@|eed238@|fcc42a@|fcb60e@@|fca80e@|e09a1c%|a8620e%%|9a620e%%|a8620e%|eea81c@|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|fce054@|000000  |fce062*|fcd246*|fcc438%|fcb61c@|fcb60e@|fca80e@|fcb61c@|fca80e@|eea80e@|fcb61c@@|fcc41c@|fcc438@|eec454*|000000        |fcd238@|fcc41c@|fcb60e@@@|fcb61c@@|fcd238@|fcd254%|000000      |fcd262+|fcc42a@|fcb60e@|fca81c@|ee9a0e@|fca81c@|fcb61c@|fcc438%|fce054+|000000  |7ed246=
+000000       |fcd246#|fcc41c@|fca80e@|e09a1c%|d28c1c%|eea81c@|fcb60e@|fcc438@|e0d254#|7ec446+|70c438+|7ed246*|7ec438*##|70c438#|7ec438%|d2c446@|fcc42a@|fcb60e@@|a8701c%|9a620e%%|b67e1c%|fca80e@|fcb60e@|fcc42a@|d2c446@|70c438@@@|7ec438@%|9ac446@|eec438@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|fca81c@|fca80e@|fcc40e@|fcc42a@|fcd254@|000000  |fcd246@|fcd22a@|fcc41c@|fcb60e@|fca81c@|fcb61c@|eea82a@|e09a1c%|d28c1c%|e09a1c%|fcb61c@|fcb62a%|fcb60e@|fcc40e@|fcc42a@|eec446@|000000      |fce054%|fcd246#|eeb638#|fcd22a@|fcc41c@@@|fcc42a@|fcd238@|eed262=|000000            |fce054#|fcd246*|eec446+|fce046@|fcd262=|000000          |fcd254*|fcd238#|fcc438%|fcd246@|fcc446=|fce062=
+000000        |fcd246=|fcc446@|fcc42a@@|fcc438@|fcd238#|fcd254+|000000          |fcd246*|fcb62a@|fcb60e@|eea80e@|ee9a1c@|ee9a0e%|fca81c@|fcb60e@|fcc41c@|eec438%|000000      |fce062#|fcd246%|fcc438%|fcb61c@|fcb60e@|fca80e@|fcb61c@|ee9a0e@|ee9a1c@|fcb61c@@|fcc41c@|fcc42a@|eec446*|000000  |fce070=|fcd254+|fcc446=|eec454#|fcd22a@|fcd21c@|fca80e@|fcb60e@@@|fcc40e@|fca80e@|fcc41c@|fcc42a@|eec446*|fcd246*|fce054#|000000         |fce062=|eec454=|fcd254+|fce054#
+000000                          |fce054%|fcc438#|fcc42a@@|fcb62a@|fcd22a@|eeb638#|fcd246+|fce062*|000000        |fce062@|fcd246%|eeb638%|fcd22a@|fcc41c@@@@|fcd238@|eec462+|fcd254=|000000      |fce062%|fcd254#|e0b646+|fcc446@|fce038@|fcc42a@@|fcd238@|fcc438@|eeb638@|fcd254@|fce062*
+000000                               |fce062=|000000              |fce054+|eec454+|fcd254*|fce054%|e0b646-|fcd262=|000000            |fce062=|eec462-|000000 |fce062*
+`,
+        plano: `
+                                                                - *=  +            =++#= =
+          -                                                 = =@##@#*%%          @##%*%*%%**#**=     +@*%%    =*#+
+       =**#*                                   ==*       -+#%%#*#*#*##*%%%     %%##**++**#%%****+  #%##*#*##-++**+  =#%*#
+      ++**#*###*+-          = =++++==-      @##%*%*%%  ++#%%#****===********  *%##*=:::-**#%%*+++*%%#*-::=*#%#*++  =##*+*##
+      +*%##*###**+=      ***%#%##%****+=  %%##**+**##%%+*####**+:::::+*####**+*###*+:::-**#%%=    #%#*=--=*#%*-===*%#*::-*#%--:
+ ==+++*%#+-:=*##+*+     =*#*+==+*#%#+**+-+%##*+:::-**#%%#%%##**+:::::***#%%%  **###*#++#*##+        %#*#*##%#      =#**+*##=  -
+       *#*+=+#%*--===+++###*:::-*###++++**###*=:::-**#%%  %%%#*#++=+**####      %*+%####%=            #+=%=          **#%-=
+        -#%%#*+          *##+++**#*      *####**++#*##+  ==-+%%*##*#*%%++#         =-=*
+                          #+#%#%*+*        %#*%####%=-      %*-#@##@#*%*
+                               -              +=+#:=            =- *
+`
+      },
+      {
+        color: `
+000000                                                                  |fce062#|000000 |e0c454=|fcd254+|fce070+|000000             |fce062*|eec454#|fcc446#|fce062%
+000000          |8cd246=|000000                                                   |fcd254%|fcd246@|eec438@|fcc42a@|fce038@|eeb62a@|fcc42a@|fce038@|fcd246@|000000  |fce070=|000000       |fcd254@|fcd238@|eeb62a@|fcd21c@|fcb61c@|fcc41c@|fcb61c@|fcc42a@|fcd238@|d2d254@|a8d254*|9ad246@|7ed238@|7ec438@|70c438#|000000     |fcd254@|fcd238@|eec438%|fcd238@|eec446%|fcd246=|000000   |7ec438*|7ed238@|8ce046@|8cd246#
+000000       |70c438#|7ec438@|7ed238@|8ce046@|7ed238@|000000                                   |fce062+|eec454*|fcd254*|fce062*|000000      |7ec446+|7ed238#|d2d246@|fcd238@|fcc42a@|fcb61c@|fcb60e@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc40e@|fcb60e@|eeb61c@|fcd22a@|fcd238@|fcd254*|000000     |fcd254@|fcd238@|fcc42a@|fcb61c@@|eea81c@|ee9a0e@|eea80e@|fca80e@|eeb60e@|fcb60e@|fcc42a@|fcd246@|a8c446@|7ed238@|7ed246@|7ec438@|70b638%|000000  |fcd246@|fcd22a@|fcb61c@@|fca80e@|fcb60e@@|fcc41c@|fcc438%|fcd254+|8cc438@|70c438@|8cd246@|7ec438@|7ec446@|000000  |eed262+|a8d246@|fcd238@|d2c438@|e0d246%
+000000      |70b638%|70c438@|8cd246@@|d2d246@|a8c438@|d2d262#|9ae046@|8cd246@|7ec438@|70c438@|70b638+|000000         |fce062=|000000  |fce054*|b6c446*|7ed246#|8ce046#|9ae054*|8cd246*|7ec438*|7ec446+|000000      |fcd254@|fcd238@|eeb62a@|fcd22a@|fcb61c@|fcc41c@|fcc42a@@|fcd238@|fcd254*|000000 |70b638%|70c438@|b6d246@|eed246@|eed238@|fcb61c@|fcb60e@@|fca81c@|eea82a@|d28c1c%%|e08c1c%|d2a81c@|fca80e@|fcb60e@@|fcb61c@|fcd238@|fce054@|fce062#|000000  |eed254%|fcd238@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|fca81c@|fca80e@|fcb60e@|fcc42a@|fcd246@|a8c446@|70b62a%|70c438@|7ec438@%|fcd254@|fcc42a@|fcb60e@|fca80e@|c47e1c%|a8620e%%|c48c2a%|fca80e@|fcc40e@|fcc438@|a8c446@|7ec438@|70b62a@|70c438%|000000  |fcd246*|fcc42a@|fcb61c@|fca80e@@|fcb61c@@|fcc446@
+000000      |7eb638@|a8c438@|eec438@|fcc41c@|fcb61c@|fcb60e@|fcc41c@|e0c42a@|e0d246@|8cd246@|7ed238@|70c438@|70b638%|000000      |fce054*|fcd246+|fcc438@|fcd21c@|fcb61c@|fcc41c@|eeb61c@|fcd238@|d2d246@|7ec438@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000  |fcd254@|fcd238@|fcc42a@|fcb61c@|fcb60e@|fca81c@|fca80e@|fca81c@|fca80e@|fcb61c@@|fcd22a@|fcd246@|a8c446@|7ed238@|8cd238@|e0c446@|fcc42a@|fcb60e@@|fca80e@|d29a2a%|a8620e%|9a620e%%|a8620e%|a8700e%|e0a82a@|fca80e@|fcb60e@@|fcc42a@|e0c446@|7ec438@@%|a8c438@|fcc438@|fcc41c@|fcb60e@|fca80e@|e09a2a%|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fca80e@|fcc40e@|fcc42a@|eed254@|000000     |e0d254%|fcd238@|fcc40e@|fca81c@|d28c1c%|b67e1c%%|d29a2a%|fca80e@|fcb60e@|fcc438@|eee054*|7ec438+**#|9ac446%|fcc438@|fcb60e@|eea81c@|a8620e%|9a620e%|c47e1c%|fca80e@|fcc41c@|e0d246@|8cd246+|7ec438=|7ed246-
+000000 |7ec438**#%|7ed246%|9ac446@|fcc438@|fcb60e@|eea81c@|b6701c%|a8700e%|d29a1c%|fca80e@|fcc41c@|c4c446@|70c438@|7ec438@|70b638%|000000      |fcc438@|fcc41c@|fca80e@|e0a81c@|e08c0e%|d28c1c%|eea80e@|fcb60e@|fcc41c@|fcd238@|b6c446@|70c438@|7ec438@|7ed238@|70c438@|7eb646*|fce062#|fcd246@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8700e%|a8620e%%|b67e1c%|fca81c@|fcb60e@@|fcc42a@|eed246@|d2d254@|eed246@|fcd238@|fcc41c@|fcb60e@@|fca80e@|e09a1c%|a8620e%%|9a620e%%|a8620e%|eea82a@|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|fce054@|000000  |fce062=|fcd246+|fcc438@|fcc41c@|fcb60e@|fca81c@|fcb61c@|fca80e@|eea80e@|fcb61c@|fcb60e@|fcc41c@|fcc438@|fcc446+|fce054=|000000       |fcc446@|fcc41c@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcb61c@|fcd238@|fcd254@|000000      |eed254*|fcc42a@|fcb61c@|fca81c@|ee9a1c@|fca81c@|fcb61c@|fcd238%|eed254*|000000  |7ed246=
+000000       |fcd246%|fcc41c@|fca81c@|e09a1c%|d28c1c%|eea81c@|fcb61c@|fcd238@|e0d254%|7ec446+|70c438+|7ed246*|7ec438*##|70c438#|7ec438%|e0d246@|fcc42a@|fcb60e@@|a8701c%|9a620e%%|b67e1c%|fca80e@|fcb60e@|fcc42a@|d2d246@|70c438@@@|7ec438@@|9ac438@|fcc438@|fcc41c@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%|a8620e%|b6701c%|fca82a@|fca80e@|fcc40e@|fcc42a@|eec454%|000000  |eec446#|fcc42a@|fcc41c@|fcc40e@|fcb61c@|fcb62a%|ee9a1c@|e09a1c%|d28c1c%|e09a1c@|fca81c@|fcb62a%|fcb61c@|fcc40e@|fcd22a@|fcc446@|000000      |fce054#|fcd246+|fcc446%|fcd22a@|fcb61c@|fcd21c@|fcb61c@|fcc42a@|fcd238@|000000 |fce054+|000000           |fcd254+|fce046%|eec446=|fcd246#|fce062#|000000          |fcd254%|fcc438#|fcd238@|fcc446#|fcd246+
+000000         |fcd246@|fcc42a@|fcd22a@|fcb62a%|fcd238%|fcd262=|000000          |fcd246%|fcc42a@|fcb61c@|fca81c@|ee9a1c@|e09a0e%|fcb61c@|fcb60e@|fcc41c@|eec446@|000000      |fce062+|fcd246*|fcc438@|fcc41c@|fcb60e@|fca81c@|fcb61c@|ee9a0e@@|fcb61c@|fcb60e@|fcc41c@|fcc42a@|fcd246*|fce062+|000000 |fce070=|fce054#|fcd246*|fcc446+|fcc438@|fcd21c@|fcb60e@@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcd22a@|fcc446%=|fcd254+|000000           |fce062%|eec454++|fce062=
+000000                          |fce054@|fcc438@|eeb62a@|fcd22a@|eeb62a@|fcd22a@|fcc446@|000000 |fce062+|000000        |fce054%|fcd246*|fcc438@|fcd22a@|fcb61c@|fcc41c@|fcb61c@|fcc41c@|fcd238@|eec446=|fce054*|000000      |fce062*|fce054@|fcc446#|e0b646%|fcd238@|fcc42a@|eeb62a@|fcd22a@|fcd238@|e0b646#|fcc454%|fce062%
+000000                                             |fce062=|fcd254=|000000 |fce054%|eec454++|fce062+|000000            |fce062*|000000 |eec462=|eed262=|fce062*
+`,
+        plano: `
+                                                                  # -=+             ***%
+          -                                                   %@##@##@#  =       %%*%#%##@#+#**=     @%#@*=   =*#+
+       =**#*                                   +++*      -+%@%*##*#*#*#%@+     %%%##*+**##%%#***+  %%##*#*#*+**#**  =#%#*
+      ++**%**##*+-         =  *=++++=-      @%*%#%##@* ++#%%#****===+***#%@#  #%%#*+:::-**#%%#++*+%%#*-::=*#%**++  *%#**##%
+      +####*%#%#*+=      *=#%*%*%%**#*+=  %%%##****##%%***####*+:::::**####**+*%##*+:::-**#%%     #%#*=--+*#%+-===*%#*::-*#%=-:
+ ==++**%#*-:+*##+*+      ##*+==**#%#+**+-*%##*+:::-**#%%%%%%#**+:::::**##%@@  ==###****#*%#==       %%*#*##%%      +%#*+*##+  -
+       ##*+=*#%*--===+++%%#*:::-*#%#+++***###*+:::-**#%#  *%%#**++=+**#%%%      #=#@#%#%% =           =%-*#          #*%++
+         %#%*%-          ###*++*###      ++###**++#*##++ =#+=%%#*#*%*#%#-+           %==-
+                          %##%#%% =        %+#%#%#%%-+      *@**@%#%%+##
+                                             == %+==            * =-*
+`
+      },
+      {
+        color: `
+000000                                                                 |fce062+|fcd262=|e0b654=|eec454+|fce062*|000000              |fce054#|eec454*#|fce054@
+000000          |8cd246=|000000                                                   |fce046@|fcd238@|eeb638@|fcd238@|fcd22a@|eeb62a@|fcd22a@|fcd238@|e0c454+|fcc446-|fce054*|fce070=|000000       |fcd262*|fcd238@|fcb62a@|fcc41c@@@@|fcb62a@|fcd238@|eed254@|9ad254*|8cd246@|7ed238@|7ec438@|70c438#|000000     |fce054@|fcc438%@|fcd238@|eeb646*|fcd254*|000000   |7ec438*|7ed238@|8ce046@|8cd246#
+000000       |70c438#|7ec438@|7ed238@|8ce046@|7ed238@|000000                                   |fce062*|eec454+*|fce054#|000000      |7ec446+|9ad246%|fcd246@|fcd238@|fcc42a@|eeb62a@|fcc41c@|fcb60e@@@|fca80e@|fcc40e@|fca80e@|fcc41c@|fcd22a@|fcd238@|000000      |eed254#|fcd238@|fcc41c@|fcb62a@|fcb61c@|eea81c@|ee9a0e@|fca80e@|eea80e@|fcb60e@@|fcc42a@|fcd238@|c4d246@|7ed238@|7ed246@|7ec438@|70b638%|000000  |fcd246@|fcd22a@|fcb62a@|fcb61c@|fca80e@|fcb60e@@|fcc42a@|fcc438#|fce054#|8cc438@|70c438@|8cd246@|7ec438@|7ec446@|000000  |eee062=|b6d246@|e0d238@|e0c438@|d2c446#
+000000      |70b638%|70c438@|9ad246@@|c4d238@|b6c438@|b6d254*|9ae046@|8cd246@|7ec438@|70c438@|70b638+|000000            |fce054#|8cc438*|7ed246#|8ce046#|9ae054*|8cd246*|7ec438*|7ec446+|000000      |fcd262*|fcd238@|eeb62a@|fcc42a@|fcc41c@@|fcc42a@|eeb62a@|fcd238@|fcd254@|000000 |70b638%|70c438@|b6d246@|d2d246@|e0c438@|fcb61c@|fcb60e@@|fcb62a@|eea81c@|d28c1c%%|e09a1c%|d2a81c@|fca80e@@|fcb60e@|fcc42a@|fcd238@|fcd254@|eee070*|000000  |e0d254@|fcd238@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%|a8620e%|b6701c%|fca81c@|fcb60e@@|fcc42a@|eed246@|a8c446@|70b62a%|70c438@|7ec438@%|fcd254%|fcc42a@|fcb60e@|fca80e@|b67e1c%|a8620e%%|c48c2a%|fcb60e@|fcc40e@|fcc438@|b6c446@|7ec438@|70b62a%|70c438%|000000  |fcd246#|fcc438@|fcb61c@|fca80e@@|fcb61c@@|fcd246@
+000000      |7eb638@|b6d238@|e0c438@|fcc41c@|fcb60e@@|fcc41c@|e0c42a@|d2d246@|9ad246@|7ed238@|70c438@|70b638%|000000      |fce054=|fcc454=|fcd238@|fcc41c@|fcb61c@|fcc41c@|eeb62a@|fcd238@|b6d246@|7ec438@|7ed238@|8cd246@|7ed238@|70c438@|70b638%|000000  |eed262#|fcd238@|fcc42a@|fcb61c@@|fca81c@|fca80e@|fca81c@|fca80e@|fcb61c@@|fcc42a@|fcd246@|c4d246@|7ed238@|8cc438@|eec446@|fcc42a@|fcc40e@|fcb60e@|fca80e@|d29a2a%|a8620e%|9a620e%%|a8620e%|a8700e%|e0a81c@|fca80e@|fcb60e@@|fcc42a@|e0c446@|9ac438@|7ec438@@|c4d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|e09a1c%|a8700e%|9a620e%|a8620e%|b67e1c%|fca82a@|fcb60e@|fcc40e@|fcc42a@|eec454#|000000     |d2c454#|fcc438@|fcc40e@|fcb61c@|d28c1c%|b67e1c%%|d29a2a%|fca80e@|fcb60e@|fcc438@|e0d254+|7ec438+**#|9ad246%|fcc438@|fcb60e@|eea80e@|a8620e%|9a620e%|c47e1c%|fca80e@|fcc41c@|e0d246@|8cd246+|7ec438=|7ed246-
+000000 |7ec438**#%|7ed246%|9ac446@|fcc438@|fcb60e@|eea81c@|b6701c%|a8700e%|d29a1c%|fcb60e@|fcc41c@|d2c446@|70c438@|7ec438@|70b638%|000000      |fcc438@|fcc41c@|fcb61c@|e0a81c@|d28c0e%%|eea81c@|fcb60e@|fcc41c@|fcd238@|b6c446@|70c438@|7ec438@|7ed238@|70c438@|7eb646*|eed262%|fcd246@|fcc41c@|fcb60e@|fca80e@|e09a1c%|a8700e%|a8620e%%|b67e1c%|fca81c@|fcb60e@@|fcc42a@|e0d246@|c4d246@|eed246@|fcd238@|fcd21c@|fcc40e@|fcb60e@|fca80e@|e09a1c%|a8620e%%|9a620e%%|a8620e%|eea82a@|fca80e@|fcb60e@@|fcc42a@|fcd246@|fce054#|000000   |eec454+|fcc438@|fcc41c@|fcb60e@|fcb61c@|fca80e@|fca81c@|fca80e@|fcb61c@|fcb60e@|fcc41c@|fcc438@|fcd246*|fce062*|000000       |fcc454#|fcc41c@|fcb60e@@|fca80e@|fcc40e@|fcc42a@|fcd238#|fce054%|000000      |eed254*|fcc42a@|fcb62a@|fca81c@|ee9a0e@|fca81c@|fcc41c@|fcd238%|eed262*|000000  |7ed246=
+000000       |fcc446@|fcc41c@|fcb61c@|e09a1c%|d28c0e%|fca81c@|fcb61c@|fcc438@|d2d254%|7ec446+|70c438+|7ed246*|7ec438*##|70c438#|7ec438%|e0d254@|fcc42a@|fcb60e@|fca80e@|a8701c%|9a620e%%|b67e1c%|fca80e@|fcb60e@|fcc42a@|d2d246@|70c438@@@|7ec438@|7ec446@|b6c446@|fcd238@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%|a8620e%|b6701c%|fca82a@|fcb60e@|fcc40e@|fcc42a@|eec454#|000000  |eec454+|fcc42a@|fcc41c@|fcc40e@|fcb61c@|fcb62a%|eea81c@|e09a1c%|d28c1c%|e09a1c@|eea81c@|fcb61c@@|fcc41c@|fcd22a@|fcd238@|fcd254#|000000    |fce070=|fcd254+|000000 |fcd246@|fcd22a@|fcb61c@|fcd21c@|fcb61c@|fcd22a@|fcc438@|fcc446+|fce062*|000000          |fcd254=|e0b646=|fce046@|eec446+|fcc446+|fce054%|000000          |fcd246%|eec438*|fcd238@|eeb638*|fcd246#
+000000         |fcd238@|fcb62a@|fcd22a@|fcb62a%|fcd246@|000000           |fcd246@|fcc42a@|fcb61c@@|e09a1c%|e09a0e%|fcb62a@|fcb61c@|fcc41c@|fcc446@|000000       |fcd246=|fcc438@|fcc41c@|fcb60e@|fcb62a@|fca80e@|eea81c@|ee9a0e@|fcb61c@|fcb60e@|fcb61c@|fcc42a@|fcd238*|fce062*|000000  |fce054@|fcd246@|fcc438*|fcc446%|fcc41c@|fcc40e@|fca80e@|fcc40e@|fca80e@|fcb60e@@|fcb61c@|fcd22a@|fcc438@|000000             |fce054%|e0c454=|eec454+
+000000                          |fcd262#|fcd238@|eeb62a@|fcd22a@|fcb62a@|fcc42a@|fcd238@|000000         |fce070+|fce054*|fcc446=|fcd246@|fcd22a@|fcb61c@|fcd21c@|fcb61c@|fcd22a@|fcc438@*|fce054#|000000       |fce054@|fcd246@|e0b638#|fcc438@|fcd238@|fcb62a@|fcc42a@|fce038@|eec446#|e0b646+|fce062*
+000000                             |fce062=|000000               |fce062=|000000 |eec454-|fce054@|eec446+|eed254*|fce062=|000000            |fce062+|fcd262+|e0c454=|eec462=|fce062+
+`,
+        plano: `
+                                                                 +=-=*              *+*%
+          -                                                   @%*%%*%@=-*=       +%#%##%#%%+#**=     @*#@=+   =*#+
+       =**#*                                   +=+#      -*%%#*%#*#*#*#%%      *%%##*+****#%#***+  %%##**##**+*#*+  =###+
+      ++*##*+##*+-            #=+++==-      +%#%##%*%@ =+#%###***==++***#%@*  #%##*=:::-**##%*++*+###*-::=*##**++  ###**##%
+      +###**##%#*+=      =-%%#%*%#**#*+=  *%%##****##%%#**####*+:::::+**###***#%%#*+:::-**##*     +%#*=--+*##=-===*%#+::-*#%=-:
+ ==+++*%#+-:=*##+*+      ##*+==**#%*+**+-#%##*+:::-**##%#%%%#*++:::::***##%#   =#%##****###++       *%*#*##*#      +%#*+*##+  -
+       ##*+=*#%*--===+++%%#*:::-*#%#++++*#%##*+:::-**##*  =###***+=+*#*#%%*    =+ %%*%*%#=*          --@==%          #+@=*
+         %#%*%           %%#*++##%%       =####*++*###**  @%+#%#*#*#*#%%             #-=
+                          *%*%#%%         =*-%%*%*%#+#       @%+%@##@*=*
+                             =               = -@=+=            +=--+
+`
+      }
+    ]
   },
   {
     cols: 112, alto: 9,
-    color: `
-000000                                                        |fcd262=|fce054%|e0c454=|eec454+|fce054%|000000            |eec454=|fce054@|eec446*|fcd246#|fcd262*
-000000        |7ed246=|9ae054+|000000                                           |fcd254=|fce046@|fcc438@|fcb62a@|fcd22a@|fcb61c@|fcc41c@|fcd22a@|e0b638#|fcd246*|fce062#|000000      |fcd254=|fcc446#|fcd22a@|fcb61c@|fcc40e@|fcb60e@|fcc41c@|fcb62a@|fcd238@|eed262#|8cd246@@|7ec438@|70c438%|000000    |fcd246@|fcc438#|fcc42a@@|fcc438@|fcd254%|000000  |7ec438*|7ed238@|8cd246@|7ed246+
-000000      |70c438%|7ec438@|8cd246@|8cd238@|7ec446*|000000 |8cd246=|000000                          |fce062*|eec446=|fcd246#@|eec446%|fce046@|000000    |70c438+|7ec438%|c4d246@|fcd246@|fcd22a@|fcb61c@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc42a@|fcc446#|fcd254=|000000    |fcd254*|fcc42a@|fcb60e@|fcb61c@|eea81c@|d28c1c%|e08c0e%|e09a1c%|fcb60e@@|fcc42a@|fcd246@|8cc438@|7ed238@@|70b638%|000000 |fcd262*|fcd238@|fcc42a@|fcb61c@|ee9a0e%%|fcb61c@|fcc41c@|fcd238@|c4c446@|70c438@|7ed238@|70c438@|7ec446=|000000  |eed246@|d2c42a@|fcd22a@|eec42a@|fcd254*
-000000     |70b638%|70c438@|b6d246@|d2c438@|fcd22a@|eec438@|e0d246@|9ad246@|7ed238@|70c438@|70b638%|000000       |fce062*|fcd246+|fcc446#|fcd238@|c4b638@|e0d246@|9ad246@|8cd246@@|7ec438@|70c438#|000000   |fce062+|fcd246*|fcc438@|fcc41c@|fcb60e@@@@|fcc42a@|fcd246@|000000 |70b638%|7ec438@|e0d246@|eed238@|fcc41c@|fcb60e@|fca80e@|fca82a@|d28c1c%|b6701c%%|b67e1c%|e0a81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|e0c446@|7ec446+|7ec438*|a8c446%|fcc438@|fcc41c@|fcb60e@|fca81c@|a8620e%|9a620e%%|a8620e%|eea81c@|fca80e@|fcc40e@|fcc438@|e0d246@|7ec446@|70c438%|7ec446%|b6d246@|fcd238@|fcc41c@|fca80e@|c48c1c%|9a620e%|a8620e%|d28c1c%|fca80e@|fcc41c@|e0d246@|7ec438@|70c42a%|70c438%|7ec438+|c4c446#|fcc42a@|fcb60e@|e09a0e%|d28c0e%|e0a81c@|fcb60e@|fcc438@
-8cd254=|7ed246#|7ec438*++@|eec446@|fcb61c@|eea81c@|e08c0e%|e09a1c%|fcb61c@|fcc42a@|b6c446@|7ed238@|70c438@|70b638*|000000     |fcd246#|fcc42a@|fcc41c@|fca80e@@|fcb60e@|eec41c@|e0c42a@|e0d246@|7ec438@|7ed238@@|70b62a%|000000 |fce062+|fcd246@|fcc41c@|fcb60e@|fca82a@|d28c1c%|c47e1c%|d28c1c%|eea81c@|fca80e@|fcc41c@|fcc438@|e0c446@|7ec438@|c4c446@|fcc438@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%%|a8620e%|c47e1c%|fca80e@@|fcc40e@|fcc42a@|fcd246@|eed254%|8cd254-|fce062+|fcd246#|fcc41c@|fcb60e@|fca81c@|eea81c@|d28c1c%|d28c0e%|e09a1c%|fcb61c@|fcb60e@|fcc42a@|fcd254@|000000     |fcd262+|fcd238@|fcc41c@|fcb61c@|ee9a0e%%|fcb61c@|fcc41c@|fcc42a@|fcd254@|000000    |fcd262+|fcc42a@|fcb61c@|d28c1c%|b67e1c%|e09a1c%|fcb60e@|fcc42a@|a8d246%|7ed246##|7ec446=
-000000      |fcd238@|fcb60e@|e09a1c%|b6701c%|c47e1c%|fca81c@|fcc41c@|e0c446@|70c438%|7ec438@|7ec446@|7ec438%|7ec446%|7ec438%|9ad246%|fcd246@|fcc41c@|fcb60e@|e09a1c%|a8620e%|9a620e%|b67e1c%|fca80e@|fcc40e@|fcd246@|8cc438@|70b62a%|70c438%|7ec438@@|d2c446@|fcc42a@|fcc40e@|fca80e@|e09a1c%|a8620e%|9a620e%%|c47e1c%|fca80e@|fcb60e@|fcc41c@|fcd246@|eed262#|fce054#|fcd238%|fcb61c@|fcb60e@|fca80e@|fca82a%|d28c1c%|b67e1c%%|c48c2a%|fca81c@@|fcb60e@|fcc41c@|fcd238@|eec462#|000000   |fce070*|fcd246#|fcc438%|fcc42a@|fcb60e@|fcc40e@|fcb60e@|fcc41c@|fcb61c@|fcd238@|fcd254*|000000        |fcd246@|fcc438%|fcd238@|fcc438@%|fce054*|000000        |fcd246@|fcb62a@|fcc42a@@|fcd254#
-000000       |fcd246#|fcc42a@|fcc41c@|fcb61c@|fcd246@=|000000         |fcc438@|fcb61c@@|d28c0e%%|eea81c@|fcb61c@|fcc41c@|fcc446@|000000      |fcc446%|fcc41c@|fcb60e@|fcb61c@|ee9a1c%|e08c1c%|e09a1c%|fca81c@|fcb60e@|fcc41c@|fcd238@|fcd262#|000000  |fcd254@|fcd238@|fcc42a@|fcb62a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc42a@|eec446#|000000       |fce062+|fcd246=|eec454+|fce046@|eec446#|fcd254#
-000000                       |fcd246@|fcc42a@|fcb61c@|fcc41c@|fcc42a@|fcd246@|000000        |fce054+|fcd246=@|fcc41c@|fcb61c@|fcc40e@|fcb61c@|fcc41c@|fcc438%|fcd246@|000000      |fcd254*|fce046@|fcc438@|fcb62a@|fcd22a@|fcb62a@|fcc42a@|fcd238@|e0b646+|fcd246+|fce062#
-000000                                       |fce062=|000000 |fcd254*#|eec454+|fce062+|000000           |fcd254-|fce054%
+    marcos: [
+      {
+        color: `
+000000                                                         |fce062*|e0c454+|eec454*|fce062#|000000           |eed254=|000000 |fce054#|eec446#|fcd246%|fcd262+
+000000        |7ed246+|9ae054+|000000                                            |fce046@|fcc438@|eeb62a@|fcd22a@|fcb62a@|fcc41c@|fcd22a@|e0b638#|fcd246%|fce054@|000000      |fcd246+|fcc446#|fcd22a@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|fcb61c@|fcd238@|eed254@|8cd246@@|7ec438@|70c438%|70b646-|000000   |fcd246@|fcc438%|fcc42a@@|fcc438%|fcd254*|000000  |7ec438#|7ed238@|8cd246@|7ed246+
+000000      |70c438@|7ec438@|8cd246@|7ed238@|7ec446*|000000 |8cd246=|7ec446-|000000                         |fce062+|eec454+|fcd246*%|eec446@|fce054@|000000    |70c438*|7ec438%|d2d246@|fcd238@|fcd22a@|fcb62a@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc41c@|fcc446#|fcd246+|fce062+|000000   |fcd254*|fcc42a@|fcb60e@|fca81c@|eea81c@|d28c1c%|d28c0e%|e09a1c@|fcb60e@@|fcc42a@|fcd246@|8cc438@|7ed238@@|70b638%|000000 |fcd254%|fcc42a@|fcb61c@@|e09a0e%%|fcb61c@|fcc42a@|fcd238@|b6c446@|70c438@|7ed238@|70c438@|7ec446=|000000  |eed246@|e0c42a@|fcd22a@|e0c42a@|fcd254+
+000000     |70b638%|70c438@|b6d246@|d2c438@|fcd238@|eec438%|d2d246@|8cd246@|7ed238@|70c438@|70b638%|000000       |fce062+|fcc446+#|fcd238@|a8c438@|c4d246@|8cd246@@@|7ec438@|70c438#|000000   |fce062*|fcd246*|fcc438@|fcc41c@|fcb60e@|fcc40e@|fcb60e@@|fcc41c@|fcd238@|e0c462+|7eb638@|7ec438@|d2d246@|eed238@|fcc41c@|fcb60e@|fca80e@|fca82a@|d28c1c%|b6701c%%|b67e1c%|e0a81c@|eea80e@|fcb60e@|fcc41c@|fcc438@|c4c446@|7ec438+*|9ac446%|fcc438@|fcc41c@|fcb60e@|fca81c@|a8620e%|9a620e%%|a8620e%|eea81c@|fca80e@|fcc41c@|fcd238@|e0d246@|7ec438@|70c438@|7ec446@|8cc446@|eed246@|fcc41c@|fca80e@|c48c1c%|9a620e%|a8620e%|d28c1c%|fca80e@|fcc41c@|e0d246@|7ec438@|70c42a@|70c438%|7ec438+|c4d246#|fcc42a@|fcb60e@|e09a0e%|d28c0e%|e0a81c@|fcb61c@|fcc438@
+8cd254=|7ec438#*++|70c438@|eec446@|fcb61c@|eea81c@|e08c0e%|e09a1c%|fcb61c@|fcc42a@|b6c446@|7ed238@|70c438@|70b638*|000000    |fcd262=|fcd246%|fcc438@|fcc41c@|fca80e@|fcb60e@@|eec41c@|d2d238@|c4d246@|7ed238@@@|70b62a%|000000 |fce062+|fcc438%|fcc41c@|fcb60e@|fca82a@|e08c1c%|c47e1c%|d28c1c%|eea81c@|fca80e@|fcb61c@|fcc438@|d2d246@|7ec438@|a8c438@|fcc438@|fcc41c@|fcb60e@|fca80e@|d28c1c%|a8620e%|9a620e%%|a8620e%|c47e1c%|fca80e@|fcb60e@|fcc40e@|fcd22a@|fcd246@|e0d254%|8cd246-|fce054+|fcd246%|fcc41c@|fcb60e@|fca81c@|ee9a1c@|c48c1c%|d28c1c%|e09a1c%|fcb61c@|fcb60e@|fcc42a@|fcd246@|000000     |eed262*|fcd238@|fcc41c@|fcb61c@|ee9a0e%%|fcb61c@|fcc41c@|fcd238@|eed262*|000000    |eed262+|fcc42a@|fcb60e@|d28c1c%|b67e1c%|e09a1c%|fcb60e@|fcc42a@|a8d246%|7ed246##|7ec446=
+000000      |fcd246@|fcb60e@|e09a1c@|b6701c%|b67e1c%|fca81c@|fcc41c@|e0c446@|70c438@|7ec438@|7ec446@|7ec438%%%|70c438#|e0d254@|fcc42a@|fcb60e@|e09a1c%|a8700e%|a8620e%|b68c1c%|fca80e@|fcc41c@|fcc438@|8cc438@|70b62a%|70c438@|7ec438@@|c4c446@|fcc438@|fcc40e@|fca80e@|e09a1c%|a8620e%|9a620e%%|c47e1c%|fca80e@|fcb60e@|fcc41c@|fcd246@|eed254#|fce054%|fcd238@|fcb61c@|fcb60e@|fca80e@|eea82a@|d28c1c%|b67e1c%%|c48c2a%|fca81c@@|fcb60e@|fcc41c@|fcc438@|eed262+|000000   |fce062#|fcd246#|fcc438%|fcc42a@|fcb60e@|fcc40e@|fcb60e@|fcc41c@|fcb62a@|fcd238@|fcd262=|000000        |fcd254@|fcc438%|fcc42a@@%|fcd246@|000000        |fcd246@|fcb62a@|fcc41c@|fcc42a@|fcd246@
+000000       |fcd254#|fcc42a@|fcb61c@@|fcc42a@|fcd246+|000000        |e0c462=|fcc438@|fcb60e@|fca82a@|d28c1c%|c47e1c%|ee9a1c@|fcb61c@|fcc41c@|eec446@|000000     |fce054=|fcc438%|fcc41c@|fcb60e@|fcb61c@|e09a1c%|d28c1c%|e09a1c%|fca81c@|fcb60e@|fcc41c@|fcd238@|fcd262%|000000  |fcd254@|fcd238@|fcc42a@|fcb62a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcc42a@|eec446*|fcd254=|fce062=|000000     |fce070=|fcd254+|eec446+|fce046@|eec446%|fcd254%|fcd262=
+000000                       |fcd254%|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcd238@|fcc454+|000000       |fce054#|fcd246+|fcc446@|fcc41c@|fcb61c@|fcc40e@|fcb61c@|fcc41c@|fcc438@|fcd254@|000000      |fcd262=|fce046@|fcc438@|eeb62a@|fcd22a@|fcb62a@|fcc42a@|fcd238@|e0b646+|fcd254+|fce070=
+000000                          |fce062=|000000            |fce070=|000000 |fcd254*|fcd246#|eec454#|fce054*|000000            |fce054#|e0c454=|eec454=|fce062+
 `,
-    plano: `
-                                                        -%-=%            -%=#+
-        -=                                           -%#*%*#%++#      =*%*#*#*%#***+    %*%##%  =*#-
-      ++**= -                          *-*%*@    -+#%%##**+**##+=    +##*+==+**#%***+ +%#*++##%*+*+-  %#%#*
-     ++###*%**+=       +=*%*##**+=   =+##*#**#% +*%%#***=---+*####-=+##**::::+*###++*#%#+=::=*##+++-+#*+=+*#
--==--+#**=+*##*+-     ###***###***+ +##**=-=+*###+*##**=::::-+*#%%#:=*##*+==+**#%     =%#*++##%#    =#*=-+*#*==:
-      %#+--*##++*++++%#*+::-*##*++++###*+:::-**#%*###***=--=**##%*   +**%*#*#*%+        %#%#**        %*##*
-       *##*%-         ##*==+*##      *#**+=+**#%*  %%#*#**+#*##*       +-=@+*
-                       %#*##%        +-%#*###*%      +@##%*#%-=*
-                                       = +*=+           -#
+        plano: `
+                                                         *=+#           - #*#=
+        -=                                            @##@#%%+#@      +*%*%*%#%%*#*+:   @#%#**  =*#=
+      +*#*= -:                         ==+##@    -*#%%##*#*#*##*++   +##**==+*#%%***+ #%##++##%***+-  %#%#=
+     ++##%*%#*+=       +=*%*###**=   **#%*####%=+*%%##**=---+*####-=+%##*::::**#%%++**%#*=::=*##*++=*%*+=+#%
+-==--+%#*=+###*+-    -###**####***+ +###*===**#%#**###*=::::-**#%%#:+###*+==+##%%     +%##++##%*    =%#=-+#%*++-
+      %#+--*##+**++++###+::-*#%*++*+#%#*+:::-*##%*#%#***=--=**#%%=   *#*%*#*##%=        %#%##%        %###%
+       *##*%+        -%#*==+*##     =###*+==*##%#  %%%##*#*#*%#+==     ===@*#-
+                       #%*##%=       *+%%*####%      -@##@#%%=+=
+                          =            = +*+*            #-=+
 `
+      },
+      {
+        color: `
+000000                                                        |fce062=|fcd254+|eec454*|fcd254*|fce062*|000000           |fce062+|e0b654-|fce054%|eec446*|fcd246#|fce062#
+000000        |7ed246=|9ae054+|000000                                           |fcd254#|fcd246@|eeb638@|fcc42a@|fcd22a@|fcb61c@|fcd22a@|fcc42a@|eeb638#|fcd246@|fce054@|000000      |fce054#|fcc438*|fcc42a@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|eeb61c@|fcd22a@|fcd254@|8cd246@@|7ec438@|70c438%|70b646-|000000   |fcd246@|eeb638%|fcd22a@|fcb62a@|fcd238@|fcd262+|000000  |7ec438#|7ed238@|8cd246@|7ed246+
+000000      |70c438@|7ec438@|8cd246@|7ed238@|7ec446*|000000 |8cd246=|7ec446-|000000                          |fcd254*|eec446+|fce054@|eeb646#|fcd246@|fcd262=|000000   |70c438*|7ec438%|fcd254@|fcd238@|fcc42a%|fcb61c@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb61c@|fcc438#|fcd246#|fce062*|000000   |fcd254#|fcc42a@|fcb60e@|fca81c@|eea81c@|d28c1c%|d28c0e%|e0a81c@|fcb60e@@|fcc42a@|fcd246@|9ac446@|7ed238@@|70b638%|000000 |fcd254@|fcd22a@|fcb61c@@|ee9a0e%%|fcb62a@|fcb61c@|fcc438@|a8b638@|70c438@|7ed238@|70c438@|7ec446=|000000  |eed246@|e0c42a@|fcd22a@|d2b62a@|fcd254*
+000000     |70b638%|7ec438@|a8d246@|e0d238@|e0c42a@|fcc438@|c4d246@|9ad246@|7ed238@|70c438@|70b638%|000000       |fce054*|eec446=|fcd246@|eec438@|c4c438@|c4d246@|8cd246@@@|7ec438@|70c438#|000000   |fcd262+|fcd246%|fcc438%|fcc41c@|fcb60e@|fcc40e@|fcb60e@|fcc40e@|fcc42a@|fcd238@|e0d262#|70b638%|7ec438@|c4d246@|eec438@|fcc41c@|fcb60e@|fca80e@|fcb62a%|d28c1c%|b6701c%%|c47e1c%|e0a81c@|fca80e@|fcb60e@|fcc41c@|fcc438@|c4c446*|8cc446+|7ec438*|b6d246#|fcc438@|fcc41c@|fcb60e@|fca81c@|a8620e%|9a620e%%|a8620e%|fca81c@|fca80e@|fcc41c@|fcd238@|d2d246@|7ec438@|70c438%|7ec446@|8cc446@|eed246@|fcc41c@|fca80e@|c48c1c%|9a620e%|a8620e%|d28c1c%|fca80e@|fcc41c@|e0d246@|7ec438@|70c42a%|70c438%|7ec438+|c4d254*|fcc42a@|fcb60e@|e09a1c%|d28c0e%|e0a80e@|fcb60e@|fcc438@
+8cd254=|7ec438#*++|70c438@|eed246@|fcb61c@|eea81c@|e08c0e%|e09a1c%|fcb61c@|eec42a@|b6d246@|7ed238@|70c438@|70b638*|000000    |fce062=|fcd238*|fcc438@|fcc41c@|fca80e@@|fcc40e@|eeb61c@|eed238@|c4c446@|7ed238@@@|70b62a%|000000 |fce062+|fcd246%|fcc41c@|fcb60e@|fca82a@|e08c1c%|c47e1c%|d28c1c%|eea81c@|fcb60e@@|fcd238@|eed254@|7ec438@|a8c438@|fcc438@|fcc41c@|fcb60e@|fca80e@|d28c1c%|a8620e%|9a620e%%|a8620e%|c47e1c%|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|fce062*|000000 |fce062=|fcc446%|fcc41c@|fcb60e@|fcb61c@|ee9a1c@|c48c1c%|d28c1c%|e09a1c%|fcb61c@|fcb60e@|fcc42a@|fcd246@|000000     |eed262=|fcc438@|fcc41c@|fcb61c@|e09a0e%|ee9a0e%|fcb61c@|fcc41c@|fcd238@|fcd262#|000000    |e0d254+|fcc42a@|fcb61c@|d28c1c%|b67e1c%|e09a2a%|fcb60e@|fcc438@|a8d246#|7ed246##|7ec446=
+000000      |fcd246@|fcb60e@|e09a1c@|a8701c%|b67e1c%|fca80e@|fcc41c@|d2d246@|70c438@|7ec438@|7ec446@|7ec438%%%|70c438#|d2c446@|fcc42a@|fcb60e@|e09a1c%|a8700e%|a8620e%|c48c1c%|fca80e@|fcb60e@|fcd246@|9ac438@|70b62a%|70c438@|7ec438@|8cc446@|e0d246@|fcc42a@|fcc40e@|fca80e@|e09a1c%|a8620e%|9a620e%%|c47e1c%|fca80e@|fcb60e@|fcc41c@|fcd246@|d2d254@|fcd254@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca82a@|d28c1c%|b67e1c%%|c48c1c%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254%|000000   |fce062#|fcd238*|fcc446@|fcc41c@|fcb60e@|fcc40e@|fcb60e@@|fcc41c@|fcd246@|000000         |fcd254#|fcd238@|fcc42a@|fcd22a@|fcc42a#|fcd246@|000000        |fcd246@|fcb62a@|fcc41c@|fcc42a@|fcd246%|fce054=
+000000       |fcd254%|fcc42a@|fcc41c@|fcb61c@|fcc438@|fcd246+|000000         |fcc438@|fcb60e@|eea82a@|d28c0e%|c47e1c%|ee9a1c@|fcb61c@|fcc41c@|fcd246@|000000      |fcc438@|fcc41c@|fcb60e@|fcb61c@|e09a1c%|d28c0e%|e09a1c%|fca81c@|fcb61c@|fcc41c@|fcd238@|fcd262+|000000  |fcd254+|fcd238@|fcd21c@|fcb61c@@|fcb60e@|fca80e@@|fcb60e@|fca80e@|fcc41c@|fcd22a@|eec446%|000000       |fce062+|000000 |fcd254#|fcd246%|eec446%|fce054@
+000000                       |fcc446*|fcd22a@|fcb61c@|fcc41c@|fcb61c@|fcd22a@|fcd254*|000000       |fce054+|fcc446=|fcd238@|fcc41c@|fcb61c@|fcb60e@|fcc41c@|fcb61c@|fcc438@|fcd254%|000000    |fce070=|000000  |fcd246@|fcd238@|eeb62a@|fcd22a@|fcc42a@@|fcd238@|eec446*|000000 |fce062=
+000000                          |fce054+|000000              |fce054%|fcc446**|fce062*|000000            |fce062#|eec454=+|fcd262=
+`,
+        plano: `
+                                                        ==++*           =-#+*#
+        -=                                           *%##%*%#+@%      #+%##*%*%%*#*+:   %*%#%=  =*#=
+      +*#*= -:                          +=%*%=   -*%%###*#***##*#*   *##**==+*##%***+ %%#*++##%***+-  %#%*+
+     ++######*+=       +-%#*###**=   +#*%*#*##%++*####**=---**###+-=+%##*::::**#%#++**%#*=::=*##*++=+#*+=+*%
+-==--+##*=+###*+-    =*##**####***+ +###*=-=**#%%**###*=::::-**#%%* -*##*+==+*###     -%##++##%*    +%#=-+##+++-
+      %#+:-*##+**++++###+::-*#%*++**#%#*+:::-**#%#%%#***=--=**#%%#   *+#%*#*##%         *%#%+@        %####=
+       ###*%+         ##*==+*#%      ##**+==*##%=  +%%*#***#*#%#       = *#*%
+                       +%*%*%+       +=%#####%#    =  %%*%##@+ =
+                          +              #++*            #-=-
+`
+      },
+      {
+        color: `
+000000                                                        |fce062+|eec454+*|fce054#|000000            |fce062+|eec454+|fcd254**|eec446#|fce054%
+000000        |7ed246+|9ae054+|000000                                           |fce054@|fcd246@|eeb638%|fcd22a@|fcc42a@|fcc41c@|fcd22a@|eeb62a@|fcc438@|fce046@|fcd262+|000000      |fcd254@|fcc438#|fcc42a@|fcc41c@|fcb61c@@|fcc41c@@|eec438@|fcd246@|9ad246@|8cd246@|7ec438@|70c438%|70b646-|000000  |fce062=|fcd246#|fcb638%|fcd22a@|fcb638@|fcd238@|eec454=|000000  |7ec438#|7ed238@|8cd246@|7ed246+
+000000      |70c438@|7ec438@|8cd246@|7ed238@|7ec446*|000000 |8cd246=|7ec446-|000000                          |fce054#|eec446*|fce054@|eec446#|fcd246%|fce054#|000000   |70c438*|9ac446%|eed254@|eed238@|fcc438%|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@@|fcb60e@@|eeb62a@|fcd238%|fcd246@|fce070+|000000   |fcd246#|fcc42a@|fcb60e@|fcb61c@|eea82a@|d28c1c%|d28c0e%|e0a81c@|fca80e@|fcb60e@|fcc42a@|eed246@|a8d246@|7ed238@@|70b638%|000000 |fcd254%|fcd238@|fcb61c@|fca81c@|ee9a0e%@|fcb61c@|fcc41c@|fcc438@|9ab646@|70c438@|7ed238@|70c438@|7ec446=|000000  |d2c446@|eec42a@|fcc42a@|e0c42a@|fcd254*
+000000     |70b638%|8cc438@|9ad246@|eed238@|d2c42a@|fcd238@|b6d238@|a8d246@|7ed238@|70c438@|70b638%|000000       |fce054=|eeb646=|fcd246@|e0c438%|d2d246@|b6d246@|8cd246@@@|7ec438@|70c438#|000000    |fcd246@|fcc42a%|fcc41c@|fcb60e@|fcc40e@|fca80e@|fcc41c@|fcb62a@|fcd238@|eed254@|70b638%|7ec438@|b6d246@|e0c438@|fcc41c@|fcb60e@|fca80e@|fcb62a%|d28c1c%|b6701c%%|c47e1c%|d2a82a@|fca80e@|fcb60e@|fcb61c@|eec438@|fcd246+|b6d254+|7ec438*|e0d254#|fcd238@|fcc41c@|fcb60e@|fca81c@|a8620e%|9a620e%%|a8620e%|fca81c@|fcb60e@|fcc41c@|fcc438@|b6c446@|7ec438@|70c438@|7ec446@|7ec438@|eed246@|fcc41c@|fca80e@|c48c1c%|9a620e%|a8620e%|d28c1c%|fca80e@|fcc41c@|eed246@|7ec438@|70c42a@|70c438%|7ec438+|e0d254+|fcc42a@|fcb60e@|e09a1c%|d28c0e%|e0a80e@|fcb61c@|fcd238@
+8cd254=|7ec438#*++@|e0d238@|fcc41c@|eea81c@|e08c0e%|e09a1c%|fcb61c@|eec42a@|c4d246@|7ed238@|70c438@|70b638*|000000    |fce062=|fcd246*|fcc42a@|fcb60e@@|fca80e@|fcb60e@|fcb61c@|fcd238@|a8c446@|7ed238@@@|70b62a%|000000 |fce070+|fcd246@|fcc41c@|fcb60e@|fca81c@|d29a1c%|c47e1c%|d28c1c%|eea82a@|fcb60e@@|fcd238@|e0d246@|9ac446@|c4c446@|fcc438@|fcc41c@|fcb60e@|fca80e@|d28c1c%|a8620e%|9a620e%%|a8620e%|c47e1c%|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|eee062=|000000  |fcc446@|fcc41c@|fcb60e@|fcb61c@|e09a1c@|d28c1c%|c48c1c%|e09a1c@|fcb61c@|fcb60e@|fcc42a@|fcc446#|000000      |fcc438@|fcb60e@|fcb61c@|e09a0e%|ee9a1c@|fcb61c@@|fcd238%|fcd262*|000000    |e0d254*|fcc42a@|fcb60e@|d28c1c%|b67e0e%|e09a1c%|fcb60e@|fcc438@|a8d246#|7ed246##|7ec446=
+000000     |a8d254=|fcd238@|fcb60e@|e09a1c@|a8701c%|b67e1c%|fca80e@|fcb61c@|e0d246@|70c438@|7ec438@|7ec446@|7ec438%%%|70c438#|d2c446@|fcc42a@|fcb60e@|e09a1c%|a8700e%|a8620e%|c47e1c%|fca80e@|fcb60e@|fcd238@|8cc438@|70b62a%|70c438@|7ec438@|8cc446@|eed254@|fcc42a@|fcb60e@|fca80e@|e09a1c%|a8620e%|9a620e%%|c47e1c%|fca80e@|fcb60e@|fcc41c@|eed246@|c4d246@|eed246@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|c48c1c%|b67e1c%%|c48c1c%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|000000   |fce054+|fcc446+|fcd238@|fcc41c@|fcb60e@@@@|fcc41c@|fcd246@|000000         |fcd262+|fcd238@|fcb62a@|fcd22a@|eeb638#|fcd246%|fcd262+|000000       |fcd238@|fcc42a@|fcb61c@|fcc42a@|fcc438#|fce054+
+000000       |fcd246@|fcb61c@|fcc41c@|fcb61c@|fcc42a@|fcd246#|000000         |fcc438@|fcb60e@|eea81c@|d28c1c%|c48c1c%|ee9a1c@|fca80e@|fcc41c@|fcd246@|000000      |fcc438@|fcc41c@|fcb61c@@|e09a1c%|d28c0e%|e09a1c%|fcb61c@@|fcc41c@|fcc438@|000000    |fcc438@|fcd21c@|fcb61c@|fcb60e@@|fca80e@@|fcb60e@@|fcb61c@|fcd22a@|fcd246@|000000       |fce062=|000000 |fce054@|fcc446%%|fce054@
+000000                      |fce062+|fcc446*|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcd22a@|fcd254%|000000       |fcd254=+|fcd238@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|fcb61c@|fcd238@|fcd254*|000000     |fce054+|000000 |fcd246#|fcd238@|fcb62a@|fcc42a@|fcd22a@|eeb62a@|fcd238@|fcd254@
+000000                          |fce054=|000000              |fce054%|eec446*|fcd246#|fcd262=|000000            |fcd254+|fce062*|000000 |eec462=
+`,
+        plano: `
+                                                        +==#            +=+*+#
+        -=                                           @%*%##%*%@=      %*#######@##*+:  =**%#@-  =*#=
+      +*#*= -:                          *=%+#*   -*%%###*#**####@+   ###**==+*##%#**+ %##*++*##***+-  ####+
+     +**%*%##*+=       =-@*####**=    %####*##%%+*####**=---**###===*%#**::::**#%#++**%#*=::=*#%*++==%*+=+#%
+-==--+##*=+###*+-    =+##**##%****+ +%##*=-=**#%%*#%##*=::::-**#%%=  ###*+==+*##*      ##*++*##+    +%*=-+##*++-
+     -%#+--*##+**++++###+::=*#%*++**%%#*+:::-*##%#%%%#**=--=***#%%   +=%#*##*%%         =%#%+#=       %##%*+
+       %####*         ##*==+*#%      ####+==*##%    %%#*#***##%%       - %**%
+                      ++%#%*%#       -=%##*%*%+     + *@##%*%%
+                          =              #+*=            =* -
+`
+      },
+      {
+        color: `
+000000                                                        |fce062=|eec454*+|fce062%|000000            |fce062=|fcd254*|eec446*|fce054%|e0b646+|fcd254*
+000000        |7ed246+|9ae054+|000000                                           |fce054@|fcc438%|eeb638@|fcd22a@|fcb62a@|fcc41c@|fcd22a@|eeb62a@|fcd238@|fcd246@|000000       |fcd262@|fcd238@|fcb62a@|fcc41c@|fcb60e@|fcc41c@|fcb61c@|fcc41c@|e0c438@|fcd246%|b6d246@|8cd246@|7ec438@|70c438%|70b646-|000000  |fce062+|fcd238+|fcc42a@@@|fcd238@|000000   |7ec438#|7ed238@|8cd246@|7ed246+
+000000      |70c438@|7ec438@|8cd246@|7ed238@|7ec446*|000000 |8cd246=|7ec446-|000000                          |fce054#|eec446#|fcd246%%|eec446#|fce054%|000000   |70c438*|a8d246@|e0d246@|d2d246@|eec42a@|fcc41c@|fcb60e@|fca80e@|fcb60e@@|eea80e@|fcb60e@|eeb60e@|fcc41c@|fcd238@|fcd246@|000000    |fcd246@|fcc42a@|fcb60e@|fcb61c@|eea81c@|d28c0e%%|e0a81c@|fca80e@|fcb60e@|fcc42a@|e0d246@|b6d246@|7ed238@@|70b638%|000000 |fce054#|fcc42a@|fcb61c@|fca80e@|ee9a1c@|ee9a0e@|fca81c@|fcc41c@|fcc438@|a8c446%|7ec438@|7ed238@|70c438@|7ec446=|000000 |fce062=|c4c438@|fcd22a@|eec42a@|eec438@|fcd246+
+000000     |70b638%|8cc438@|9ad246@|eed238@|d2c42a@|fcd238@|a8c438@|a8e046@|7ed238@|70c438@|70b638%|000000        |fcc446+|fcd246@|e0c438#|eed246@|a8d246@|8cd246@@@|7ec438@|70c438#|000000    |fcd246@|fcc42a@|fcb61c@|fcc40e@|fcb60e@@|fcc41c@|fcc42a@|fcd238%|fcd254@|70b638@|70c438@|9ad246@|eec438@|fcc41c@|fcb60e@|fca80e@|fca82a@|c48c1c%|b6701c%%|c47e1c%|d2a82a@|fca80e@|fcb60e@|fcb61c@|fcc438@|fcd254#|e0e054*|7ec438*|eed254#|fcd238@|fcc41c@|fcb60e@|fca81c@|a8620e%|9a620e%%|a8620e%|fca81c@|fcb60e@|fcc41c@|fcc438@|a8c446@|70c438@@|7ec446@@|eec446@|fcc41c@|fca80e@|c48c1c%|9a620e%|a8620e%|d28c1c%|fcb60e@|fcc41c@|e0c446@|7ec438@|70c42a@|70c438%|7ec438*|e0d254+|fcc42a@|fcb60e@|e09a0e%|d28c0e%|e09a0e@|fcb60e@|fcd238%
+8cd254=|7ec438#*++|8cc438@|d2d238@|fcc41c@|eea80e@|e08c0e%|e09a1c%|fcb61c@|eec42a@|b6d246@|7ed238@|70c438@|70b638*|000000     |fcc446*|fcc41c@|fcb60e@@|fca80e@|fcb60e@|fcc41c@|fcd238@|8cc446@|7ed238@@@|70b62a%|000000 |fce070=|fcd246@|fcc41c@|fcb60e@|fca81c@|d29a2a%|c47e1c%|d28c1c%|eea82a@|fcb60e@@|fcc438@|e0d246@|a8d246@|e0d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|d28c1c%|a8620e%|9a620e%%|a8620e%|c47e1c%|fca80e@|fcb60e@@|fcc42a@|eec454@|9ad246=|000000 |a8d254=|eec446@|fcc41c@|fcb60e@|fcb61c@|e09a1c@|d28c1c%|c48c1c%|ee9a1c@|fcb61c@|fcb60e@|fcc42a@|fcd246#|000000      |fcc438@|fcb60e@|fca81c@|ee9a0e@|ee9a1c@|fca80e@|fcb60e@|fcc438%|fce062+|000000    |e0d254*|fcc42a@|fcb60e@|d28c1c%|b67e0e%|e09a1c%|fcb60e@|fcc42a@|a8d246#|7ed246##|7ec446=
+000000     |a8c454=|fcd238@|fcb60e@|e09a1c@|a8701c%|b67e1c%|fca80e@|fcb61c@|e0c446@|70c438@|7ec438@|7ec446@|7ec438%%%|70c438#|e0c446@|fcc42a@|fcb60e@|e09a1c%|a8700e%|a8620e%|c47e1c%|fca80e@|fcb60e@|fcd238@|8cc438@|70b62a@|70c438@|7ec438@|8cc446@|eed254@|fcc42a@|fcb60e@|fca80e@|e09a1c%|a8620e%|9a620e%%|c47e1c%|fca80e@|fcb60e@|fcc41c@|eed246@|a8c446%|d2d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|c48c2a%|b67e1c%%|d28c1c%|eea82a@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|fce070=|000000  |fcd254=|fcc454+|fcd238@|fcb61c@|fcb60e@@|fcc40e@|fcb60e@|fcd22a@|fcd246%+|000000         |fcd238@|fcb62a@|fcd22a@|fcc438%|fcd238*|fce062*|000000      |fcd262=|fcc42a%@|fcb62a@|fcc42a@|fcc438#|fcd254+
+000000       |fcd246@|fcb61c@|fcc41c@@|fcb62a@|fcd246%|000000        |fce062=|fcc438@|fcb60e@|fca81c@|d28c1c%|c48c1c%|e09a1c@|fcb60e@|fcc41c@|fcd246@|000000     |e0d254+|fcd238@|fcc41c@|fcb60e@|fcb61c@|e09a1c%|d28c0e%|d28c1c%|fcb61c@|fcb60e@|fcc41c@|fcc438@|000000    |eec446@|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc41c@|fcb61c@|fcd22a@|fcd246@|fcd262=|000000        |fce054@|eec446%|fcd246%|fcd254#|eec454=
+000000                      |fce062+|fcc438*|fcc42a@|fcc41c@@|fcb61c@|fcc42a@|fcd254@|000000        |fcd254#|fcd22a@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|fcb61c@|fcd238@|fcd254=|fce054=|000000    |fce054#|fcd246+|eec454+|fcd238@|fcc42a@|fcb62a@|fcd22a@|eeb62a@|fcc438@|fcd246@
+000000                           |fce062=|000000             |fcd254#|eec446*|fce054%|000000           |fce062=|000000  |fce054%
+`,
+        plano: `
+                                                        =+=#            =+=%-*
+        -=                                           @*#@#%%*%@       %%#%###%#%##*+:  ++#%#%   =*#=
+      +*#*= -:                          #*##+%   -*%%###**#*###%@    %%##+==**####**+ *##*++*##***+- =#%##+
+     +*#%#%*#*+=        =@*%###**=    %%###*%##%+*####**=--=**##%*+=*%#**::::*##%*++**%#*=::=#%#*++=+%#+=+##
+-+=--*##*=+###*+-     +%##*##%****+ =%##*+==**#%###%%#*=::::-*###%- -%%##+==+*##*      ##*++*##+    +%*=-+*%*++-
+     -%#+--*##+**++++#%#+::=*#%*++**%%#*+:::-*#%%*%%%#**=--=**##%@=  -=%####*%#=         @#%*+*      -###%*+
+       %#####        =%#*==+*#%     =%%##+==*###    #%#*#*#*##%%=        %*%*-
+                      ++#####@        #%#%*%#%=-    #==@%#@#%@
+                           =             *+%           =  %
+`
+      },
+      {
+        color: `
+000000                                                        |eec454=|e0c454=|fce054*|fcd262=|000000  |fce070=|000000          |fcd254*|eec446*|fce054@|eec454=|fcc454+|fce062+
+000000        |7ed246+|9ae054+|000000                                          |fce062*|fcd246#|eeb638+|fcc438@|fcd22a@|fcb62a@|fcd22a@|fcc42a@|fcb62a@|fcd238@|fcd254#|000000       |fcd254*|fcd238@|fcb62a@|fcc41c@|fcb60e@|fcc41c@|fcb61c@|fcd21c@|e0c438@|fcd246#|c4e054@|8cd246@|7ec438@|70c438%|70b646-|000000  |fce062*|fcc446=|fcd238@|fcc42a@@|fcc438@|fcc446=|000000  |7ec438#|7ed238@|8cd246@|7ed246+
+000000      |70c438@|7ec438@|8cd246@|7ed238@|7ec446*|000000 |8cd246=|7ec446-|000000                          |fce062+|fcd246#|eec446#|fce046@|e0b646+|fce054#|000000   |70c438*|a8d246@|c4d246@|c4d238@|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|eeb60e@|fcc41c@|fcd238@|fcd254@|000000    |fcd254@|fcc42a@|fcb60e@|fcb61c@|ee9a1c@|d28c0e%|d28c1c%|eea81c@|fca80e@|fcb60e@|fcc42a@|d2c438@|a8d246@|7ed238@@|70b638%|000000 |fce054+|fcc438@|fcb60e@|fca80e@|ee9a0e@|ee9a1c@|fca80e@|fcc41c@|fcc438@|c4c446@|7ec438@|7ed238@|70c438@|7ec446=|000000 |fce062=|c4c438@|fcd22a@|e0c42a@|fcd238@|eec446+
+000000     |70b638%|8cc438@|b6d246@|e0d238@|e0c42a@|fcd238@|b6c438@|a8e046@|7ed238@|70c438@|70b638%|000000        |fcd254#|fcd238%|eec438#|fcd246@|8cd246@|9ad246@|8cd246@@|7ec438@|70c438#|000000    |fcd254@|fcc42a@|fcb61c@|fcc41c@|fcb60e@@|fcc40e@|fcc42a@|fcd238#|fcd254%|8cc438@|70c438@|9ad246@|fcc446@|fcc42a@|fcc40e@|fca80e@|fca81c@|c48c1c%|b6701c%%|c47e1c%|d2a81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fce054@|d2d254*|7ec438*|e0d254%|fcd238@|fcc41c@|fca80e@|fca81c@|a8620e%|9a620e%%|a8620e%|eea81c@|fcb60e@|fcc41c@|fcc438@|9ac446@|70c438@@|7ec446@@|fcc446@|fcc41c@|fcb60e@|c48c1c%|9a620e%|a8620e%|d28c1c%|fcb60e@|fcc41c@|e0c446@|7ec438@|70c42a@|70c438%|7ec438+|e0d246*|fcc42a@|fcb60e@|e09a0e%|d28c0e%|e09a1c@|fcb60e@|fcc438%
+8cd254=|7ec438#*++|8cc438@|d2d238@|fcc41c@|eea80e@|e09a0e%|e09a1c%|fcb61c@|fcc42a@|b6d246@|7ed238@|70c438@|70b638*|000000     |fcc446#|fcc41c@|fcb60e@@@@|fcc41c@|fcc438@|8cc438@|7ed238@@@|70b62a%|000000  |fcd246@|fcc41c@|fcb60e@|fcb61c@|d28c1c%|c47e1c%|d28c1c%|eea82a@|fca80e@|fcb60e@|eec42a@|d2d238@|c4d254@|eed246@|fcd238@|fcc41c@|fcb60e@|fca80e@|d28c1c%|a8620e%|9a620e%%|a8620e%|c47e1c%|fca80e@|fcb60e@@|fcc42a@|e0c446@|8cd246=|000000 |c4d254*|fcd246@|fcc41c@|fcb60e@|fcb61c@|e09a2a@|d28c1c%|c48c1c%|ee9a1c@|fcb61c@|fcb60e@|fcc42a@|fcd246#|fce062+|000000     |fcc438@|fcb60e@|fca80e@|ee9a0e@|eea81c@|fca80e@|fcb60e@|fcc438@|fce062=|000000    |e0d254+|fcc42a@|fcb60e@|d28c1c%|b67e0e%|e09a1c%|fcb60e@|fcc438@|b6d246%|7ed246##|7ec446=
+000000     |a8d254=|fcd246@|fcb60e@|e09a1c@|a8701c%|b67e1c%|fca80e@|fcc41c@|e0c446@|70c438@|7ec438@|7ec446@|7ec438%%%#|eed246@|fcc42a@|fca80e@|e09a1c%|a8700e%|a8620e%|c47e1c%|fca80e@|fcc41c@|fcd246@|8cc438@|70b62a%|70c438@|7ec438@|8cc446@|e0d246@|fcc42a@|fcb60e@|fca80e@|e09a1c%|a8620e%|9a620e%%|c47e1c%|fca80e@|fcb60e@|fcc42a@|eec446@|8cc446*|b6c446@|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb62a@|c48c1c%|b67e1c%%|d28c1c%|eea82a@|fca80e@|fcb60e@|fcb61c@|fcd238@|fce054%|fce070+|000000   |fcd254#|fcd22a@|fcb61c@|fcc41c@|fcb60e@|fcc40e@|fcb60e@|fcd22a@|fcc446#|fce054*|000000       |fce062=|fcc438=|fcd238@|fcc42a@@|fcc438@=|fce054*|000000      |fcd254=|fcc438#|fcc42a@|fcb61c@|fcc42a@|fcd22a#|fcd254+
+000000       |fcd238%|fcb61c@@|fcc41c@|fcc42a@|fcd246%|000000        |eed262=|fcc438@|fcb60e@|fca81c@|d28c1c%|c47e0e%|e09a1c@|fcb60e@|fcc41c@|fcd246%|000000     |eed254%|fcd238@|fcc41c@|fcb60e@|fcb61c@|e09a1c@|d28c0e%|d28c1c%|fcb61c@|fcb60e@|fcc41c@|fcc438@|fcd254+|000000 |fce062+|fcd246+|fcc446*|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcb62a@|fcc42a%|fcd246@|fcd262%|000000       |fcd254=|fcd246%|eec446#|fce046@|eec446+|eed254*
+000000                      |fcd262+|fcd238#|fcb62a@|fcc41c@|fcb61c@|fcc41c@|fcc42a%|fcd246@|000000        |fcd246@|fcd22a@|fcb61c@|fcc41c@|fcb60e@|fcc41c@@|fcd238@|fcd246=|fce062+|000000    |fce062#|fcd246#|eeb638+|fcc438@|fcd22a@|eeb62a@|fcd22a@|fcc42a@|eec438@|fce046@|fcd262+
+000000                           |fce062+|000000            |fce062+|fcd254*|eec446*|fce054@|000000 |fcd262=|000000         |fce062+|eed262=|000000 |fce054*|fcd262=
+`,
+        plano: `
+                                                        --*=  =          *+%-=+
+        -=                                          *#=%%#%##@*       +%#%*%*%##%#*+:  +-%#%%-  =*#=
+      +*#*= -:                          +**@=#   -####%*#*#*#*#%%    %%##+==**####**+ +##*++*###**+- =#%#%=
+     +*###%*#*+=        ##*%*##**=    %%*%*##%*#**##%#**=--=***#%%+=#%#**::::*##%*++**##*=::=#%#*++=+%#+=+##
+-==--*##*=+###*+-     *%*#**##****+  %#**===**####%%##+=::::-*####- +%%*#+==+*##*+     ##*++*##=    +#*=-+*%*++-
+     -%#+--*##+**++++%%*+::=*#%*++**%%#*+:::-*#%#=#%%#**=--=**##%#=   *%##*##%**       =-%#%%=*      =*%##*=
+       #####%        =%#*==+###     #%###+==**##= +++#%*#*#*###@#       -#*@=+
+                      =##%##*%        %%#%###%-+    #*-%%#%##@=
+                           +            +++% -         +- *=
+`
+      },
+      {
+        color: `
+000000                                                       |fce062=|eec462=|000000 |fce062#|000000 |e0c454=|fce062+|000000           |fce054#|eec446#|fcd254%*|000000 |fce062+
+000000        |7ed246+|9ae054+|000000                                          |fce062#|fcd246+|e0b646+|fcd238@|fcc42a@|fcb62a@|fcd22a@|eeb62a@|fcc42a@|fcd238@|eec462=|000000 |fce062=|000000      |fcd238@|fcc42a@|fcc41c@|fcb61c@|fcc40e@|fcb61c@|fcc41c@|eed238@|e0d254#|c4e054@|8cd246@|7ec438@|70c438%|70b646-|000000  |fce054=|eec454=|fcd238@|fcb62a@|fcd22a@|fcc438%|fcd246+|000000  |7ec438#|7ed238@|8cd246@|7ed246+
+000000      |70c438@|7ec438@|8cd246@|7ed238@|7ec446*|000000 |8cd246=|7ec446-|000000                           |fcd254%|eec446%|fce046@|eec446+|fcd254+|fce062+|000000  |70c438*|9ad246@|a8d246@|d2c438@|fcc42a@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@|fca80e@|fcb60e@|eeb60e@|fcc41c@|fcd238@|fcd254*|000000    |fcd254@|fcc42a@|fcb61c@@|ee9a1c@|d28c1c%%|eea81c@|eeb61c@|fcb60e@|fcc42a@|d2c446@|9ac438@|7ed238@@|70b638@|000000 |fcd254=|fcc42a@|fcb60e@|fca81c@|ee9a0e@|ee9a1c@|fcb60e@|fcb61c@|fcc438%|d2d246@|70c438@|7ed238@|70c438@|7ec446=|000000  |c4d238@|fcd238@|e0c42a@|fcd238@|e0c446=
+000000     |70b638%|7ec438@|c4d246@|d2c438@|eec42a@|eec438@|c4d238@|a8d246@|7ed238@|70c438@|70b638%|000000        |fcd246@|fcc446#|fcc438%|eed246@|9ad246@@|8cd246@@|7ec438@|70c438#|000000    |fcd254*|fcd22a@|fcb61c@|fcc41c@|fcb60e@|fcc40e@|fcb60e@|fcc42a@|fcc446#|fce054*|9ac446@|70c438@|b6d246@|fcd246@|fcc42a@|fcb60e@|fca80e@|fca81c@|c48c1c%|b6701c%%|c47e1c%|e0a81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|fcd254@|b6d254%|7ec438*|c4d246@|fcd238@|fcc41c@|fca80e@|eea81c@|a8620e%|9a620e%%|a8620e%|eea81c@|fcb60e@|fcc41c@|fcc438@|b6d246@|70c438@@|7ec446@|8cc446@|fcc446@|fcc41c@|fcb60e@|c48c1c%|9a620e%|a8620e%|d28c1c%|fcb60e@|fcc41c@|eec446@|7ec438@|70c42a@|70c438%|7ec438*|e0d254#|fcc42a@|fcb60e@|e09a0e%|d28c0e%|e09a1c@|fcb60e@|fcc438@
+8cd254=|7ec438#*++|8cc446@|e0d238@|fcb61c@|fca81c@|e09a1c%@|fcb60e@|fcc42a@|b6d246@|7ed238@|70c438@|70b638*|000000     |fcd246@|fcc41c@|fcb60e@@@|fca80e@|fcc41c@|e0c438@|a8c438@|7ed238@@@|70b62a%|000000  |fcc446@|fcc41c@|fcb60e@|fcb61c@|d28c1c%|c47e1c%|d28c1c%|fca81c@|fca80e@|fcc40e@|fcc42a@|b6c438@|c4d254@|eed246@|fcd238@|fcc41c@|fcb60e@|fca80e@|d28c1c%|a8620e%|9a620e%%|a8620e%|c47e1c%|fca80e@|fcb60e@|fcc40e@|fcc42a@|eec446@|a8d246*|000000 |d2d254%|fcd238@|fcc41c@|fcb60e@|fcb61c@|e09a2a@|d28c1c%|c48c1c%|e09a2a@|fca81c@|fcb60e@|fcc42a@|fcd246%|fce062+|000000    |fce062=|fcc438%|fcb61c@|fca80e@|ee9a1c@|ee9a0e@|fca81c@|fcb60e@|fcc438@|000000     |e0d254+|fcc42a@|fcb60e@|d28c1c%|b67e1c%|e09a1c%|fcb60e@|fcc438@|a8d246%|7ed246##|7ec446=
+000000     |a8d254=|fcc446@|fcb60e@|e09a1c@|b6701c%|b67e1c%|fca81c@|fcc41c@|d2c446@|70c438@|7ec438@|7ec446@|7ec438%%%#|eed246@|fcc42a@|fca80e@|e09a1c@|a8700e%|a8620e%|c47e1c%|fca80e@|fcc41c@|fcc446@|7ec438@|70b62a@|70c438@|7ec438@@|d2d246@|fcc438@|fcb60e@|fca80e@|e09a1c%|a8620e%|9a620e%%|c47e1c%|fca80e@|fcb60e@|fcc42a@|eec446@|8cc446+|b6c446*|eec438@|fcc41c@|fcb60e@|fca80e@|fcb62a@|d28c1c%|b67e1c%%|c48c1c%|eea82a%|fca80e@|fcb60e@|fcb61c@|fcc438@|fcd246*|fce070=|000000   |fcd246@|fcd22a@|fcb61c@|fcc41c@|fcb60e@@|fcb61c@|fcc42a@|fcc438*|fcd254#|000000       |fce062=|fcd246+|fcc438@|fcd22a@|fcc42a@|fcd238@|eec454=|fce054=|000000      |fcd254+|fcc438#|fcc42a@|fcc41c@|fcc42a@|fcd22a%
+000000       |fcd238#|fcc42a@|fcb61c@|fcc41c@|fcc42a@|fcd254%|000000        |eed262+|fcd238@|fcb60e@|fca81c@|d28c1c%|c47e0e%|e09a1c@|fcb60e@|fcc41c@|fcd246#|000000     |fcd254@|fcd238@|fcc41c@|fcb60e@|fca81c@|e09a2a@|d28c0e%|d28c1c%|fcb62a@|fcb60e@|fcc41c@|fcc438%|fce054*|000000 |fce062#|fcd246#|fcc438*|fcc42a@|fcc41c@|fcb60e@@|fca80e@|fcb60e@|fca80e@|fcc40e@|fcc42a@|fcc438%|fcd238@|fce054@|000000       |fce054*|fcd246#|eec446#|fce046@|e0b646*|fcd254*
+000000                       |fcd238@|fcb62a@|fcc41c@|fcb61c@|fcc41c@|fcb62a%|fcd246%|000000        |fcd246@|fcc42a%@|fcc41c@|fcb60e@@|fcc41c@|fcc438@|fcd246+|fce062+|000000    |fce062+|fce054@|fcc438#|eec438@|fcd22a@|fcb62a@|fcc42a@|fcd22a@|eeb638@|fcd246@|fce062%
+000000                         |fce062=|000000 |fce054=|000000            |fce054*|eec454+|fcd254##|eec454+|000000           |fce062+|eec454==|fce062#
+`,
+        plano: `
+                                                       =- # -+           **#+ +
+        -=                                          #+=@%#@*%@- =      %###%*%%*%#*+:  ==@#%*+  =*#=
+      +*#*= -:                           #*@=+=  -*##%%*#*#*#*%%+    %%##+==**###***+ -##*++*###**+-  #%#%-
+     +*######**=        @*#%*###*=    *%#%*##%****#%%#**=--=**##%%*=#%#**::::*##%#++**%#*=::=#%%*++=*%#+=+#%
+-+=--*%#*++###*+-     %%*##*%#****+  %%#*===**###%%%%#*=::::-*##%%= #%%##+==+*###+    =##*++*##     =##=-+*%*++-
+     -%#+--*##+***+++%%*+::=*#%+++**#%#*+:::-*#%%-=###**=--=**###+=   %%#%*##%*#       =+#%#%-=      =*%###
+       *#####        +%#*==+###     %%##*+==*###* ##+#%#**#*##*%@       ***@=*
+                       %#%#%*#        @#####%%++    =@*#@#%%*%#
+                         = =            *=**=           ==-#
+`
+      },
+      {
+        color: `
+000000                                                         |fcd262=|fce062*|e0b654-|eed254+|fce062*|000000           |fce062*|eec454#|fcc446#|fce054%
+000000        |7ed246+|9ae054+|000000                                          |fce062+|000000 |fcc454#|fcd238@|fcc42a@@|fcd22a@|eeb61c@|fcd22a@|fcc438@|000000 |fcd254+|fce070+|000000      |fcd246@|fcc42a@|fcb61c@|fcc41c@|fcc40e@|fcb61c@|fcc41c@|fcd238@|d2d254#|b6d246@|8cd246@|7ec438@|70c438%|70b646-|000000   |fcd254*|fcd238@|fcb62a@|fcd22a@|eeb638#|fce054*|000000  |7ec438#|7ed238@|8cd246@|7ed246+
+000000      |70c438@|7ec438@|8cd246@|7ed238@|7ec446*|000000 |8cd246=|7ec446-|000000                           |fce054%|eec446%|fcd246@|fcd254*|000000 |fce062+|000000  |70c438*|7ec438%|9ad246@|eec438@|fcd22a@|fcb60e@@@|fca80e@@@|fcb60e@@|fcc41c@|fcc438@|eec454=|000000    |eec454%|fcc42a@|fcb61c@@|eea81c@|d28c1c%%|eea81c@|eeb60e@|fcb60e@|fcc42a@|d2c446@|7ec438@|7ed238@@|70b638@|000000 |eec462=|fcc42a@|fcb60e@|fca81c@|e09a0e%|ee9a0e@|fcb61c@@|fcd238%|d2c446@|70c438@|7ed238@|70c438@|7ec446=|000000  |e0d238@|eec42a@@|fcd238@|e0c446=
+000000     |70b638%|70c438@|d2d246@|c4c438@|fcd238@|e0c438@|c4d246@|9ad246@|7ed238@|70c438@|70b638%|000000        |fce046%|eec438*|fcd246@|d2c438@|a8d246@|9ad246@|8cd246@@|7ec438@|70c438#|000000   |fce054=|fcc454+|fcd238@|fcb61c@|fcb60e@@|fcc40e@|fcb60e@|fcc41c@|fcc446%|fcd254+|a8c446@|70c438@|d2d254@|fcd246@|fcc41c@|fcb60e@|fca80e@|fca81c@|c48c2a%|b6701c%%|b68c1c%|e0a81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|eed246@|a8d246%|7ec438*|b6d246@|fcd238@|fcc41c@|fcb60e@|fca81c@|a8620e%|9a620e%%|a8620e%|eea81c@|fca80e@|fcc41c@|fcd238@|d2d254@|7ec438@|70c438@|7ec446@|8cc446@|fcd246@|fcc41c@|fca80e@|c48c1c%|9a620e%|a8620e%|d28c1c%|fca80e@|fcc41c@|eed246@|7ec438@|70c42a@|70c438%|7ec438*|d2d254%|fcc42a@|fcb60e@|e09a0e%|d28c0e%|e0a81c@|fcb60e@|fcc438@
+8cd254=|7ec438#*++|8cc438@|eed238@|fcb61c@|fca81c@|e08c0e%|ee9a1c@|fcb60e@|fcc42a@|b6d246@|7ed238@|70c438@|70b638*|000000     |fcd246@|fcc42a@|fcb60e@@@@|fcc41c@|c4c438@|b6d246@|7ed238@@@|70b62a%|000000  |fcc446@|fcc41c@|fcb60e@|fcb61c@|d28c1c%|c47e1c%|d28c1c%|fca81c@|fca80e@|fcc40e@|fcc42a@|a8c438@|a8d246@|d2d246@|fcd238@|fcc41c@|fcb60e@|fca80e@|d28c1c%|a8620e%|9a620e%%|a8620e%|c47e1c%|fca81c@|fcb60e@|fcc40e@|fcc42a@|eed246@|c4d254@|7ed246-|e0d254%|fcd238@|fcc41c@|fcb60e@|fcb61c@|e09a2a@|c48c1c%|c47e1c%|e09a2a@|fcb61c@|fcb60e@|fcc42a@|fcd246@|fce070=|000000    |fcd262+|fcd238%|fcb61c@@|ee9a1c@|ee9a0e@|fcb61c@|fcb60e@|fcc42a@|000000     |e0d254+|fcc42a@|fcb60e@|d28c1c%|b67e1c%|e09a1c%|fcb60e@|fcc438@|a8d246%|7ed246##|7ec446=
+000000     |a8d254=|fcc438@|fcb60e@|e09a1c@|b6701c%|b67e1c%|fca81c@|fcc41c@|d2c446@|70c438@|7ec438@|7ec446@|7ec438%%%#|eed246@|fcc42a@|fca80e@|e09a1c@|a8700e%|a8620e%|b68c1c%|fcb60e@|fcc41c@|fcc438@|7ec438@|70b62a@|70c438@|7ec438@@|c4d246@|fcc438@|fcc40e@|fca80e@|e09a1c%|a8620e%|9a620e%%|c47e1c%|fca80e@|fcb60e@|fcc42a@|fcd246@|c4d254+|e0d246=|eec438@|fcc41c@|fcb60e@|fca80e@|fcb62a%|d28c1c%|b67e1c%%|c48c1c%|eea82a@|fca80e@|fcb60e@|fcc41c@|eec438@|fcd246=|000000    |fcd246@|fcc42a%|fcb62a@|fcc40e@|fcb60e@@|fcc41c@|fcb62a@|fcd238#|fcd254%|000000        |fcd246#|eeb638%|fcd22a@|fcb62a%|fcd238@|fcc454+|000000       |fce054+|fcc438%|fcc42a@|fcc41c@|fcb61c@|fcd238@
+000000       |fcd246*|fcc42a@|fcb61c@@|fcc42a@|fcd254#|000000        |eed262*|fcd238@|fcb60e@|fca81c@|d28c1c%|c47e0e%|e09a2a@|fcb60e@|fcc41c@|fcc446#|000000     |fcd254%|fcd238@|fcb61c@|fcb60e@|fca81c@|ee9a1c@|d28c1c%|e08c0e%|fca82a@|fcb60e@|fcb61c@|fcd238@|fcd254%|000000 |fce062*|fcd246@|fcd238%|fcc438%|fcc41c@|fcb60e@|fca80e@|fcb60e@|fca80e@@|fcb60e@|fcc41c@|fcc438@|fcd238#|fce054%|000000       |fce054#|eec446*|fcd246%%|eec446#|fce054*
+000000                       |fcd246@|fcb62a@|fcc41c@|fcb61c@|fcc41c@|fcc438@|fcd246*|fce062=|000000      |fce062+|fcd246@|fcc438%|fcc41c@|fcb61c@|fcc40e@|fcb60e@|fcc41c@|fcc438%|fcd246#|fce062=|000000     |fce054@|fcd238@|eeb638%|fcd22a@|fcc42a@@|fcd22a@|eeb638@|fcc446@|fce054@
+000000                         |fce062=|000000              |fce054+|e0c454=|fce054@|eec446*|eed254*|000000           |fce062*|eec454==|fce062*
+`,
+        plano: `
+                                                         =*-=*           ***%
+        -=                                          + *@#%%#@% ++      %%####%%*%#*+:   +%#@+*  =*#=
+      +*#*= -:                           %#%+ +  -*##%#*#****#%%-    #%##+==+*#%#***+ -%#*++####**+-  %##%-
+     ++%*%###**+        %+@#####*=   ==%##*#*%#=**%%%#**=--=**#%%%*=#%#**::::**#%%*+**%#*=::=*%%*++=#%#+=+#%
+-+=--*%#*=+*%#*+-     %%**#*###***+  ###*===**##*#%%##*=::::-**#%%#:#%##*+==+##%%=    +##*++*#%     =##=-+#%*++-
+     -%#+--*%#+***+++%%*+::=*#%+++**#%#*+:::-*#%%==###**=--=**###-    @#####%#*#        **@*@+       =*%##%
+       +%##%*        +%#*==+*#*     %%##*+==*##%# *@####*#**#%#*%       #+##**
+                       @#%#%#+=      +%*%#%*%**=     @%*@##@#%@
+                         =              +-%++           *--*
+`
+      },
+      {
+        color: `
+000000                                                         |fce062*|eec454=*|fcd254*|fce062=|000000           |fcd254=#|eec446%|fce054@
+000000        |7ed246+|9ae054+|000000                                            |fcd246@|fcd238@|eeb62a@|fcd22a@|fcc42a@|fcc41c@|fcd22a@|eec438%|fcc446+|fce054%|000000      |fcd246=|fcd254%|fcd22a@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|fcb61c@|fcd238@|d2d254#|9ad246@|8cd246@|7ec438@|70c438%|70b646-|000000   |fcd254%|fcd238@|fcc42a@|fcd22a@|fcc438#|fce054#|000000  |7ec438#|7ed238@|8cd246@|7ed246+
+000000      |70c438@|7ec438@|8cd246@|7ed238@|7ec446*|000000 |8cd246=|7ec446-|000000                         |fce062=|000000 |fce054#|fcc446%%|fce054%|000000 |fce062=|000000  |70c438*|7ec438%|a8d246@|fcd238@|fcd22a@|fcb61c@@|fcb60e@@|fca80e@|fcb60e@|eea80e@|fcb60e@|fcc41c@|fcc438@|fcc454=|000000    |eec454#|fcc42a@|fcb60e@|fcb61c@|eea81c@|d28c1c%|d28c0e%|e09a1c@|eeb60e@|fcb60e@|fcc42a@|eed246@|7ec438@|7ed238@@|70b638%|000000 |eed254+|fcc42a@|fcb61c@@|e09a0e%|ee9a0e%|fcb61c@|fcc42a@|fcd238@|c4c446@|70c438@|7ed238@|70c438@|7ec446=|000000  |eed246@|e0c42a@|fcc42a@|eec438@|eed254=
+000000     |70b638%|70c438@|c4d246@|c4c438@|fcd238@|e0c438@|d2d246@|8cd246@|7ed238@|70c438@|70b638%|000000       |fce062=|fcd246#|eec438*|fce046@|b6c438@|b6d246@|9ad246@|8cd246@@|7ec438@|70c438#|000000   |fce062*|fcd246+|fcc438@|fcc41c@|fcb60e@@@@|fcc41c@|fcd246@|eec454=|9ac438@|7ec438@|e0d254@|fcd238@|fcc41c@|fcb60e@|fca80e@|fca81c@|c48c2a%|b6701c%%|b68c1c%|eea81c@|fca80e@|fcb60e@|fcc41c@|fcd238@|e0d254@|8cc446*|7ec438*|a8d246@|fcc438@|fcc41c@|fcb60e@|fca81c@|a8620e%|9a620e%%|a8620e%|eea81c@|fca80e@|fcc41c@|fcd238@|e0d254@|7ec438@|70c438@|7ec446@|8cd246@|fcd246@|fcc41c@|fca80e@|c48c1c%|9a620e%|a8620e%|d28c1c%|fca80e@|fcc41c@|e0c446@|7ec438@|70c42a@|70c438%|7ec438+|c4d254%|fcc42a@|fcb61c@|e09a0e%|d28c0e%|e0a81c@|fcb60e@|fcc438@
+8cd254=|7ec438#*++@|eec438@|fcb61c@|fca81c@|e08c0e%|e09a1c@|fcb61c@|fcc42a@|b6c446@|7ed238@|70c438@|70b638*|000000     |fcd246@|fcc42a@|fcb61c@|fca80e@|fcb60e@@|fcc41c@|d2c42a@|c4d246@|7ed238@@@|70b62a%|000000  |fcc446@|fcc41c@|fcb60e@|fcb62a@|d28c1c%|c47e1c%|d28c1c%|eea81c@|fca81c@|fcc40e@|fcc42a@|b6c446@|8cc446@|c4c438@|fcc438@|fcc41c@|fcb60e@|fca80e@|d29a1c%|a8620e%|9a620e%%|a8620e%|c47e1c%|fca80e@|fcb60e@|fcc40e@|fcc42a@|fcd246@|d2d254@|8cd246=|eed254#|fcd246%|fcc41c@|fcb60e@|fca81c@|e09a2a@|c48c1c%%|e09a2a@|fcb61c@|fcb60e@|fcc42a@|fcd246@|000000     |fcd262*|fcd238@|fcc41c@|fcb61c@|ee9a0e@%|fcb62a@|fcb61c@|fcc438@|eed262+|000000    |eed254=|fcc42a@|fcb60e@|d28c1c%|b67e1c%|e09a1c%|fcb60e@|fcc438@|a8d246%|7ed246##|7ec446=
+000000     |a8d254=|fcc438@|fcb60e@|e09a1c%|b6701c%|b67e1c%|fca81c@|fcc41c@|e0c446@|70c438@|7ec438@|7ec446@|7ec438%%%#|eed254%|fcc42a@|fcb60e@|e09a1c%|a8700e%|a8620e%|b68c1c%|fcb60e@|fcc41c@|fcc438@|8cc438@|70b62a%|70c438@|7ec438@|70c438@|b6c446@|fcc438@|fcc40e@|fcb60e@|e09a2a%|a8620e%|9a620e%%|c47e1c%|fca80e@|fcb60e@|fcc42a@|fcd246@|fce062+|fcd254*|fcc438@|fcb61c@|fcb60e@|fca80e@|fcb62a%|d28c1c%|b67e1c%%|c48c1c%|fca82a@|fca81c@|fcb60e@|fcc41c@|fcc438@|000000    |fce062+|fcd246@|fcc438#|fcc42a@|fcb60e@@@|fcc41c@|fcb62a@|fcd238@|fcd262*|000000        |fce046%|eeb638#|fcd238@|fcb62a%|fcd238@|fcd254%|000000        |fcd246@|fcc42a@|fcc41c@|fcb61c@|fcd246@
+000000       |fcd246*|fcc42a@|fcb61c@@|fcc42a@|fcd246*|000000        |e0d262+|fcc438@|fcb61c@|fca81c@|d28c1c%|c47e0e%|ee9a2a@|fcb60e@|fcc41c@|eec446%|000000     |fce054*|fcc438%|fcc41c@|fcb60e@|fca81c@|ee9a1c@|d28c1c%|e09a1c%|fca81c@|fcb60e@|fcb61c@|fcd238@|fcd254%|000000 |fce070=|fcd246@|fcd238@|fcc42a%@|fcc40e@|fca80e@|fcb60e@|fca80e@|fcb60e@@|fcc41c@|fcc42a@|fcc446*|fce054*|fce062=|000000      |fce054*|e0b646+|fce046@|eec446#|fcd246%|fce062+
+000000                       |fcd246@|fcc42a@|fcc41c@|fcb61c@|fcc41c@|fcc438@|fcd254=|fce070=|000000      |fce062#|fcd246#|fcc438%|fcd21c@|fcb61c@|fcc40e@|fcb60e@|fcc41c@|fcc438%|fcd246%|000000      |fcd254%|fcd246@|eeb638@|fcc42a@|fcd22a@|fcb62a@|fcd22a@|fcc438@|eeb638*|fce054%
+000000                            |fce062=|000000           |fcd254=|eec446=|fce054@|eec446*|fcd254*|000000           |fce062*|fcd254+|eec454+|fcd254=|fce062=
+`,
+        plano: `
+                                                         *-++=           -**%
+        -=                                            %%*%##@*=#      -#%*%###%*##*+:   #%#%+#  =*#=
+      +*#*= -:                         = #*#% =  -*#%%##***#*#%#-    *##*+==+*#%%***+ +%##++##%#**+-  %###=
+     ++#*%*##*+=       =*+@*###**=   +=%#*##*%%-**%%##**=---+*#%%%==#%#**::::+*#%%++**%#*=::=*##*++=*#*+=+#%
+-==--+%#*=+*#**+-     %##*#*###***+  ##**=-=**#%#*####*=::::-**#%%%:*###*+==+##%%     +%#*++##%=    =##=-+#%*++-
+     -%#+--*##+**++++##*+::-*##*++*+*%#*+:::-*##%++###**=--=**###    +%*###*%#%*        %*%*%#        %###%
+       *%##%+        =%#*=-+*##     *###*+==*##%# -@%###*#*#*%#+*=      *-@*#+
+                       %####%==      #**%*%*%*%      #%##%#%#+#
+                            -           =-%=*           +====
+`
+      }
+    ]
   },
   {
     cols: 94, alto: 8,
-    color: `
-000000                                                |fcd254+#|eec454+|fcd246#|fcd262+|000000        |fce062=|000000 |fcd254%|eec446#|fcd246%|fcd254+
-000000      |7ec438+|8cd246#|8cd254*|000000                                     |fcd246@|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcd21c@|eeb62a@|fcd246%|fce062#|000000     |fcd246#|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fcb61c@|fcd238@|b6d254%|9ad246@|7ed238@|70c438@|70b646=|000000  |fcd254#|fcc42a@|fcc41c@|fcb61c@|fcc42a@|fcd254*|000000 |7ec438#|7ed238@|8cd238@|000000   |8cd246+|e0d254=
-000000     |70c438@|8cd238@@|a8d238@|9ad254+|9ae046%|7ec438#=|000000                    |fcd254+|fcd238%|fcc438@|fcc42a@@|fcd246@=|000000 |70b638-|70c438@|8cd238@|e0c446@|fcc42a@|fcc41c@|fcb61c@|fca81c@|eea81c@|fca80e@|eea80e@|fcb60e@|fcb61c@|fcd238%|fcd254%|000000   |fcd246%|fcc41c@|fcb60e@|eea82a@|c47e1c%|b67e1c%|c48c1c%|eea80e@|fcb60e@|fcc42a@|c4c446@|70c438@|7ec438@|70c438@|c4d254=|fcc438@|fcb61c@|eea81c@|c47e0e%|d28c0e%|fca81c@|fcc40e@|eec438@|7ec438@@|70c438%|000000  |fcd246%|fcc41c@|fcb61c@|fcc41c@|fcd238#
-000000    |70b638*|a8c438@|e0c438@|fcb61c@@|fcc42a@|d2d238@|b6d246@|7ec438@|70b638%|000000      |fcd238@|fcb62a@|fcc41c@|fcb61c@|fcd238@|9ad238@|9ad246@|7ed238@|70c438@|70b638#|000000  |fcc446@|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcb60e@|fcc41c@|fcd246#|b6c446@|8cd246@|eed246@|fcc42a@|fcb60e@|fca80e@|eea81c@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcc438@|d2d246@|8cd246@|a8d246@|fcd238@|fcc41c@|fca80e@|e09a1c%|a8700e%|9a620e%|b67e1c%|fca81c@|fcb60e@|fcc42a@|fcd254%|b6d254=|7ec446==|eee054=|fcc438@|fcb60e@|eea81c@|b67e1c%%|eea81c@|fcb60e@|fcc438@|9ad246*|70c438*|7ec446#|9ad246#|eec438@|fcb60e@|d28c1c%|a8620e%|d29a1c%|fcb60e@|eec446@|7ec438=
-000000 |7ec438=+*|9ad246#|fcc438@|fcb60e@|c48c1c%|a8620e%|e09a1c%|fcb60e@|d2c438@|70c438@@|7ec446*|7ec438==|8cc438-|eed254#|fcc42a@|fcb61c@|d29a1c%|c47e0e%|d29a1c%|fcb60e@|fcc41c@|b6c446@|70c438%|7ec438@|70c438@|7ec446#|eed246@|fcc41c@|fcb60e@|eea81c@|a8700e%|9a620e%|a8700e%|ee9a1c@|fcb60e@|fcc41c@|fcc438@|c4c446@|fcd246@|fcc42a@|fcb60e@|fca80e@|eea81c@|a8701c%|9a620e%|a8620e%|c47e1c%|fca81c@|fcb60e@|fcc41c@|fcc438@|fcd254+|000000  |fce070+|fcd238@|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcb60e@|fcc42a@|fcd254*|000000      |fcd246#|fcc41c@|fcb61c@@|fcc42a@|fcc446*|fce054+|000000    |fcd254=|fcc42a@|fcb61c@|fca81c@|fcb62a@|fcc42a%|fcd246*
-000000     |fcd254=|fcc438@|fcb61c@|fca81c@|fcc42a@|fcc438%|fcd254+|000000      |fcd254*|fcc41c@|fcb60e@|c48c1c%|b6701c%|d28c1c%|fcb60e@|fcc41c@|eed246%|7ec438=|7ec446=|70c438=|a8d246=|fcd246#|fcc42a@|fcb60e@|fca81c@|d28c1c%|c47e1c%|c48c1c%|fca81c@|fcb60e@|fcc42a@|fcd254%|000000  |fcd246@|fcc42a@|fcb61c@@|fca80e@|fca81c@|fca80e@@|fcb60e@|fcb61c@|fcc438%|fce054*|000000     |fce054%|fcc438*|fcd238@|fcc438@|fcd246@|eec446+|fcd254=|000000                     |fcd254=
-000000                   |fcd254=|fcd238@|fcb61c@|fcc41c@|fcb61c@|fcd246@|fcd238=|000000      |fcd246#|fcc438%|fcc41c@|fcb60e@@|fcc41c@|fcb61c@|fcd238@|fcd262+|000000     |fcd246@|fcc42a@|fcb62a@|fcd21c@|fcb61c@|fcd22a@|eeb638#|fcd246#|fce062*
-000000                      |fce062=|000000            |fcd254*|fcd246#|fcc454*|fce062=|000000         |fcd254+|fce054#|eec454=|fcd262=
+    marcos: [
+      {
+        color: `
+000000                                                 |fcd254*|eec446#|fcd254#|000000          |eec454=|fcd254#|eec446#|fcd246%|fcd262=
+000000      |7ec438+|8cd246#|8cd254*|000000                                   |fce062=|000000 |fcd246@|fcd22a@|fcb61c@|fcd21c@|fcb61c@|fcd21c@|eeb62a@|fcd238@|fcd254@|000000     |fcd246#|fcc438@|fcc41c@|fcb60e@@@|fcb61c@|fcc42a@|c4d254@|9ad246@|7ed238@|70c438@|70b646+|000000  |fcd254#|fcc42a@|fcc41c@|fcb61c@|fcd22a@|fcd262=|000000 |70c438#|7ed238@|8cd238@|7ec446-|000000  |8cd246+|d2d254=
+000000     |70c438@|7ed238@|8cd238@|a8d238@|8cd254=|8cd246%|7ec438#=|000000                    |fcd262=|fcd246%|fcc438%@@|fcd246@=|fce062+|70b638-|70c438@|8cd238@|e0c438@|fcc42a@|fcb61c@@|fca81c@|eea81c@|fca80e@|eea80e@|fcb60e@@|fcc438%|fcd246@|fce070=|000000  |fcd246%|fcc41c@|fcb60e@|eea82a@|c47e1c%|b67e1c%|c48c1c%|eea80e@|fcb60e@|fcc42a@|b6c446@|70c438@|7ec438@|70c438@|a8d246=|fcc438@|fcb60e@|eea81c@|c47e0e%|d28c0e%|fca81c@|fcc41c@|fcc438@|7ec438@@|70c438%|000000  |fcd238%|fcc41c@|fcb61c@|fcc42a@|fcd246*
+000000    |70b638*|a8c438@|e0c438@|fcb61c@@|fcc42a@|c4d238@|a8d246@|7ec438@|70b638%|000000      |fcd246@|fcb62a@|fcc41c@|eec42a@|eed238@|8cd238@|8cd246@|7ed238@|70c438@|70b638#|000000  |fcd246@|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcb60e@|fcc41c@|fcd238%|c4c446@|8cd246@|e0d246@|fcd22a@|fcb60e@|fca80e@|eea81c@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcc438@|c4d246@|8cd246@|a8d246@|fcd238@|fcc41c@|fca80e@|e09a1c%|a8620e%|9a620e%|b6701c%|fca81c@|fcb60e@|fcc42a@|fcd254#|a8d254=|7ec446==|c4d262=|fcc438@|fcb60e@|eea81c@|b67e1c%%|eea81c@|fcc40e@|fcc438@|9ac446*|70c438*|7ec446#|7ed246#|eec446@|fcb60e@|d28c1c%|a8620e%|d29a1c%|fcb60e@|eec446@|7ec446=
+000000 |7ec438+**|7ec446#|eec438@|fcb60e@|c48c1c%|a8620e%|e09a1c%|fcb60e@|d2c438@|70c438@@|7ec446+|7ed246-|000000  |e0c446#|fcc42a@|fcb61c@|e09a1c%|d28c0e%|e09a1c@|fcb60e@|fcc42a@|b6c446@|70c438@|7ec438@|70c438@|7ec446*|eed254@|fcc42a@|fcb60e@|eea81c@|a8701c%|9a620e%|a8700e%|ee9a1c@|fcb60e@|fcc41c@|e0d246@|b6c446@|eed246@|fcc42a@|fcb60e@|fca80e@|e0a81c@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcc438@|fcd254=|000000  |fcd262+|fcc42a@|fcc41c@|fcb61c@|fca80e@@|fcb61c@|fcb60e@|fcc42a@|fcd246*|000000      |fcd246#|fcc41c@|fcb61c@@|fcc41c@|fcc446#|fce054+|000000    |fcd254=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|eed254*
+000000     |fcd254+|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|eed254+|000000   |7ec438-=|7ec446=|eed254#|fcc41c@|fcb60e@|c47e1c%|a8701c%|c48c1c%|fcb60e@|fcc41c@|eed246%|70c438+++|a8d246*|fcd246%|fcc42a@|fcb60e@|fca81c@|d28c1c%|b67e1c%|c47e1c%|fca81c@|fcb60e@|fcc42a@|fcd254%|000000  |fcc438@|fcc41c@|fcb61c@@|fca80e@|fca81c@|fca80e@|fca81c@|fcb60e@|fcb61c@|fcc438%|fcd246%|000000     |fce054#|fcc438#|fcd238@|fcc438@|fcd238@|eec446*|fce054=|000000                     |fcd246+
+000000        |fcd254+|000000          |fcd246+|fcc438@|fcb61c@|fcb60e@@|fcc42a@|fcd246*|000000      |fcd246%|fcc438%|fcc41c@|fcb60e@@@|fcb61c@|fcd238@|fcd262+|000000   |fce054=|000000 |fcd246@|fcc42a@|fcb61c@|fcd21c@|fcb61c@|fcd22a@|eeb638%|fcd246#|fce062=
+000000                      |fce054+|000000 |fce054=|000000         |fcd254=*|fcd246%|fcc446#|fce054+|000000         |fcd262=|fcd254*|eec454+|fcd254+
 `,
-    plano: `
-                                                =#=*+        = %+#=
-      -+=                                     %%*%*%*#*     *##**##%*#*+:  *%##%+ =**   =-
-     +***-*=-                    =##%#%- :+*#%##*+++*###   ##*+--=*###+++-##*-=*##+++  ####*
-    -*#*####*+      %#%*%*#*+=  %##****#***%%#*+:::-**###**%#*+::-*###-::=##+--+##===+#*=:=##-
- :-=+#*=:+##++=-::*#*=-+*#*+++=%#*+:::+*###%##*+:::-**##=  =%##***##+      *##*%+=    -##*##+
-     -##*#*+      +#*=-=*#*--:-*##*=-=**##  %%##****##**     #+%#%=-                     =
-                   =%*##%-      **%*##*%+     %##%*%+**
-                      -            +*+-         =*--
+        plano: `
+                                                 ++#          -**#=
+      -++                                   = %%#%#%*%@     ##%#*##%##*+-  *%##%= =**:  =-
+     +***-*=-                    -##%%#==:+*#%##****###%-  ###*--=*#%*+*+-%#*==*##**+  ####+
+    -*######*+      %#%#%*#*+=  %%#****###*%%#*+:::-*####*#%#*+::-*##*-::=%#+--+#%==++##=:=##-
+ -==+#*=:+##++-:  *#*+=+*%*+**=%#*+:::+##%#%%#*+:::-*###=  +%##**###+      *%#*%*=    =##+##+
+     =##*##=   ::-*##-:=*##---=###*=--**##  #%##****####     **%#%+-                     +
+        =          =%###%+      %*%*###%=   = %%#%#%*#=
+                      + -         =+#*=         =*=+
 `
+      },
+      {
+        color: `
+000000                                                |fce062+|eec454+#|fce054%|000000          |fcd254+|fcd246*#|fcc446%|fce054*|000000          |fce062=
+000000      |7ec438+|8cd246#|8cd254*|000000                                     |fcd238@|fcc42a@|fcc41c@@@@|fcb62a@|fcd238@|fcd254*|000000     |fcd246@|fcc42a%|fcc41c@|fcb60e@@@|fcb61c@|fcd22a@|c4d246@|8cd246@|7ed238@|70c438@|70b646+|000000  |fcd254%|fcc42a@|fcc41c@|fcb61c@|fcd238@|fcc454=|000000 |70c438#|7ed238@|8cd238@|7ec446-|000000  |9ad246+|c4d254=
+000000     |70c438@|8cd238@|8cd246@|a8d238@|9ad254=|8cd246%|7ec438#=|000000                     |fcd246@|eeb638%|fcd238@|fcc438@|fcd246@|000000 |fce062+|70b638-|70c438@|8cd238@|fcd246@|fcc42a@|fcb61c@@|fca81c@|eea80e@|fca80e@|eea80e@|fcb60e@|fcb61c@|fcd22a@|fcd254@|000000   |fcd254@|fcc41c@|fcb60e@|eea81c@|c47e1c%|b67e1c%|c48c1c%|fca80e@|fcb60e@|fcc42a@|c4c446@|70c438@|7ec438@|70c438@|b6d254*|fcc438@|fcb61c@|fca81c@|c47e1c%|d28c0e%|fca81c@|fcc41c@|eec438@|8cc438@|7ec438@|70c438%|000000  |fcc438%|fcc41c@|fcb61c@|eeb61c@|fcd246*
+000000    |70b638*|a8c438@|e0c438@|fcc41c@|fcb61c@|fcc42a@|c4d238@|9ad246@|7ec438@|70b638%|000000      |fcd238@|fcb62a@|fcc41c@|eec42a@|e0d238@|9ad238@|8cd246@|7ed238@|70c438@|70b638#|000000  |fcc446@|fcc41c@|fcb61c@@|fca80e@|fcb61c@|fca80e@|fcc41c@|fcc438%|b6c446@|9ad246@|eed246@|fcc42a@|fcb60e@|fca80e@|eea81c@|a8700e%|9a620e%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcc438@|e0d246@|9ad246@|b6d246@|fcd238@|fcc41c@|fca80e@|e09a1c@|a8620e%|9a620e%|b6701c%|fca81c@|fcb60e@|fcc42a@|fcd246#|a8d254=|7ec446==|c4d254=|fcc438@|fcb60e@|eea81c@|b67e1c%%|eea81c@|fcb60e@|fcc438@|8cc446*|70c438*|7ec446#|7ed246#|eec446@|fcb60e@|d28c1c%|a8620e%|d28c1c%|fcb60e@|fcd246@|7ed246=
+000000 |7ec438+**|7ec446#|eec438@|fcb60e@|c48c1c%|a8620e%|e09a1c%|fcb60e@|e0c438@|70c438@@|7ec446+|7ed246-|000000  |eed254@|fcc42a@|fcb61c@|e09a0e%|d28c0e%|e09a1c@|fcb60e@|fcc42a@|b6c446@|70c438@|7ec438@|70c438@|7ec446*|eed246@|fcc42a@|fcb60e@|eea81c@|a8701c%|9a620e%|a8700e%|ee9a1c@|fcb60e@|fcc41c@|e0c446@|9ac438@|e0d246@|fcc42a@|fcb60e@|fca80e@|e0a81c@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcc438@|000000   |fcd254%|fcd22a@|fcc42a@|fcb61c@|fca80e@@|fcb60e@|fcc41c@|fcc42a@|fcd246#|000000     |fce062=|fcc438*|fcc42a@|fcb60e@|fcb61c@|fcc41c@|fcc446%|000000     |fcd254=|fcc438@|fcb61c@|eea80e@|fcb61c@|fcc42a@|e0d254*
+000000     |fcd254+|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|e0d254+|000000   |7ec438-=|7ec446=|eed254#|fcc41c@|fcb60e@|c47e1c%|a8701c%|c48c1c%|fcb60e@|fcc41c@|e0d246%|70c438+++|b6d246+|fcd246#|fcc42a@|fcb60e@|fca81c@|d28c1c%|b67e1c%|c47e1c%|fca81c@|fcb60e@|fcc42a@|fcd246#|000000  |fcc446%|fcc41c@|fcb60e@|fcb61c@@|fca80e@@|fcb61c@|fcb60e@|fcc41c@|fcc438%|fcd246*|fce062=|000000    |fcd254%|eeb638#|fcd238@|eeb638@|fcd238@|eeb646+|fce062+|000000          |fce054=|000000          |fcd246+=
+000000        |fcd254==|000000         |fcd246*|fcc438@|fcb61c@|fcb60e@@|fcc42a@|fcd246*|000000     |fce062=|fcd246#|fcc438%|fcc41c@|fcb60e@@@|fcb61c@|fcd238@|fcd254=|000000   |fce062*|fcc446=%|fcd22a@|fcb61c@|fcd21c@|fcb61c@|fcd22a@|fcc438%|fcd246+|fce062+
+000000                      |fce054+|000000            |fcd254%|fcc446#|fcd246#|000000           |fce054%|eec446=|eed254+
+`,
+        plano: `
+                                                +=+%          ++*#*          =
+      -++                                     @####%#@*     %##*###%##*+-  ##%#%- =**:  =-
+     +**#-*=-                     %*%#% +:+*%%##*+**##%%   %#**--=*#%#+*++%#*==*##**+  *###+
+    -*######*+      %#%#%##*+=  %##****###*%%#*+:::-*##%%*#%#*+::-*###-::-%#+--+#%==++##=:=#%-
+ -==+#*=:+##++-:  ###+=+*%*+**=%%**:::+###*#%#*+:::-*###   #%##***##*     =+%*###     =%#*##+
+     =%**##=   ::-*#*-:=#%#---=*##*=-=*#%*  ###*****###*=    #+%#%=+          =          =-
+        =-         +###*%+     =*#%**##%-   *-#%*%#%#++
+                      +            #*#           %-=
+`
+      },
+      {
+        color: `
+000000                                                |fce054*|eec454*|fcd246*|fce062#|000000          |fcd254*|eec446*|fcd246%|eec446#|fce054%|000000          |fce062=
+000000      |7ec438+|8cd246#|8cd254*|000000                                    |fcd262*|fcd238@|eeb62a@|fcd22a@|fcb61c@|fcc41c@|fcb61c@|fcc42a@|fcd238@|000000      |fcd246@|fcc42a@|fcc41c@|fcb60e@@@|fcb61c@|fcd22a@|e0d246@|8cd246@|7ed238@|70c438@|70b646+|000000  |fcd246@|fcb62a@|fcc41c@|fcb62a@|fcd238@|fcd246=|000000 |70c438#|7ed238@|8cd238@|7ec446-|000000  |a8d246+=
+000000     |70c438@|8cd238@|9ad246@|9ad238@|a8d254+|8cd246%|7ec438#=|000000                     |fcd254@|eec438@|fcd238@|eeb638@|fcd246@|000000  |8cc446=|70c438@|a8d246@|fcd246@|fcc42a@|fcb61c@@|fca81c@|ee9a0e@|eea80e@|fca80e@|fcb60e@|fcb61c@|fcd22a@|fcd246@|000000   |fcd246@|fcc41c@|fcb60e@|eea81c@|c47e1c%|b67e1c%|c48c1c%|fca80e@|fcb60e@|fcc42a@|d2d246@|70c438@|7ec438@|70c438@|c4d254#|fcc438@|fcb60e@|fca81c@|c47e1c%|d28c1c%|fca81c@|fcc41c@|eec446@|9ac446@|7ec438@|70c438%|000000  |eec438%|fcc41c@|fcb61c@|eeb61c@|fcd246#
+000000    |70b638*|a8c438@|e0c42a@|fcc41c@|fcb61c@|eeb61c@|c4d238@|9ad246@|7ec438@|70b638%|000000     |fcd262=|fcd238%|fcc42a@|fcc41c@|fcc42a@|d2c438@|b6d246@|8cd246@|7ed238@|70c438@|70b638#|000000  |fcc446%|fcc41c@|fcb60e@|fcb61c@|fca80e@|fcb60e@@|fcc41c@|fcc438@|a8c438@|9ad246@|eed246@|fcc42a@|fcb60e@|fca80e@|eea81c@|a8700e%|9a620e%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|eed254@|9ad246@|b6d246@|fcd238@|fcc41c@|fca80e@|e09a1c@|a8620e%|9a620e%|b6701c%|fca80e@|fcb60e@|fcc42a@|fcd246%|a8d254+|7ec446==|b6d254+|fcc438@|fcb60e@|ee9a1c@|b67e1c%%|ee9a1c@|fcb60e@|fcc438@|8cc446#|70c438*|7ec446#|7ed246#|eed246@|fcb60e@|d28c1c%|a8620e%|d28c1c%|fcb60e@|fcd246@|7ed246=
+000000 |7ec438+**|8cc446#|eec438@|fcb60e@|d28c1c%|a8620e%|e09a1c%|fcc40e@|e0c446@|70c438@@|7ec446+|7ed246-|000000  |eed254@|fcc42a@|fcb60e@|e09a0e%|d28c0e%|e09a1c%|fcb60e@|fcc42a@|b6c446@|70c438@|7ec438@|70c438@|7ec446*|eed254%|fcc42a@|fcb60e@|eea81c@|a8700e%|9a620e%|a8700e%|ee9a1c@|fcb60e@|fcc41c@|eec446@|7ec438@|c4c438@|fcc42a@|fcb60e@|fca80e@|e09a1c@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcc438@|eed262=|000000  |fcd254%|fcd22a@|fcc42a@|fcb60e@|fcb61c@|fca80e@|fcb61c@|fcc41c@|fcc42a@|fcd246%|000000     |fcd262=|fcd238#|fcc42a@|fcb60e@|fcc41c@|fcb61c@|fcd238@|000000     |fcd254=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|eed254+
+000000     |fcd254=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|e0d254+|000000   |7ec438-=|7ec446=|e0d254#|fcc41c@|fcb60e@|c47e1c%|a8701c%|c48c1c%|fcb60e@|fcc41c@|e0c446@|70c438+++|a8d254+|fcd246#|fcc42a@|fcb60e@|fca81c@|c48c1c%|b67e1c%|c48c1c%|fca81c@|fcb60e@|fcc42a@|fcd246#|fce062=|fce054+|fcc446#|fcc41c@|fcb60e@|fca80e@|fcb61c@|fca80e@|eea80e@|fcb61c@|fcb60e@|fcc41c@|fcc438@|fcd246=|fce062=|000000    |fcd246#|eec438#|fcd238@|fcc438@|fcd238@|eec446*|fce062=|000000          |fce054+|000000          |fcd246=|fcd254+
+000000        |fcd254=+|000000         |fcd246#|fcc42a@|fcc41c@|fcb60e@|fcb61c@|fcc41c@|fcd246*|000000     |fce062+|fcd246+|fcc438@|fcc41c@|fcb60e@@@|fcc41c@|fcc446@|fcd246=|000000   |fce062#|fcd246*|eec446*|fcd22a@|fcb61c@|fcc41c@|fcb61c@|fcc42a@|fcd246@|000000 |fce062+
+000000                      |fcd246=|000000            |fce046%|eec446#|fcd246%|000000         |fcd262=|000000 |fce054#|fcc454+|eec454+
+`,
+        plano: `
+                                                *++*          *=#+#          =
+      -++                                    *%#%#%##%      %##*###%%**+-  %#%#%- =**:  =-
+     +*#*=*=-                     @#%#%  :+#%%##*+***#%%   %#**--=*#%#+*++%#*-=*##**+  ####*
+    -*######*+     =###%##**+=  ##*#***##**%%#*+:::-**#%%*#%#*+::-*###=::=%#+--+#%+=++%*=:=#%-
+ -==+#*=:+##++-:  %%*+=+*##+**-#%#+:::+*##+###*+:::-**#%-  %%##***###     =*#*##%     -%**##=
+     =%**##=   ::-*#*-:=*%#---=*##*=-=*##*=+*##***+####=-    *+%#%+=          +          ==
+        -=         ####*%+     ++%##*##%=   *++%#%#%% +
+                      -            %+#         - #==
+`
+      },
+      {
+        color: `
+000000                                                |fcd254+|eec454*|fce054#|fcd262=|000000 |fce062=|000000        |fcd254*|eec446*|fce046@|eeb646*|fce054#
+000000      |7ec438+|8cd246#|8cd254*|000000                                    |fcd254@|fcd238@|eeb62a@|fcd22a@|fcb61c@|fcd21c@|eeb61c@|fcd22a@|fcd246@|000000      |fcd254@|fcc42a@|fcb61c@|fcb60e@@@|fcc41c@|eed22a@|eed246@|8cd246@|7ed238@|70c438@|70b646+|000000  |fcd246%|fcb62a%|fcc41c@|fcc42a@|fcc438@|fcd246+|000000 |70c438#|7ed238@|8cd238@|7ec446-|000000  |b6d246+|9ac446=
+000000     |70c438@|7ed238@|9ad246@|8cc438@|a8d254+|8cd246%|7ec438#=|000000                     |fcd246%|fcc438@|fcd238@|fcc438@|fcd238@|fcd254+|000000 |8cc446=|70c438@|b6d246@|fcd246@|fcc42a@|fcb61c@|fcb60e@|fca81c@|ee9a0e@|eea80e@|fcb60e@|eeb60e@|fcc41c@|fcd22a@|fcd254#|000000   |fcd246@|fcc41c@|fca80e@|eea81c@|c47e1c%|b67e1c%|c48c1c%|fca80e@|fcb60e@|fcc42a@|d2d246@|70c438@|7ec438@|70c438@|d2d254#|fcd238@|fcb60e@|fca81c@|c47e1c%|d28c1c%|fca81c@|fcc41c@|eec438@|9ac446@|7ec438@|70c438%|000000  |eec438@|fcc41c@|fcb61c@@|fcd246#
+000000    |70b638*|9ac438@|e0c42a@|fcc41c@|fcb61c@|eeb61c@|d2d238@|8cd246@|7ec438@|70b638%|000000     |fce054*|fcc438#|fcc42a@|fcb61c@|fcd22a@|c4c438@|b6d246@|7ed238@@|70c438@|70b638#|000000 |fce062=|fcc446#|fcc41c@|fcb60e@|fcb61c@|fca80e@@|fcb61c@|fcc41c@|fcc438@|8cc438@|9ad246@|e0d246@|fcc42a@|fcb60e@|fca80e@|eea82a@|a8700e%|9a620e%|a8620e%|b67e1c%|fca80e@@|fcc41c@|fcd238@|eed254@|8cd246@|b6d246@|fcd238@|fcc41c@|fcb60e@|e09a2a@|a8620e%|9a620e%|b6701c%|fca81c@|fcb60e@|fcc42a@|eed246@|9ad254+|7ec446==|b6d254+|fcc438@|fcb60e@|ee9a1c@|b67e1c%%|ee9a1c@|fcb60e@|fcd238@|9ac446#|70c438*|7ec446#|7ed246#|fcc446@|fcb60e@|d28c1c%|a8620e%|d28c1c%|fcb60e@|fcd246@|7ec438=
+000000 |7ec438+**|8cc446#|fcc438@|fcb60e@|d28c1c%|a8620e%|e09a1c%|fcc40e@|e0d246@|70c438@@|7ec446+|7ed246-|000000  |fcd254%|fcc42a@|fcb60e@|e09a0e%|d28c0e%|e09a1c%|fcb60e@|fcc42a@|c4d246@|70c438@|7ec438@|70c438@|8cc446*|fcd254#|fcc42a@|fcb60e@|eea81c@|a8700e%|9a620e%|a8700e%|ee9a1c@|fca80e@|fcc41c@|eed246@|7ec438@|c4c438@|fcc42a@|fcb60e@|fca80e@|e09a2a@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcd238@|fcd262*|000000  |fcd246%|fcd238%|fcc41c@|fcb60e@|fcb61c@|fca80e@|fcb60e@|fcc42a@@|fcd246@|000000     |fcd262=|fcd238%|fcc42a@|fcb61c@|fcc41c@|fcb61c@|fcd238@|000000      |fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|fcd254=
+000000     |fce062=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|eed254=|000000   |7ec438-=|7ec446=|e0d254%|fcc41c@|fca80e@|c47e1c%|a8701c%|c48c1c%|fca80e@|fcc41c@|e0d246@|70c438+++|9ad246+|eed246%|fcc42a@|fcb60e@|fca81c@|c48c1c%|b67e1c%|c48c1c%|fca81c@|fcb60e@|fcc42a@|fcd246#|fce062+|fce054#|fcd238#|fcb61c@|fcb60e@|fca80e@|fcb61c@|ee9a0e@|eea81c@|fcb61c@|fcb60e@|fcc41c@|fcc438@|fcc454-|000000     |fcd246+|fcc446%|fcd238@|fcc438@@|fcd246%|000000           |fce054+|000000          |fcc446=|fcd254+
+000000         |fcd254+|000000         |fcd254%|fcc42a@|fcc41c@|fcb60e@|fcb61c@|fcc41c@|fcd246%|000000     |fce062+|fcd246+|fcc438@|fcb61c@|fcb60e@@@|fcc41c@|fcc438%|fcd246*|000000   |fce062+|fcd246%|eec438*|fcc42a@|fcc41c@@@|fcc42a@|fcd238@
+000000                     |fcd254=|000000 |fce054+|000000           |fcd246#|eec446#|fcd254%|000000         |fce062+|eec454=|fcd254+|fce054#
+`,
+        plano: `
+                                                ++#- =        *+%=#
+      -++                                    @%*%*%*%%      %%#####%%**+-  %*%##+ =**:  =-
+     +*#*=*=-                     ##%#%+ :+#%###*+***#%*   %#**--=*###+*++%#*==*##**+  ####*
+    -*#####**+     +*##%##**+= =*#*#**##%+#%##*+:::-**#%%*#%#*+::-**#%=::=%#+--+#%+=++%#=:=#%:
+ -==+%*=:+##++-:  ###==+###+**=*%#*:::+*#%+*##*+:::-**#%*  ###****##%     -#####%      %***#=
+     -#**##=   ::-*#*-:=*##----*##*=-=*##*=#*##*#+*#*%#-     +#%%%*           =          -+
+         =         ###*#%#     ==%##*#%#+   +#+%####%
+                     - +           #+%         +-=*
+`
+      },
+      {
+        color: `
+000000                                               |fce062=|eed254+|eec454+|fce054%|000000 |eec454=|fce062+|000000        |fce054+|eec446#|fcd246%|eec446*|fcd246*|fce062=
+000000      |7ec438+|8cd246#|8cd254*|000000                                    |fce046@|fcc438%|fcc42a@|fcd21c@|fcb61c@|fcc41c@|fcb61c@|fcd22a@|eec446#|fcd246-|fce062=|000000    |fcd254#|fcc42a@|fcb61c@|fcb60e@@@|fcc41c@|eed238@|eed246@|8cd246@|7ed238@|70c438@|70b646=|000000  |fcd238#|fcc42a@|fcc41c@@|fcc42a@|fcd246*|000000 |70c438#|7ed238@|8cd238@|7ec446-|000000  |b6d254+|8cc446=
+000000     |70c438@|7ed238@|a8d246@|7ec438@|b6d254+|8cd246%|7ec438#=|000000                    |fcd246=|fcc446#|fcd238@|fcc438@@@|fcd254%|000000 |8cc446=|70c438@|b6d246@|eed238@|eec42a@|fcb60e@|fca80e@|fcb61c@|ee9a0e%|eea80e@|fcb60e@|eeb60e@|fcc40e@|fcc42a@|eec454+|000000   |fcd246@|fcc41c@|fcb60e@|eea81c@|b67e1c%%|c48c1c%|fca80e@|fcb60e@|fcc42a@|d2d246@|7ec438@@|70c438@|d2d254*|fcd238@|fcb60e@|eea80e@|c48c1c%|d28c1c%|fca81c@|fcb61c@|fcd238@|8cc438@|7ec438@|70c438%|000000  |eec438@|fcc41c@|fcb61c@|fcc41c@|fcd246#
+000000    |70b638*|8cc438@|eec42a@|fcb61c@@|fcc41c@|e0d238@|8cd238@|7ec438@|70b638%|000000     |fce054*|fcc438#|fcd22a@|fcb62a@|fcc42a@|c4c438@|b6d246@|7ed238@@|70c438@|70b638#|000000 |fce062=|fcd246#|fcc41c@|fcb60e@|fcb61c@|fca80e@@|fcb61c@|fcc41c@|fcc438@|8cc438@|9ad246@|d2d246@|fcc42a@|fcb60e@|fca80e@|e0a82a@|a8700e%|9a620e%|a8620e%|b67e1c%|fca80e@|fcb60e@|fcc41c@|fcd238@|e0d254@|8cc446@|a8d246%|eed238@|fcc41c@|fcb60e@|e09a2a%|a8620e%|9a620e%|b6701c%|fca81c@|fcb60e@|fcc42a@|eed246@|9ad254+|7ec446==|c4d254+|fcd238@|fcb60e@|ee9a1c@|b67e1c%%|ee9a1c@|fcb60e@|fcd246@|a8c446#|70c438*|7ec446#|7ed246#|fcd246@|fcb60e@|d28c1c%|a8620e%|d28c1c%|fcb60e@|fcd246@|7ed246=
+000000 |7ec438+**|8cc446#|fcd238@|fcb60e@|d28c1c%|a8620e%|e09a1c%|fcb60e@|e0c446@|70c438@@|7ec446+|7ed246-|000000  |fcd254#|fcc42a@|fcb60e@|d29a0e%|d28c0e%|e09a1c%|fcb60e@|fcc42a@|c4c446@|70c438@|7ec438@|70c438@|9ac446*|fcd254%|fcc42a@|fcb60e@|eea81c@|a8700e%|9a620e%|a8700e%|ee9a1c@|fca80e@|fcc41c@|fcd246@|a8c446@|c4c446@|fcc42a@|fcb60e@|fca80e@|e0a82a@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcd238@|fcd254%|000000  |fcd246#|fcc438%|fcc41c@|fca80e@|fcb61c@|fca80e@|fcb60e@|fcc41c@|fcc42a@|fcd254@|000000      |fcd238@|fcb61c@@@@|fcd238@|000000      |fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|fcd254=
+000000     |fcd262=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|fcd254=|000000   |7ec438-=|7ec446=|eed254%|fcc41c@|fca80e@|c47e1c%|a8701c%|c48c1c%|fca80e@|fcc41c@|e0d254@|70c438+++|7ec446+|e0d246@|fcc42a@|fcb60e@|fca81c@|c48c1c%|b67e1c%|c47e1c%|fca81c@|fcb60e@|fcc42a@|fcd246%|fce070=|fce054%|fcd238%|fcc42a@|fcb60e@|fca80e@|fcb61c@|ee9a0e@|fca81c@|fcb61c@@|fcc41c@|fcc438@|eed262=|000000    |fce062=|fcc446=|fcd246@|fcc438@|fcd238@|fcc438@|fcd246@|000000                     |fce054=|000000 |fce054=
+000000       |fce054=|000000 |fce054=|000000         |fcd254#|fcc42a@|fcb61c@|fcb60e@|fcb61c@|fcc42a@|fcd246@|000000      |fcd254+|fcd22a@|fcb61c@|fcc40e@|fcb60e@@|fcc41c@|fcc438#|fcd254#|000000    |fce046@|fcc438#|fcc42a@|fcd21c@|fcb61c@|fcd21c@|fcb62a@|fcd238@|fcd262+
+000000                     |fce054+|000000 |fce054+|000000          |fcd254=|fcd246#|fcc446#|fcd254#|eec454+|000000        |fce062=|fcd254+|eec454=|fce054%
+`,
+        plano: `
+                                               -==# -=        ++#=+-
+      -+=                                    %*#%*%*%*-=    *#*##*##%**+:  *####* =**:  =:
+     +*#*=*=-                    =+%#### :+#%##**++**##=   ##*+--=*###++++#*+==*##*++  ####*
+    -*#####**+     *+%*%##**+= =*#****###+*###*+:::-**#%%**##*+::-**#%-::=%*+--+*%+=++%*=:=#%-
+ -==+%*=:+##++-:  *#*==+*##+*+=###+:::+*#%*###*+:::-**#%#  *##****#%%      %*##*%      #*+*#-
+     =#*+*#-   ::-##*-:=*##----##**=--*###-%###**+*###%-    =-%#%#%                     = =
+       = -         *##*##%      =%*#**#**    %*#%*%*%=
+                     = +          =*+*=        ==-#
+`
+      },
+      {
+        color: `
+000000                                               |fce062+|eec454+|fcd254+|fce054*|e0b654=|fcd254+|000000         |fcd262=|fcd246#|fcc446#|fcd254#|eec446=|fce062+
+000000      |7ec438+|8cd246#|8cd254*|000000                                   |e0d262+|fce046%|fcc438*|fcc42a@|fcc41c@@@@|fcd22a@|eec446*|fcd246*|fce070=|000000    |fcd254+|fcc42a@|fcb61c@|fcb60e@@@|fcc41c@|e0c438@|eed246@|9ad246@|7ed238@|70c438@|70b646=|000000 |fce062=|fcd238+|fcc42a@|fcb61c@|fcc41c@|fcb62a%|fcd254#|000000 |70c438#|7ed238@|8cd238@|7ec446-|000000  |b6e054+|9ac446=
+000000     |70c438%|7ed238@|a8d246@|7ec438@|b6d262+|8cd246%|7ec438#=|000000                    |fce054*|eec446*|fcd238@|fcc438@|fcd238@|fcc438#|fcd254@|000000 |70b638-|70c438@|c4d246@|d2d238@|fcb61c@|fcb60e@|fca80e@|fcb61c@|ee9a0e%@|fcb61c@|fca80e@|fcc40e@|fcc42a@|fcd254+|000000   |fcd246%|fcc41c@|fcb60e@|eea81c@|b67e1c%%|c48c1c%|fcb61c@|fcb60e@|fcc42a@|d2d246@|7ec438@@|70c438@|d2d254+|fcd238%|fcb60e@|eea81c@|d28c1c%|c48c1c%|fca81c@|fcb61c@|fcd246@|8cc446@|7ec438@|70c438%|000000  |fcd238@|eeb61c@|fcb61c@|fcc42a@|fcd238#
+000000    |70b638*|8cc438@|eec438@|fcb61c@@|fcc42a@|d2d238@|8cd246@|7ec438@|70b638%|000000     |fce046*|fcc438#|fcd22a@|fcb62a@|fcc42a@|d2d238@|a8d246@|7ed238@@|70c438@|70b638#|000000 |fce062=|fcd238#|fcc42a@|fcb61c@@|fca80e@@|fcb61c@|fcc41c@|fcd238@|a8c438@|7ed238@|c4c446@|fcc42a@|fcb60e@|fca80e@|e0a82a@|a8700e%|9a620e%|a8620e%|b67e1c%|eea81c@|fcb60e@|fcc41c@|fcd238@|c4d246@|7ec446@|8cc446@|eec438@|fcc41c@|fcb60e@|e09a2a%|a8620e%|9a620e%|b6701c%|fca81c@|fcb60e@|fcc42a@|e0d246@|8cd246=|7ec446==|b6c454+|fcc438@|fcb60e@|ee9a1c@|b67e1c%%|ee9a1c@|fcb60e@|fcd238@|a8d246#|70c438*|7ec446##|fcd246@|fcb60e@|d28c1c%|a8620e%|d29a1c%|fcb60e@|eed246@|7ed246=
+000000 |7ec438+**|7ec446#|fcd238@|fcb60e@|c48c1c%|a8620e%|e09a1c%|fcb60e@|e0c438@|70c438@@|7ec446+|7ed246-|000000  |fcd254*|fcc42a@|fcb60e@|d29a0e%|d28c0e%|e09a1c%|fcb60e@|fcc42a@|c4c446@|70c438%|7ec438@|70c438@|8cc446*|fcd246%|fcc42a@|fcb60e@|eea81c@|a8700e%|9a620e%|a8700e%|ee9a1c@|fca80e@|fcc41c@|eed246@|c4d254@|e0d246@|fcc42a@|fcb60e@|fca80e@|eea81c@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcd238@|fcd254@|000000  |fcd246+|fcc438@|fcc41c@|fca80e@|fcb60e@|fca80e@|fcb61c@@|fcc42a@|fcd254#|000000      |fcd238@|fcb61c@@@@|fcd238%|fcd262+|000000    |fcd262=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|fcd254=
+000000     |fcd262=|fcc42a@|fcb61c@|eea81c@|fcb61c@|fcc42a@|fcd254=|000000   |7ec438-=|7ec446=|e0c454@|fcc41c@|fca80e@|c47e1c%|a8701c%|c48c1c%|fca80e@|fcc41c@|e0d246%|70c438+++|9ad246*|e0d246@|fcc42a@|fcb60e@|fca81c@|c48c1c%|b67e1c%|c48c1c%|fca81c@|fcb60e@|fcc42a@|fcd246@|000000 |fcd254%|fcd238@|fcc42a@|fcb61c@|fcb60e@|fca81c@|ee9a0e@|fca81c@|fcb60e@|fcb61c@|fcc41c@|fcd238@|fcd254*|000000    |fce054=|000000 |fcd246@|eec438@|fcd238@|eeb638@|fcd246@|000000            |fce062=|000000        |fcd254=|fcc446=|fcd254=
+000000       |fcd254=|fcd246=|000000          |fcd254*|fcc42a@|fcb61c@|fcb60e@|fcc41c@|fcc42a@|fcd246@|000000      |fcd254#|fcd22a@|fcb61c@|fcc40e@|fcb60e@@|fcc42a@|fcc438#|fcd254#|000000    |fcd254@|fcd238@|eeb62a@|fcd21c@|fcb61c@|fcd21c@|eeb62a@|fcd238@|fcd254%
+000000                     |fce054=|000000 |fcd254=|000000          |fce054+|eec446*|fcd246%|eec446*|fcd254*|000000         |fcd254+|eec454+|fce054*
+`,
+        plano: `
+                                               ===*-+         -***-=
+      -+=                                   =#=#####%=+=    =#*#**##%#*+: =+##%** =**:  =-
+     +*#*=*=-                    +=%#%+% :+####**++**##=   ##*+--=*###+++=##+--**%*++  #*##+
+    -*#*###*++     ++%###***+= =*##*+*##%**###*+:::-**#%#**##*+::-**##-::=#*+--+*#+=++%#=:=*#:
+ -===%*=:+*#++-:  +#*==+*##+++=##*+:::+*######*+:::-**#%%  +##*****#*      %*####=    -#*+*#=
+     =#*+*#-   ::-##*-:-*##---=##**=--**## %%#***+**##%+    = %#%#%            =        =--
+       =-          +#**##%      *%*#**#*#    %%*%*%*%#
+                     = =          ++#++         +=*
+`
+      },
+      {
+        color: `
+000000                                               |fcd262=|000000 |fce054#|eec454+*|fce054#|000000          |fcd246#|eec446%|fcd254@|000000 |fce062+|000000          |fce062=
+000000      |7ec438+|8cd246#|8cd254*|000000                                   |eee062*|fcd246*|eeb646*|fcd22a@|fcb61c@|fcc41c@|fcb61c@|fcc41c@|fcc42a@|fcc446+|fce054%|000000    |fce062=|fcd246+|fcc438@|fcb61c@|fcb60e@@@|fcc41c@|eec42a@|e0d246@|a8d246@|7ed238@|70c438@|70b646+|000000 |fce062+|fcc446+|fcd22a@|fcb61c@|fcc41c@|fcc42a%|fcd254*|000000 |70c438#|7ed238@|8cd238@|7ec446-|000000  |a8d254+|b6d246=
+000000     |70c438@|7ed238@|9ad246@|8cc438@|a8d262+|8cd246%|7ec438#=|000000                    |fce054#|eec438+|fcd246@|fcc438@|fcd238@|eeb638#|fcd246%|000000 |70b638-|7ec438@|b6d246@|d2d238@|fcc41c@|fcb60e@|fca80e@|fcb61c@|ee9a0e@@|eeb60e@|fcb60e@|fcc40e@|fcc42a@|fcd246+|fce062=|000000  |fcd246%|fcc41c@|fcb60e@|eea82a@|c47e1c%|b67e1c%|c48c1c%|eea80e@|fcb60e@|fcc42a@|c4c446@|7ec438@@|70c438@|d2d254=|fcc438@|fcb60e@|eea81c@|d27e0e%|c48c1c%|fca81c@|fcb61c@|fcd246@|8cc438@|7ec438@|70c438%|000000  |fcd238@|eeb61c@|fcb61c@|fcc42a@|fcd238*
+000000    |70b638*|9ac438@|eec438@|fcb61c@@|fcc42a@|d2d238@|9ad246@|7ec438@|70b638%|000000     |fcd254=|fcc438%|fcc42a@|fcc41c@|eec42a@|e0d238@|9ad238@|7ed238@@|70c438@|70b638#|000000 |fcd262=|fcd238@|fcc42a@|fcc41c@|fca81c@|fca80e@|fca81c@|fcb61c@|fcc42a@|fcd238@|b6c446@|7ed238@|c4c446@|fcc42a@|fcb60e@|fca80e@|e0a82a@|a8700e%|9a620e%|a8620e%|b67e1c%|eea81c@|fcb60e@|fcc41c@|fcc438@|a8c446@|7ec446@|8cc438@|eec438@|fcc41c@|fca80e@|e09a1c%|a8620e%|9a620e%|b6701c%|fca81c@|fcb60e@|fcc42a@|e0d246@|7ec446===|a8c454+|fcc438@|fcb60e@|ee9a1c@|b6701c%|b67e1c%|eea81c@|fcb60e@|fcc438@|a8d246*|70c438*|7ec446##|fcd246@|fcb60e@|d28c1c%|a8620e%|d29a1c%|fcb60e@|eec446@|7ed246=
+000000 |7ec438+**|7ec446#|fcd238@|fcb60e@|c48c1c%|a8620e%|e09a1c%|fcb60e@|d2c438@|70c438@@|7ec446+|7ed246-|000000  |fcd254+|fcc42a@|fcb60e@|d29a1c%|d28c0e%|e09a1c%|fcb60e@|fcc42a@|c4c446@|70c438@|7ec438@|70c438@|8cc446#|eed246@|fcc42a@|fcb60e@|eea81c@|a8701c%|9a620e%|a8700e%|ee9a1c@|fcb60e@|fcc41c@|eed246@|d2d254@|fcd246@|fcc42a@|fcb60e@|fca80e@|eea82a@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcd238@|fce054%|000000  |fcd254=|fcc438@|fcc41c@|fcb61c@|fca80e@@|fcb61c@|fcb60e@|fcc42a@|fcc446*|000000      |fcd246@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|fcd238#|fcd254*|000000    |eed262=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|fcd254+
+000000     |eed254=|fcc42a@|fcb61c@|eea81c@|fcb61c@|fcc42a@|eed254=|000000   |7ec438-=|7ec446=|e0c446@|fcc41c@|fcb60e@|c47e1c%|a8701c%|c48c1c%|fca80e@|fcc41c@|eed246%|70c438+++|9ad254*|eed246@|fcc42a@|fcb60e@|fca81c@|c48c1c%|b67e1c%|c48c1c%|fca81c@|fcb60e@|fcc42a@|fcd254@|000000 |fce062*|fcd238@|fcc42a@|fcb61c@|fcb60e@|fca80e@@|fca81c@|fca80e@|fcb61c@|fcc41c@|fcd238@|fcd254@|000000     |eed262=|fcd246@|fcc438@|fcd238@|fcc438@|fcd254%|000000          |fce054=|000000 |fce054=|000000        |fcd254=|fcd246=
+000000       |fcd254=|fcd246=|000000          |fcd254+|fcc42a@|fcb61c@|fcb60e@|fcc41c@|fcb62a@|fcd246%|000000      |fcd246@|fcd22a@|fcb61c@|fcb60e@@@|fcc41c@|fcd238%|fcd254#|000000    |fcd254#|fcd238@|eeb62a@|fcd21c@|fcb61c@|fcc41c@|fcc42a@|fcc438@|fcd254@
+000000                                  |fce054*|eec446+|fcd246@|eec446*|fcd254*|000000         |fce054#|eec454+|fcd254+|fce062+
+`,
+        plano: `
+                                               = *=+#          #*% +          -
+      -++                                   +*+%#%#%#+#    =+%##*###%#*+- ==%#%#+ =*#:  =-
+     +*#*=*+-                    *=@#@+# :+####**++**##+=  #%#*--=*#%#**+=%#*==*#%**+  %###+
+    -*######*+     =#%##%****= -%%#***##%#*#%#*+:::-*##%***##*+::-*#%#-::=%#+--+#%+=++%#=:=#%-
+ -==+%#=:+##++-:  =#*+=+*##+**=%##*:::+*#%%%%#*+:::-*##%%  =%##**##%+      %####*+    -##**%=
+     =##*#%=   ::-#%*=:=*#*---+%%**=-=**#% *%%##****##%%     -@#%##          = =        ==
+       -=          =%*####      %%######*    *@#%#%##@
+                                  *=%+*         #==+
+`
+      },
+      {
+        color: `
+000000                                                 |fce054#|e0c446+|fcd254#|fce062*|000000        |fce062=|000000 |fcd254#|eec446%|fcd246@
+000000      |7ec438+|8cd246#|8cd254*|000000                                   |fce062+|fcd246=|fcc446#|fcd22a@|fcb61c@|fcd21c@|fcb61c@|fcd21c@|eeb62a@|fcd238#|fce054@|000000    |fce062=|fcd246*|fcc438@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fcc41c@|fcc42a@|d2d246@|a8d246@|7ed238@|70c438@|70b646+|000000 |fce054=|fcc446*|fcd22a@|fcb61c@|fcc41c@|fcc42a@|fcd254+|000000 |70c438#|7ed238@|8cd238@|7ec446-|000000  |9ad246+|d2d254=
+000000     |70c438@|7ed238@|8cd246@|9ad238@|9ad254=|8cd246%|7ec438#=|000000                    |fce062+|fcc438#|fcd238@|fcc438@|fcd238@|eec438#|fcd246*|fce062=|70b638-|7ec438@|9ad238@|d2c438@|fcc42a@|fcb60e@|fcb61c@|fca81c@|eea80e@|ee9a0e@|eea80e@|fcb60e@@|fcc42a@|fcd246#|fce062=|000000  |fcd246%|fcc41c@|fcb60e@|eea82a@|c47e1c%|b67e1c%|c48c1c%|eea80e@|fcb60e@|fcc42a@|b6c446@|7ec438@@|70c438@|c4d254=|fcc438@|fcb60e@|eea81c@|d27e0e%|d28c1c%|fca81c@|fcc41c@|fcc446@|7ec438@@|70c438%|000000  |fcd246%|fcb61c@@|fcc42a@|fcc438*
+000000    |70b638*|a8c438@|eec438@|fcb61c@@|fcc42a@|c4d238@|a8d246@|7ec438@|70b638%|000000      |fcd246@|fcc42a@|fcc41c@|eeb62a@|eed238@|8cd238@@|7ed238@|70c438@|70b638#|000000  |fcd246@|fcc42a@|fcc41c@|fca81c@|fca80e@|fcb61c@|fcb60e@|fcc41c@|fcd238%|c4c446@|7ed238@|d2d246@|fcc42a@|fcb60e@|fca80e@|e09a1c@|a8700e%|9a620e%|a8620e%|b67e1c%|eea81c@|fcb60e@|fcc41c@|fcc438@|a8c446@|7ec446@|9ad246@|eed238@|fcc41c@|fca80e@|e09a1c%|a8620e%|9a620e%|b6701c%|fca81c@|fcb60e@|fcc42a@|eed254#|9ad246=|7ec446==|b6d254+|fcc438@|fcb60e@|eea81c@|b67e1c%%|eea81c@|fcb60e@|fcc438@|a8d246*|70c438*|7ec446#|7ed246#|eec446@|fcb60e@|c48c1c%|a8620e%|d29a1c%|fcb60e@|eec446@|8cd246=
+000000 |7ec438+**|7ec446#|fcc438@|fcb60e@|c48c1c%|a8620e%|e09a1c%|fcb60e@|d2c438@|70c438@@|7ec446+|7ed246-|000000  |eed254+|fcc42a@|fcb60e@|d29a1c%|d28c0e%|e09a1c%|fcb60e@|fcc42a@|c4c446@|70c438@|7ec438@|70c438@|8cc446*|eed246@|fcc42a@|fcb60e@|eea81c@|a8701c%|9a620e%|a8700e%|ee9a1c@|fcb60e@|fcc41c@|eed246@|d2d254@|fcd246@|fcc42a@|fcb60e@|fca80e@|eea81c@|a8700e%|9a620e%|a8620e%|b67e1c%|fca81c@|fcb60e@|fcc41c@|fcc438@|fce054*|000000  |fcd254=|fcc438@|fcc41c@|fcb61c@|fca80e@@|fcb61c@|fcb60e@|fcc42a@|fcd246*|fce062=|000000     |fcd246%|fcc41c@|fcb61c@@|fcc42a@|fcc438#|fce062*|000000    |eed254=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|eed254+
+000000     |fcd254=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc42a@|eed254+|000000   |7ec438-=|7ec446=|eed246%|fcc41c@|fcb60e@|c47e1c%|a8701c%|c48c1c%|fca80e@|fcc41c@|eed246#|70c438+++|a8d246*|eed246@|fcc42a@|fcb60e@|fca81c@|c48c1c%|b67e1c%|c47e1c%|fca81c@|fcb60e@|fcc42a@|fcd254@|000000  |fcd238@|fcc41c@|fcb61c@@|fca81c@|fca80e@|fca81c@|fca80e@|fcc41c@|fcb61c@|fcd238%|fcd254@|000000     |fcd262+|fcd246@|fcc438@@@|fcd254#|000000          |fce054=|000000           |fcd246+
+000000        |fcd254+|000000          |fcd254+|fcc42a@|fcb61c@@@|fcc438@|fcd246*|000000      |fcd246@|fcc42a%@|fcb60e@@@|fcb61c@|fcd238@|fcd262*|000000    |eed262=|fcd238@|fcc42a@|fcc41c@@@|fcc42a@|eeb638%|fcd254@
+000000                      |fce054+|000000 |fce062=|000000         |fcd254+|eec446+|fcd246%|eec446#|fce054*|000000         |fce054*|eec454++|fce062*
+`,
+        plano: `
+                                                 #=**        = #*%
+      -++                                   +=*%*%*%#*@    -+%##*#####*+- =+%###= =**:  =-
+     +*#*-*=-                    +*%#%**-:+*###**++**##*=  ###*--=*#%#+*+-%#*==*#%**+  ####+
+    -*#*#%##*+      %#%#%***+=  %%#***####*#%#*+:::-*###***%#*+::-*#%*-::=%#+--+#%+=++##=:=##-
+ -==+%#=:+##++-:  =#*+=+*##+**=%#**:::+*#%#%%#*+:::-*##%*  =%##**###+=     ###*%*+    -##+*%+
+     =##*##=   ::-#%#-:=*#*---+%##*=-=**#%  %%##****###%     +%#%%*          =           +
+        +          =%*###*      %##*###%+    -@####%*@
+                      = =         +=%++         *==*
+`
+      }
+    ]
   },
   {
     cols: 84, alto: 7,
-    color: `
-000000                                        |fce062=|000000 |fcd254*|fcd246#|fcc446*|fce054@|000000        |fcd246+%|fcc438#|fcd246@
-000000     |7ec438*|8cd246%#|000000                       |fce054=|000000 |fce062=|000000    |c4d254=|fcd246+|fcc446%|fcc41c@|fcb61c@|fcc40e@@|fcb61c@|fcd22a@|fcd254@|000000    |fcd254*|fcc42a@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fcc41c@|eed246@|b6d246@|7ed238@|7ec438@|70b638+|000000 |fcd254=|fcd238@|fcb61c@@|fcc42a@|fcd246#|e0d254+|70c438@|8cd246@|7ec446#|000000  |a8d246#|eed246+
-000000    |70b638@|9ad238@|a8d238@|d2c438@|d2d246%|8cd246@|7ec438@|70b638+|000000       |fcd246#|c4c438*|c4d246#|8cd246**|7ec438+|000000   |fce054=|fcd246%|fcc42a@|fcc41c@|fcb61c@|fcc42a@|fcd238#|eed262=|70b638%|9ad238@|d2d246@|fcc42a@|fcb60e@|fcb62a@|e09a1c%|d28c1c%%|fca80e@|fcb60e@|fcc42a@|fcd246@|c4d254*|000000 |d2d254%|fcc42a@|fcb60e@|eea81c@|a8701c%|a8620e%|c47e1c%|fca80e@|fcc41c@|fcc438@|9ac446@|7ec438@@|eed246%|fcc41c@|fcb60e@|b67e1c%|a8701c%|e09a1c@|fcb60e@|e0c438@|7ec438@|70c438@|7ec446+|d2c446+|fcc42a@|eea81c@|ee9a0e@|fcb61c@|fcc438%
-7ed246=|7ec438+|7ed246+|7ec446*|a8c438@|fcc41c@|eea81c@|e08c0e%|fcb61c@|eec42a@|9ad246@|70c438@|70b646=|000000   |fcd254*|fcc42a@|fcb61c@|fca80e@|fcb60e@|fcc41c@|e0d238@|8cd238@|7ed238@|70c438@|70b646=|fcd254+|fcc42a@|fcb60e@|eea81c@|d28c1c%%|eea81c@|fcb60e@|fcc42a@|c4c446@|9ac446@|fcc438@|fcc40e@|fcb60e@|e09a1c%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc42a@|eed246%|9ad246=|fcd254+|fcc438@|fcc40e@|fca81c@|d28c1c%|d28c0e%|ee9a1c@|fcb60e@|fcc42a@|fcd254%|000000    |fcc438@|fcc41c@|eea81c@|ee9a0e@|fcb61c@|fcc42a@|eed246%|000000   |fcd254#|fcc41c@|e09a1c%|c47e0e%|fca81c@|fcc42a@|a8d246*|7ed246+|7ec446=
-000000    |fcd254=|fcc42a@|eea81c@|d28c0e%|fcb61c@|fcc42a@|a8c446*|70c438+|7ec438*|7ec446*|7ec438*|b6d246*|fcc438@|fcb60e@|d28c1c%|9a620e%|b67e1c%|fca80e@|fcc42a@|a8c446%|70c438%%|8cc446%|eed246@|fcc41c@|fca80e@|e09a1c%|a8620e%%|e09a1c%|fcb60e@|fcc41c@|fcd254%|fce062=|fcd246*|fcc42a@|fcb60e@|fcb61c@|e09a1c%|e08c0e%|e09a1c@|fca81c@|fcb60e@|fcc42a@|fcd246@|000000   |fce054=|fcd246*|fcc42a@|fcc41c@|fcb61c@|fcc42a@|fcc438#|fcd254*|000000      |fcd246*|eec438+|fcd246#+|000000      |fcd254=|fcc42a*|fcc438#|fcd246*
-000000      |fcc438+|fcd238*|fcd246=|000000       |fcd254=|fcc438%|fcc41c@|fcb61c@@|fcc42a@|fcd238#|000000     |fcd246%|fcc42a@|fcb61c@|fcb60e@@|fcb61c@|fcc42a@|fcd246*|000000  |fce062=|fcd246+|fcc446@|fcc41c@|fcb61c@|fcc40e@|fcc41c@|fcc42a@|fcc438@|fcd254@
-000000                   |fcd254=|000000         |fce054+|eec446-|fcd246@|eec446*|fcd254+|000000        |fcd254*|fcd246*|eec454+|fce062=
+    marcos: [
+      {
+        color: `
+000000                                          |fcd254=|fcd246*|eec446#|fce054#|000000        |fcd246+#|eec438%|fcd246@
+000000     |7ec438*|8cd246@#|000000                              |d2d254+|fcd246*|fcc446%|fcc41c@|fcb61c@|fcc41c@|fcc40e@|fcb61c@|fcc42a@|fcd246@|000000    |fcd254%|fcc42a@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fcb61c@|fcc438@|c4d246@|7ed238@|7ec438@|70b638*|000000 |fcd246+|fcc438@|fcb61c@@|fcc42a@|fcd246*|c4c446+|70c438@|7ed246@|7ec438#|000000  |b6d246#|e0d246*
+000000    |70b638%|9ad238@|a8d238@|d2d238@|c4d246%|8cd246@|7ec438@|70b638+|000000       |fcd246*|b6c438*|a8d246#|8cd246*#|7ec438*|000000   |fce054=|fcd246#|fcc42a@|fcc41c@|fcb61c@|fcc42a@|fcd238%|fcd254+|70b638%|9ad238@|d2d246@|fcc42a@|fcb60e@|fcb61c@|e09a1c%|d28c1c%%|eea80e@|fcb60e@|fcc41c@|fcd246@|c4d254*|000000 |c4d254%|fcc42a@|fcb60e@|eea81c@|a8700e%|9a620e%|b67e1c%|fca80e@|fcc41c@|eec438@|9ac446@|70c438@|7ec438@|c4d246%|fcc41c@|fca80e@|b6701c%|a8700e%|e09a1c%|fcb60e@|eec438@|7ec438@|70c438@|7ec446+|d2d246*|fcc42a@|eea81c@|ee9a0e@|fcc41c@|fcc438#
+7ed246=|7ec438++|7ec446+|a8c438@|fcc41c@|eea81c@|e08c0e%|fcb61c@|eec42a@|8cd246@|70c438@|70b638=|000000   |fcd254#|fcc42a@|fcb61c@|fca80e@|fcb61c@|eec42a@|d2d238@|8cc438@|7ed238@|70c438@|70b646=|fcd254+|fcc42a@|fcb60e@|eea81c@|d28c1c%%|eea81c@|fcb60e@|fcc42a@|c4d246@|8cc438@|fcc438@|fcc41c@|fcb60e@|e09a1c%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc42a@|eed246@|9ad246=|fcd254+|fcc438@|fcb60e@|fca81c@|d28c1c%|d28c0e%|e09a1c@|fcb60e@|fcc42a@|fcd254@|000000    |fcc438@|fcc41c@|eea81c@|ee9a0e%|fcb61c@|fcc42a@|eed254#|000000   |eed254*|fcc41c@|e09a1c%|c47e0e%|fca81c@|fcc42a@|a8d246*|7ed246+|7ec446=
+000000    |fcd254=|fcc42a@|eea81c@|d28c0e%|fca81c@|fcc42a@|a8c446*|70c438*|7ec446**|7ec438*|8cd246#|fcc438@|fcb60e@|d28c1c%|9a620e%|b67e1c%|fca80e@|fcc42a@|a8c446@|70c438%%|8cc446%|e0d246@|fcc41c@|fca80e@|d29a1c%|a8620e%%|d28c1c%|fcb60e@|fcc41c@|fcd254#|fce062=|fcc446#|fcc41c@|fcb60e@|fcb61c@|e09a1c%|d28c1c%|e09a1c%|fca81c@|fcb60e@|fcc41c@|fcd246@|000000   |fce054+|fcd254*|fcc42a@|fcc41c@|fcb61c@|fcc42a@|fcc438#|fcd262=|000000      |fcd254*|eec438*|fcd238#*|fcd254=|000000      |fcc42a#%|fcd238#
+000000      |fcc438+|fcd238#*|000000       |fcd254+|fcc42a%|fcc41c@|fca80e@|fcb61c@|fcc42a@|fcd246#|000000     |fcd238@|fcc42a@|fcb61c@|fcb60e@@@|fcc42a@|fcd246*|000000  |fce062*|fcd238*|fcc446%|fcc41c@|fcb61c@|fcc40e@|fcc41c@|fcb61c@|fcd238@|fcd254*
+000000                   |fcd246+|000000 |fce054=|000000       |fce062=|eec446+|fcd246@|eec446#|fcd254*|000000        |fcd254+|fcd246*|eec446*|fce054+
 `,
-    plano: `
-                                        = +*+%        =#*%
-     =*+                       = =    -=#%####%%    +##**##%#**- =%##%*+*#+  ++
-    +*####*-       *=*++-   -##%##*-+*###*+==*#%%= *%#+::-*#%***##*-:+##*+-=#*+##
-:--=*#*=*#**:   +##**##**+:+%#*==**%#*%#*+:::=*#%#-+%#*==+###    ##++###   *#+-*%+-:
-    =#*=#%+-===+%*=:-*#*+++%#*+::+#%#-*##*+=+*#%%   =*%##%*+      *=*=      -+*+
-      =+=       =##*#%*     %%#####+  ==#%#####%
-                   =         =-%++        +*==
+        plano: `
+                                          =+*#        =**%
+     =*+                              =+*%*###%%    ###***#%#**- +%*#%+=+*=  *+
+    +*###**-       *=+++=   =*#%###++*###*+==**#%+ *%*+::-*##*+**#*-:+##*+-=#*+#*
+:---*#*=*#*+:   *##**##**+:=##*==**##*##*+:::=*#%#-+%#*==+*##    ##++##*   *#+-*%+-:
+    =#+=*%=====+#*=:-*#*++*##*=::=*#*=*##*+=+*##%   ++%##%*=      +=*+=      +#*
+      =*+       =##**#*     %##***#+  ++#%*###%*
+                   + =       ==%**        ++++
 `
+      },
+      {
+        color: `
+000000                                          |fce054*|eec446*|fcd246#|fce054+|000000        |fcd254*|fcc446*%|fcd246%|eed254=
+000000     |7ec438*|8cd246@#|000000                              |eee054=|fcd246=@|fcc41c@|fcb61c@|fcb60e@|fcc40e@|fcb61c@|fcd22a@|fcd254#|000000    |fcd254#|fcc42a@|fcb61c@@|fca80e@|fcb60e@|fcb61c@|fcc438@|b6d246@|8cd246@|7ec438@|70b638*|000000 |fcd246+|fcc438@|fcb61c@@|fcc42a@|fcd238*|c4c446*|70c438@|7ed246@|7ec438#|000000  |b6d246#|eed246*
+000000    |70b638%|8cd238@|b6d238@|d2c438@|b6d246%|8cd246@|7ec438@|70b638+|000000       |fcd246#|b6c438*|b6d246#|8cd246*#|7ec438*|000000   |fce054+|fcc446#|fcc42a@|fcc41c@|fcb61c@|fcc42a@|fcc438#|fcd254#|70b638%|8cc438@|d2c446@|fcc42a@|fcb60e@|fcb61c@|e09a1c%|d28c0e%|d28c1c%|eeb61c@|fcb60e@|fcc41c@|fcd246@|a8d254=|000000 |d2d254#|fcc42a@|fcb60e@|ee9a1c@|a8700e%|9a620e%|c47e1c%|fca80e@|fcc41c@|eec438@|8cc438@|70c438@|7ec438@|c4d246@|fcc41c@|fcb60e@|b6701c%|a8700e%|e09a1c@|fcb60e@|e0c438@|7ec438@|70c438@|7ec446+|d2d254+|fcc42a@|eea81c@|ee9a0e@|fcb61c@|fcd238#
+7ed246=|7ec438++|7ec446+|a8c438@|fcc41c@|eea81c@|e08c0e%|fcb61c@|e0c42a@|8cd246@|70c438@|70b638=|000000   |fcd246*|fcc438@|fcb61c@|fca80e@|fcb61c@|eec41c@|d2d238@|7ec438@|7ed238@|70c438@|70b646=|fcd254+|fcc42a@|fcb60e@|eea81c@|d28c0e%|d28c1c%|eea81c@|fcb60e@|fcc42a@|c4d246@|8cc438@|fcc438@|fcc41c@|fcb60e@|e09a1c%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc438@|fcd254#|9ad246=|fce054=|fcc438@|fcb60e@|fcb61c@|d28c1c%|d28c0e%|ee9a1c@|fcb60e@|fcc42a@|fcd246%|000000    |fcc438@|fcb61c@|eea81c@|e09a0e%|fcb61c@|fcc42a@|fcd254#|000000   |eed254#|fcc41c@|e09a1c%|c47e0e%|fca81c@|fcc42a@|a8d246*|7ed246+|7ec446=
+000000    |eed254=|fcc42a@|ee9a1c@|d28c0e%|fca81c@|fcc42a@|a8c446*|70c438*|7ec446**|7ec438*|8cd246#|fcc438@|fcb60e@|d28c1c%|9a620e%|b67e1c%|fca80e@|fcc42a@|a8c446@|70c438%%|8cc446%|eed246@|fcc41c@|fca80e@|d29a1c%|a8620e%%|d29a1c%|fcb60e@|fcc41c@|fcd246%|fcd254*|fcd246#|fcc41c@|fcb60e@|fca81c@|e09a1c%|d28c1c%|e09a1c%|fca81c@|fcb60e@|fcc41c@|fcd246@|fce062=|000000  |fcd254=#|fcc42a@|fcc41c@|fcb61c@|fcc42a@|fcc438%|000000       |fcd254+|eec438*|fcd238%|fcc438=|fce054+|000000     |fcd254=|fcc438#|fcc42a#|fcd246%
+000000      |fcc438+*|fcd246*|000000       |fcd254+|fcc42a%|fcc41c@|fca80e@|fcb61c@|fcc42a@|fcd246#|000000     |fcd238@|fcc42a@|fcb61c@|fcb60e@|fcb61c@|fcb60e@|fcc42a@|fcd246*|000000  |fce062+|fcd246#|fcc438#|fcc42a@|fcb61c@|fcc40e@|fcb61c@|fcc42a@|fcc438#|fcd254%
+000000                  |fcd254=|fcd246+|000000         |fce054+|eec446=|fcd246%|fcc446#|fcd254*|000000       |fcd254=|eec454=|fce054#|eec446*|fce054+
+`,
+        plano: `
+                                          *+*+        *+*#=
+     =*+                              =-%####*%*    *%#**##%#**- =%*#%+=+*=  *+
+    +*##*#*-       *=*++=   +*%##%**+*###*+==**#%- *%#+::-*##*+*#%*-:+##*+-=#*+#*
+:---*#*=*#*+:   *%#**##**+:=##*==**##*##*+:::=*#%*-=%#*==+*##    %#*+##*   *#+-*#==:
+    =#+=*%=====+#*=:-*#*+++%#*=::=*##*###*+=+*##%-  -*#####       +=#-+     -+*#
+      =+*       =##**#*     ###***#+  =#*%*###*#
+                  -=         =-%*+       --#=+
+`
+      },
+      {
+        color: `
+000000                                          |fce054*|eec446#|fce054%|000000         |fcd254#|eec446*|fcd246%|fcc446%|fcd254*|000000        |fce062=
+000000     |7ec438*|8cd246@#|000000                              |e0d254=+|fcd238@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|fcb61c@|fcd22a@|fcc446*|000000    |fcd246*|fcc42a@|fcb61c@@|fca80e@|fcb60e@|fcb61c@|fcc438@|b6d246@|8cd246@|7ec438@|70b638*|000000 |fcd254+|fcc42a@|fcb61c@@|fcc42a@|fcd238*|b6c446*|70c438@|7ed246@|7ec438#|000000  |c4d246#|e0d246*
+000000    |70b638%|8cd238@|c4d238@|d2c438@|a8d246@|8cd246@|7ec438@|70b638+|000000       |fcd246*|c4c446*|a8d246#|8cd246*#|7ec438*|000000   |fcd254*|fcc438*|fcc42a@|fcb61c@@|fcc41c@|fcc438#|fcd254#|70b638%|7ec438@|d2c446@|fcc42a@|fcb60e@|fcb61c@|e09a1c%|d28c0e%|d28c1c%|eeb61c@|fcb60e@|fcc41c@|fcc438@|000000  |e0d254*|fcc42a@|fcb60e@|ee9a1c@|a8700e%|9a620e%|c47e1c%|fca80e@|fcc41c@|fcd238@|7ec438@|70c438@|7ec438@|c4c446@|fcc41c@|fcb61c@|b6701c%|a8701c%|ee9a1c@|fcb60e@|e0c438@|7ec438@|70c438@|7ec446+|e0d254+|fcc42a@|eea80e@|ee9a0e@|fcb61c@|fcd246#
+7ed246=|7ec438++|7ec446+|a8c438@|fcc41c@|eea81c@|e08c0e%|fcb61c@|e0c42a@|9ad246@|70c438@|70b638=|000000   |fcd246+|fcc42a@|fcb61c@|fca80e@|fcb61c@|eec41c@|d2c446@|7ec438@|7ed238@|70c438@|70b646=|fcd262+|fcc42a@|fcb60e@|eea81c@|d28c0e%%|eea81c@|fcb60e@|fcc42a@|c4c446@|a8c446@|fcc438@|fcc41c@|fca80e@|e09a1c%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcc40e@|fcc438@|fce054*|8cd246=|eed254=|fcc438@|fcb61c@@|d28c1c%%|ee9a1c@|fcb61c@|fcc42a@|fcd246#|000000    |fcc438@|fcb61c@|eea81c@|e09a0e%|fcb61c@|fcc42a@|fcd254*|000000   |eed254#|fcb61c@|e09a1c%|c47e0e%|fca80e@|fcc42a@|a8d246*|7ed246+|7ec446=
+000000    |e0d254+|fcc42a@|ee9a1c@|d28c0e%|fca80e@|fcc42a@|a8c446+|70c438*|7ec446**|7ec438*|8cc446#|fcc438@|fcb60e@|d28c1c%|9a620e%|b67e1c%|fca80e@|fcc42a@|a8c446@|70c438%%|8cc446%|eed246%|fcc41c@|fca80e@|d29a1c%|a8620e%%|d29a1c%|fca80e@|fcc41c@|eed246%|e0d254%|fcd246@|fcc41c@|fcb60e@|fca81c@|e09a1c%|d28c1c%|e09a1c%|fca81c@|fcb60e@|fcc41c@|fcd246%|fce062+|000000   |fcd254%|fcc42a@|fcc41c@@|fcc42a@|fcd238@|000000       |fcd254=|fcc438*|fcd238%|eec438=|fce054+|000000     |fcd254=|fcc438#|fcc42a#|fcd246#
+000000      |fcc438+*|fcd246*|000000       |eed254=|fcc42a@|fcb61c@|fca80e@|fcb61c@|fcc41c@|fcd246*|000000    |fcd262+|fcd238#|fcc42a@|fcb60e@|fcb61c@@@|fcc42a@|fcd246#|000000   |fcd246@|fcc438#|fcc42a@|fcb61c@|fcc40e@|fcb61c@|fcc42a@|fcc438#|fcd254#
+000000                  |fcd254=|fcc446=|fcd246=|000000        |fcd254=|fcc446+|fcd246%%|fcc446+|000000       |fce054+|e0c454=|fce054%|eec446+|fcd254+
+`,
+        plano: `
+                                          **#         *+#*+        =
+     =*+                              ==%##*%#%+    +##**##%##*- +%###*=**+  *+
+    +*####*-       *+*++=   ++%##%*#+*#%##+==**##  +%#+::-*#%***#%*-:+##*+-=#*+#*
+---=*#*=*#**:   +%**###**+:+##*==*###*%#*+:::=*#%*-=%#*==+*%*    %#*+##+   *#+-*#==:
+    =#+=*%=====+%#=:-*%*+++##*+::=*###%##*+=+*###=   %#%##%       =+#-+     =***
+      =+*       -##**#*    =#%####%*   %*%#%*%+#
+                  =-=        ==##=       =-#=+
+`
+      },
+      {
+        color: `
+000000                                          |fcd254*|eec446*|fce054%|000000 |fcd254=|000000       |fce054+|eec446#|fcd246@|eec438*|fcd254#|000000        |fce054=
+000000     |7ec438*|8cd246@#|000000                              |b6d246=|d2d254#|fcd238@|fcb61c@|fcc41c@|fcb60e@|fcc41c@@|fcc42a@|fcc446+|fce054+|000000   |fcd254+|fcc42a@|fcb60e@|fcb61c@|fcb60e@@|fcb61c@|fcc438@|a8d246@|8cd238@|7ec438@|70b638*|000000 |fcd254*|fcc42a@|fcb61c@@|fcc42a@|fcd238#|9ac454+|70c438@|7ed246@|7ec438#|000000  |d2d246#|e0d246*
+000000    |70b638@|8cd238@|d2d238@|c4c438@|a8d246@|8cd246@|7ec438@|70b638+|000000      |fcd254=|fcd246+|e0d246*|9ad246#|8cd246*#|7ec438*|000000   |fcd254+|fcc438*|fcc42a@|fcb61c@|fcc41c@@|fcc438#|fcd254*|70b638%|7ec438@|e0d246@|fcc42a@|fcb60e@|fcb61c@|e09a1c%|d28c0e%|d28c1c%|eeb61c@|fcb60e@|fcc41c@|fcc446%|000000  |fcd254+|fcc42a@|fcb60e@|ee9a1c@|a8700e%|9a620e%|c47e1c%|fca80e@|fcc41c@|fcd238@|8cc438@|70c438@|7ec438@|d2d246@|fcc41c@|fca80e@|b6701c%|a8701c%|ee9a1c@|fcb60e@|eec446@|7ec438@|70c438@|7ec446+|fcd254=|fcc42a@|eea80e@|ee9a0e@|fcb61c@|fcd238#
+7ed246=|7ec438++|7ec446+|a8c438@|fcc41c@|eea80e@|e09a0e%|fcb61c@|e0c42a@|9ad246@|70c438@|70b638=|000000   |fcd254=|fcc42a@|fcb61c@|fca80e@|fcb61c@|fcc41c@|c4c446@|7ec438@|7ed238@|70c438@|70b646=|fcd262+|fcc42a@|fcb60e@|eea81c@|d28c1c%|d28c0e%|eea81c@|fcb60e@|fcc42a@|c4c446@|b6c446@|fcc438@|fcc41c@|fca80e@|e09a1c%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcc40e@|fcc438@|e0d254*|7ec438=|d2d254*|fcc438@|fcb61c@@|d28c1c%%|eea81c@|fcb61c@|fcc42a@|fcd246#|000000    |fcc438@|fcb61c@|eea81c@|ee9a0e@|fcb61c@|fcc41c@|fcd254*|000000   |eed246#|fcb61c@|e09a1c%|c47e1c%|fca80e@|fcc42a@|a8d246*|7ed246+|7ec446=
+000000    |eed254=|fcc41c@|ee9a1c@|d28c0e%|fca80e@|fcc42a@|a8c446+|70c438*|7ec446**|7ec438*|8cc446#|fcd238@|fcb60e@|d28c1c%|9a620e%|b67e1c%|fcb60e@|fcc42a@|a8c446@|70c438%%|8cc446%|eed246@|fcc41c@|fcb60e@|d29a1c%|a8620e%%|e09a1c%|fca80e@|fcc41c@|eed246@|d2d254%|fcd246@|fcc41c@|fcb60e@|fca81c@|e09a1c%|d28c1c%|e09a1c%|fca81c@|fcb60e@|fcc41c@|fcd246#|fce062+|000000   |fcd246@|fcb62a@|fcc41c@@|fcb62a@|fcd246@|000000        |fcd238#%|fcc446+|fce054=|000000     |fcd246=|fcc438#|fcc42a#|fcc438#
+000000      |fcd238+|fcc438*|fcd246+|000000       |eed262=|fcc42a@|fcb61c@|fca80e@|fcb61c@|fcc41c@|fcd246#|000000    |fce054+|fcd238#|fcc42a@|fcb60e@|fcb61c@|fcb60e@|fcb61c@|fcc42a@|fcd246%|000000   |fcd246@|fcc42a%@|fcc41c@|fcc40e@|fcb61c@|fcd22a@|fcc446#|fcd246*
+000000                  |fce054+|eec446=|fcd254*|000000         |fcd254*|fcc446#|fcd246%|eec446+|fce062=|000000      |fce054*|eec454+|fcd254#|fcc446+|eec454+
+`,
+        plano: `
+                                          *+% =       ++%+*        =
+     =*+                              -*%#%###%=+   +%##*##%#**- +%####-*#+  *+
+    +*####*-      -=++++=   ++%##%**+*%%##+==*###  +%#+::-*#%***#%*-:+#%*+-=#*+#*
+--==*%*+*##*:   =%**###**+:+%#*==*####%#*+:::=*#%+:+%#*==+#%*    %#*+*#+   *#+-*#==:
+    =#+=*%=====+%#=:-*%#++*%#*+::+*#%#%##*+=+*##*+   %#%%#%        *#==     =***
+      +++       -%#**#*    +*%*#####   @#####%*+
+                  +-+         +*%=-      +=*==
+`
+      },
+      {
+        color: `
+000000                                         |fce062=|fcd254*|fcc446*|fcd254#|e0c446=|fce054*|000000       |fcd254=|fcc446#|fcd246%|eeb638*|fcd254#
+000000     |7ec438*|8cd246@#|000000                              |8cd238=|e0d254@|fcd238@|fcb61c@|fcc41c@|fcb60e@|fcb61c@|fcc41c@|fcc42a@|fcd246*|fce062*|000000   |fcd254+|fcc42a@|fcb60e@|fcb61c@|fcb60e@@|fcc41c@|fcd238@|a8d246@|7ed238@|7ec438@|70b638+|000000 |fcd254#|fcc42a@|fcc41c@|fcb61c@@|fcd238%|8cb654-|70c438@|7ed246@|7ec438#|000000  |d2d246#|c4c438*
+000000    |70b638%|8cd238@|c4d238@|b6c438@|b6d246@|8cd246@|7ec438@|70b638+|000000      |fce054+|eec446=|eed246*|8cd246#**|7ec438*|000000   |fcd262=|fcd238%|fcc42a@|fcb61c@|fcc41c@@|fcd246%|fcd254+|7ec438%@|eed246@|fcc42a@|fcb60e@|fcb61c@|e09a1c%|d28c0e%%|e0a81c@|fcb60e@|fcc41c@|fcd238#|fce062+|000000 |fcd254+|fcc42a@|fcb60e@|eea81c@|a8700e%|9a620e%|c47e1c%|fca80e@|fcb61c@|fcd238@|8cc438@|70c438@|7ec438@|d2d246@|fcc41c@|fca80e@|b6701c%|a8701c%|ee9a1c%|fcb60e@|eec446@|7ec438@|70c438@|7ec446+|fcd254=|fcc42a@|eea80e@@|fcb61c@|fcd246%
+7ed246=|7ec438++|7ec446+|a8c438@|fcc41c@|eea80e@|e09a0e%|fcb61c@|eec42a@|9ad246@|70c438@|70b638=|000000   |fcd254=|fcc42a@|fcb60e@|fca80e@|fcb60e@|fcc42a@|c4c438@|8cd238@|7ed238@|70c438@|70b646=|fcd262+|fcc438@|fcb60e@|eea81c@|d28c1c%|d28c0e%|eea81c@|fcb60e@|fcc42a@|c4c446@|c4d246@|fcc438@|fcc41c@|fca80e@|e09a1c%|a8620e%|9a620e%|a8620e%|d29a1c%|fca80e@|fcc40e@|fcc438@|c4c446#|7ec438=|d2d254#|fcc438@|fcb60e@|fca81c@|d28c1c%|c48c1c%|eea81c@|fcb61c@|fcc42a@|fcd246#|000000    |fcc438%|fcb61c@|eea81c@|ee9a0e%|fca80e@|fcc41c@|fcd254+|000000   |eed246*|fcb61c@|e09a1c%|c47e1c%|fca80e@|fcc42a@|a8d246*|7ed246+|7ec446=
+000000    |eed254=|fcc41c@|ee9a1c@|d28c1c%|fca80e@|fcc42a@|a8c446*|70c438*|7ec446**|7ec438*|8cc446#|fcd238@|fcb60e@|d28c1c%|9a620e%|b67e1c%|fcb60e@|fcc42a@|a8c446@|70c438%%|8cc446%|e0d246@|fcc41c@|fcb60e@|d29a1c%|a8620e%%|e09a1c%|fca80e@|fcc41c@|eed246@|d2d254#|fcd246@|fcc41c@|fcb60e@|fcb61c@|e09a1c%|d28c0e%|e09a1c%|fcb62a@|fcb60e@|fcc41c@|fcc446#|fce062=|000000   |fcd238%|fcc42a@|fcc41c@@|fcb62a@|fcd246@|000000        |fcd246#|fcc438#|fcd246*|000000      |fcd246=|fcc438#|fcc42a%|fcc438*
+000000      |fcd238*|fcc42a*|fcc446+|000000        |fcc42a@|fcb61c@|fca80e@|fcb61c@@|fcd246%|000000    |fce054+|fcd238#|fcc41c@|fcb60e@@@|fcc41c@|fcc42a@|fcd246%|000000   |fcd254%|fcd22a@|fcb61c@|fcc41c@|fcb60e@|fcb61c@|fcc42a@|fcd246%=
+000000                  |fce054=|fcc446-|fcd246*|000000         |fcd254*|eec438#|fcd246@|eec446+|000000       |fce062+|fcd254+|fcc446+|fcd254#
+`,
+        plano: `
+                                         =++*-+       =*%=*
+     =*+                              -%%*##*##++   +#****#%#*+- *#####:+*=  *=
+    +*#*#**-      +-++++-   -######=+*%#**===**#*= +##+::-*#%*++##*-:+##*+-=#*+**
+:---*#+=*#*+:   =#***##**+:+#*+==*######*+:::=*##*:*#**==+*#*    ##++*#+   +#=-*#=-:
+    -#+=*#=-===+%#=:-*%*+++##*=::=*#%*%#**+==*##*=   #####%        #++      -**+
+      ++=        #***#*    +*#***###   #%*###%#=
+                  =-+         *+%=       ===*
+`
+      },
+      {
+        color: `
+000000                                         |fce062+|eec454*|fcd254#|eec446+|fcc446*|fce062*|000000       |eec454=|fcd246%%|fcc446*|fcd246*
+000000     |7ec438*|8cd246@#|000000                              |8cd246=|fcd246@|fcc42a%@|fcc41c@|fcc40e@|fcb60e@|fcc41c@|eec42a@|fcd246#|fce062+|000000   |fcd246*|fcc42a@|fcb61c@@|fcb60e@@|fcc41c@|fcd238@|b6d246@|7ed238@|7ec438@|70b638*|000000 |fcd246#|fcc42a@|fcc41c@|fcb61c@@|fcd246%|9ac446-|70c438@|7ed246@|7ec438#|000000  |d2d246#|c4c438*
+000000    |70b638%|9ad238@|c4d238@|b6c438@|c4d246@|8cd246@|7ec438@|70b638+|000000      |fcd254*|eec446=|eed246*|8cd246#*#|7ec438*|000000    |fcd238@|fcc42a@|fcc41c@@|fcb62a@|fcd246@|000000 |8cc438%|8cd238@|eed246@|fcc42a@|fcb60e@|fca81c@|e09a1c%|d28c0e%%|e0a81c@|fcb60e@|fcc41c@|fcd246%|eed254*|000000 |e0d254*|fcc42a@|fcb60e@|eea81c@|a8700e%|9a620e%|c47e1c%|fca80e@|fcb61c@|eed246@|9ac446@|70c438@|7ec438@|d2d246@|fcc41c@|fca80e@|b6701c%|a8700e%|ee9a1c%|fcb60e@|eed246@|7ec438@|70c438@|7ec446+|eed246+|fcc42a@|eea81c@|eea80e@|fcb61c@|fcd246%
+7ed246=|7ec438++|7ec446+|a8c438@|fcc41c@|eea81c@|e09a0e%|fcb61c@|eec42a@|9ad246@|70c438@|70b638=|000000   |fcd254+|fcc42a@|fcb61c@|fca80e@|fcb60e@|fcc42a@|c4c438@|8cd238@|7ed238@|70c438@|70b646=|fcd254+|fcc42a@|fcb60e@|eea81c@|d28c1c%%|eea81c@|fcb60e@|fcc42a@|c4d246@@|fcc438@|fcc40e@|fca80e@|e09a1c%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcc40e@|fcc438@|d2d246@|7ec446=|d2d254%|fcc438@|fcb60e@|fca81c@|d28c1c%|c48c1c%|ee9a1c@|fcb60e@|fcc42a@|fcd246#|000000    |fcd238%|fcc41c@|eea80e@|ee9a0e%|fca81c@|fcc41c@|fcd254+|000000   |eed254*|fcb61c@|e09a1c%|c47e1c%|fca80e@|fcc42a@|a8d246*|7ed246+|7ec446=
+000000    |eed254=|fcc42a@|ee9a1c@|d28c0e%|fca80e@|fcc42a@|a8c446*|70c438*|7ec446**|7ec438*|9ad246#|fcd238@|fcb60e@|d28c1c%|9a620e%|b67e1c%|fcb60e@|fcc42a@|a8c446@|70c438%%|7ec446%|e0d246@|fcc41c@|fcb60e@|d29a1c%|a8620e%%|e09a1c%|fca80e@|fcc41c@|eed246@|b6d254=|fcd246@|fcc41c@|fcb60e@|fcb61c@|e09a1c%|d28c0e%|e09a1c%|fcb61c@|fcb60e@|fcc41c@|fcc446#|000000    |fcd238#|fcc42a@|fcb61c@|fcc41c@|fcc42a@|fcd246%|fce054=|000000       |fcd246%|fcc438*|fcd246%|000000       |fcc438%%*
+000000      |fcd246*|fcc438#=|000000        |fcc42a@|fcb61c@|fca81c@|fcb61c@@|fcd246@|000000    |fce054=|fcc438%|fcc41c@|fcb61c@|fcb60e@@|fcc41c@|fcc42a@|fcd254%|000000   |fcd254*|fcd238@|fcb61c@|fcc41c@|fcb60e@|fcc41c@@|fcd246@|000000         |fce054=
+000000                   |fcd246=+|000000         |fcd246#|eec438#|fcd246%|fcc446*|000000        |fcd254*|eec446+|fce054%
+`,
+        plano: `
+                                         +=*=++       -##++
+     =*+                              -%####*%##+   +##***#%#**- *#####:+*=  *=
+    +*#*#**-      +-*+++=    %####% +*%##*+==**##+ +##+::-*#%*+*##*-:+#%*+-=#*+*#
+:---*#+=*#*+:   =#***##**+:+#**==*####%#*+:::=*#%#-#%#*==+##*    ##++*#+   +#+-*#+-:
+    -#+=*#=====+%#=:-*%*+++#%*=::=*#%-%#**+==*##*    *#####=       #=#       ##=
+      +*=        #***##    =###**###   +%*%*##%         -
+                   ==         *+#+        +=#
+`
+      },
+      {
+        color: `
+000000                                         |fce054+|e0c446=|fce054#|e0b646+|fcd254#|fce062=|000000        |fcd246%|fcc438%|fcd246#=|000000         |fce054=
+000000     |7ec438*|8cd246@#|000000                              |a8d246+|fcd246@|fcc438#|fcc42a@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|fcc42a%|fcd246@|fce062=|000000   |fcd246#|fcc42a@|fcc41c@|fcb61c@|fca80e@|fcb60e@|fcc41c@|eed238@|c4d246@|7ed238@|7ec438@|70b638*|000000 |fcd246#|fcc42a@|fcb61c@@|fcb62a@|fcd246#|c4c446=|70c438@|7ed246@|7ec438#|000000  |c4d246#|c4c438*
+000000    |70b638%|9ad238@|b6d238@|c4c438@|c4d246@|8cd246@|7ec438@|70b638+|000000      |fcd254+|fcc446=|e0d246#|9ad246#|8ce046*|8cd246#|7ec438*|000000    |fcd246@|fcb62a@|fcc41c@@|fcb62a@|fcd238@|fcd262=|8cc438%|8cd238@|e0d246@|fcc42a@|fcb60e@|fca81c@|e09a1c%|d28c1c%%|eea81c@|fcb60e@|fcc41c@|fcd238@|e0d254#|000000 |d2d246#|fcc42a@|fcb60e@|eea81c@|a8700e%|9a620e%|b67e1c%|fca80e@|fcb61c@|eec438@|9ac446@|70c438@|7ec438@|d2d246%|fcc41c@|fca80e@|b6701c%|a8700e%|e09a1c@|fcc40e@|eec446@|7ec438@|70c438@|7ec446+|eed254+|fcc42a@|eea80e@@|fcb61c@|fcc446%
+7ed246=|7ec438++|7ec446+|a8c438@|fcc41c@|eea81c@|e09a0e%|fcb61c@|fcc438@|9ad246@|70c438@|70b638=|000000   |fcd254+|fcc42a@|fcb61c@|fca80e@|fcb60e@|fcc42a@|c4c438@|8cd238@|7ed238@|70c438@|7eb646=|fcd254+|fcc42a@|fcb60e@|eea81c@|d28c1c%%|eea81c@|fcb60e@|fcc42a@|b6c446@|c4d246@|fcd238@|fcc40e@|fca80e@|e09a1c%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc438@|d2d246@|8cd246=|d2d254%|fcc438@|fcb60e@|fca81c@|d28c1c%|d28c0e%|ee9a1c@|fcb60e@|fcc41c@|fcd246%|000000    |fcd238#|fcc41c@|eea81c@|ee9a0e%|fca81c@|fcc41c@|fcd254*|000000   |e0d254*|fcb61c@|e09a1c%|c47e0e%|fca81c@|fcc42a@|a8d246#|7ed246+|7ec446=
+000000    |eed254=|fcc41c@|ee9a1c@|d28c0e%|fca81c@|fcc42a@|9ac446*|70c438*|7ec446**|7ec438*|9ad246#|fcc438@|fcb60e@|d28c1c%|9a620e%|b67e1c%|fca80e@|fcc42a@|a8c446@|70c438%%|7ec446%|d2d246@|fcc41c@|fcb60e@|d29a1c%|a8620e%%|d29a1c%|fcb60e@|fcc41c@|fcd246%|000000 |fcc446@|fcc41c@|fcb61c@@|e09a1c%|d28c0e%|e09a1c%|fcb61c@@|fcc41c@|fcc446@|000000   |fce054+|fcd238*|fcc42a@|fcb61c@|fcc41c@|fcc42a@|fcc438#|fce054+|000000      |fcd246=#|fcc438*|fcd246%|000000       |fcd238%|fcc42a@*
+000000      |fcd238*#|fcc438=|000000       |fce054=|fcc42a@|fcb61c@|fca81c@|fcb61c@@|fcd246@|000000     |fcc438@|fcc41c@|fcb61c@|fcb60e@|fca80e@|fcb61c@|fcc42a@|fcd254#|000000  |fce054=|fcc454=|fcd238@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|fcb61c@|fcd238@
+000000                   |fcd246+=|000000         |fcd246*|fcc446##|fcd246#|000000        |fce054#|eec446*|fce054#
+`,
+        plano: `
+                                         +-#=*-        ###=         =
+     =*+                              =%*###*##%=   *%##**#%#**- *####*-**+  *=
+    +*###**-      ==*+++=    %#%##%-+*%##*+==*##%* *#*+::-*##*+*##*-:+#%*+-+%*+*#
+----*#*+*#*+:   +##**##**+:+%#*==*#%##%#*+:::=*#%#-#%#*==+###    *#++*#+   +#+-*%+=:
+    -#+=*#=====+%#=:-*%*+++#%*+::=*%# ####+==####   =+%##%*+      -*=#       ##+
+      +*-       -%**##%     %##**##*  ==%##*%#%
+                   =-         ****        #+*
+`
+      },
+      {
+        color: `
+000000                                         |fcd254=|eec454=|fce054#|eec446*|fce054%|000000        |eec446=|fcd246#|eec438%|fcd246@|000000          |fce054=
+000000     |7ec438*|8cd246@#|000000                              |c4d254+|fcd246#|fcc438#|fcc42a@|fcb61c@|fcc41c@|fcb60e@|fcc41c@|fcc42a@|fcd246@|000000    |fcd254%|fcc42a@|fcc41c@|fcb60e@|fca80e@|fcb60e@|fcc41c@|eed238@|c4d246@|7ed238@|7ec438@|70b638*|000000 |fcd246*|fcc438@|fcb61c@@|fcc42a@|fcd246#|c4d246+|70c438@|7ed246@|7ec438#|000000  |b6d246#|d2c446*
+000000    |70b638%|9ad238@|a8d238@|d2c438@|c4d246%|8cd246@|7ec438@|70b638+|000000      |fcd246=+|c4c446*|a8d246#|8cd246*#|7ec438*|000000    |fcd254@|fcc42a@|fcc41c@@|fcc42a@|fcd238@|eed262=|7eb638%|9ad238@|e0d246@|fcc41c@|fcb60e@|fca81c@|e09a1c%|d28c1c%|d29a1c%|eea80e@|fcb60e@|fcc41c@|fcd246@|d2d254#|000000 |c4d254%|fcc42a@|fcb60e@|eea81c@|a8700e%|9a620e%|b67e1c%|fca80e@|fcc40e@|eec438@|9ac446@|70c438@|7ec438@|d2d254#|fcc41c@|fca80e@|b6701c%|a8700e%|e09a1c@|fcc40e@|eec438@|7ec438@|70c438@|7ec446+|e0d246*|fcc42a@|eea80e@@|fcb61c@|fcc438%
+7ed246=|7ec438++|7ec446+|a8c438@|eec41c@|eea81c@|e09a0e%|fcb61c@|fcc438@|8cd246@|70c438@|70b638=|000000   |fcd254*|fcc42a@|fcb61c@|fca80e@|fcb61c@|fcc42a@|c4d238@|8cd238@|7ed238@|70c438@|7eb646=|fcd254+|fcc42a@|fcb60e@|fca81c@|d28c1c%%|eea81c@|fcb60e@|fcc42a@|c4d246@|a8d246@|fcc438@|fcc40e@|fca80e@|e09a1c%|a8620e%|9a620e%|a8620e%|d28c1c%|fca80e@|fcb60e@|fcc42a@|e0d246@|9ad246+|e0d254#|fcc438@|fcb60e@|fca81c@|d28c1c%|d28c0e%|ee9a1c@|fcb60e@|fcc42a@|fcd254%|000000    |fcd238%|fcc41c@|eea81c@|ee9a0e%|fcb61c@|fcc42a@|eed254#|000000   |e0d246*|fcc41c@|e09a1c%|c47e0e%|fca81c@|fcc42a@|a8d246#|7ed246+|7ec446=
+000000    |eed254=|fcc42a@|eea81c@|d28c0e%|fca81c@|fcc42a@|9ac446*|70c438*|7ec446**|7ec438*|9ad246#|fcc438@|fcb60e@|d28c1c%|9a620e%|b67e1c%|fca80e@|fcc42a@|a8c446@|70c438%%|8cc446%|e0d246@|fcc41c@|fca80e@|d29a1c%|a8620e%%|d28c1c%|fcb60e@|fcc41c@|fcd254#|000000 |fcc446%|fcc41c@|fcb60e@|fcb61c@|e09a1c%|d28c0e%|e09a1c%|fcb61c@|fcb60e@|fcc41c@|fcd246@|000000   |fce054*|fcc446*|fcd22a@|fcb61c@|fcc41c@|fcc42a@|fcc438#|fce054+|000000      |fcd246+|fcc438**|fcd238#|000000       |fcc438#%|fcd238*
+000000      |fcd238*#|fcc438+|000000       |fcd254+|fcc438@|fcb61c@|fca80e@|fcb61c@|fcc42a@|fcd246%|000000     |fcd238@|fcc41c@|fcb61c@|fcb60e@|fca80e@|fcb61c@|fcc42a@|fcd246#|000000  |fce054+|fcd246=@|fcc41c@|fcb61c@|fcb60e@|fcc41c@|fcb61c@|fcd238@|fcd262+
+000000                   |fcd246*|000000 |fce054=|000000        |fcc446+|fcd246%|eec438#|fcd246#|000000        |fce054#|eec446*|fcd254*|fce062=
+`,
+        plano: `
+                                         =-*+#        -#*%          =
+     =*+                              =#*%*####%    ###***#%#**- *%###*=+*=  *+
+    +*###**-      -+++++=    %#%##%=+*%##*+==**#%* *#*+::-*##*+**#*-:+##*+-+#*+##
+:---*#*=*#*+:   +##**##**+:+%#*==**%##%#*+:::=*#%#-*%#*==+###    ##++##*   +#+-*%+=:
+    =#+=*%=====+%*=:-*#*++*##*+::=*%* *##*+=+*#%%   ++%##%*=      =++*       *#+
+      +*=       =##*###     %##**##*  +-%###%#%=
+                   + =        +#*#        #++=
+`
+      }
+    ]
   },
   {
     cols: 70, alto: 6,
-    color: `
-000000                                   |fcc446=|fcd246#|fcc446#|fcd246%|fcd254=|000000      |fcd246*|fcd238%|fcc438%|fcd246@|000000  |7ed246=|000000     |fcd246+
-000000    |70c438#|8cd246@#|000000                   |fcc446=|fcd246**|000000   |7ec438+|fcd246#|fcc438%|fcc41c@|fcb60e@@@|fcc41c@|fcd238@|000000   |fcd254=|fcc42a@|fcb61c@|eea81c@|ee9a0e%|eea80e@|fcc41c@|e0d246@|8cd246@|7ec438@|70b638*|000000 |fcc438%|fcb61c@|eea80e@|fcb61c@|fcc438%|a8c446%|7ed238@|7ec438@|000000  |d2c438@|fcc42a#
-000000   |70b638#|b6d238@|e0c42a@|fcc42a@|e0d238@|a8d246@|70c438@|70b638=|000000    |fcd238#|fcc42a@|eec42a@|d2d238@|9ad246@|7ed238@|70c438%|000000  |fcd246%|fcc42a@|fcb61c@|fca80e@|fcb61c@|fcc42a@|fcd246#|8cc438@|d2d246@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c47e1c%|fca80e@|fcc40e@|fcc438@|d2d246%|8cd246*|fcd246@|fcc40e@|fca81c@|a8701c%|a8620e%|d28c1c%|fcb60e@|fcc42a@|d2d246*|70c438+|8cc446+|fcd246%|fcb60e@|e09a1c%|a8701c%|e09a1c%|fcb61c@|d2c446@|70c438#|7ec438*|d2d246#|fcb61c@|d28c0e%|c48c0e%|fcb61c@|eed246#
-000000 |7ec438-=|b6d246*|fcc42a@|e09a1c%|b6701c%|fcb61c@|e0c438@|70c438@|7ec438%|7ec446+|7ec438+|d2d254*|fcc42a@|fca81c@|c47e0e%|c48c1c%|fcb60e@|fcd238@|7ec438@|70c438@@|eed246@|fcc41c@|fca80e@|b6701c%|9a620e%|c48c1c%|fca80e@|fcc41c@|d2c446@|eed246%|fcc42a@|fcb60e@|eea81c@|c47e1c%|b6701c%|c48c1c%|fca81c@|fcc40e@|fcc438@|000000   |fcd238%|fcc42a@|fcb61c@|fcb60e@|fcb61c@|fcc42a@|fcd254+|000000    |fcd254*|fcc42a@@@|fcd246+|000000    |fcd238#|fcb62a@@|fcc438%|eed254=
-000000     |fcc42a#%|fcd246+|000000      |fcc438%|fcb61c@|ee9a0e%|eea81c@|fcb61c@|fcc446@|000000   |fce062=|fcc438@|fcb61c@|fca81c@|ee9a0e@|fcb61c@|fcc41c@|fcd238#|000000  |fcd246#|fcc438%|fcc41c@|fcb60e@@|fcc41c@@|fcd246@|000000      |fcd254+|eec446+|fcd254=
-000000               |fcd246=+|fcc446-|000000       |fcd254*|fcc446*|fcc438%|fcd246#|000000       |fcd254#|fcc446*|fcd254*
+    marcos: [
+      {
+        color: `
+000000                                   |fcc454=|fcd246*|eec446#|fcd246%|000000       |fcd246*|fcd238#|fcc438%|fcd246%|000000 |c4e054=|7ed246=|000000     |fcd246+|000000    |8cd246-
+000000    |70c438#|8cd246@%|000000                    |fcd246+*|000000   |7ec438*|fcd246%|fcc42a%|fcc41c@|fcb60e@@@|fcb61c@|fcc438@|fcd254=|000000  |fcd254+|fcc42a@|fcb61c@|eea81c@|ee9a0e@|eea80e@|fcc41c@|e0d246@|8cd238@|7ec438@|70b638*|fcd254=|fcc42a%|fcb61c@|eea80e@|fcb61c@|fcc438%|a8c446%|7ed238@|7ec438@|000000  |d2c438@|eec438#
+000000   |7eb638#|b6c438@|e0c42a@|fcc42a@|d2d238@|9ad246@|70c438@|70b638=|000000    |fcd238#|fcc42a@|e0c42a@|c4d246@|8cd246@|7ed238@|70c438%|000000  |fcd246%|fcc42a@|fcb61c@|fcb60e@|fcb61c@|fcc41c@|fcd246%|8cc438@|c4d246@|fcc42a@|fcb60e@|fca81c@|b67e1c%|a8701c%|c47e1c%|fca80e@|fcc40e@|fcc438@|b6d246%|8cd246#|eed246@|fcc40e@|fca81c@|a8701c%|9a620e%|d28c1c%|fcb60e@|fcc42a@|c4d246*|70c438*|7ec438+|e0d246%|fcb60e@|e09a1c%|a8701c%|e09a1c%|fcb61c@|d2c446@|70c438#|7ec438*|c4d246#|fcc41c@|d28c0e%|c48c0e%|fcb61c@|eed246#
+000000 |7ec438==|9ad246*|fcc42a@|e09a1c%|b67e1c%|fcb61c@|e0c438@|7ec438@%++|b6d246*|fcc42a@|fca81c@|c47e0e%|c48c1c%|fcb60e@|fcd238@|7ec438@|70c438@@|e0d246@|fcc41c@|fca80e@|b6701c%|9a620e%|c48c1c%|fca80e@|fcc41c@|d2d246@|eed246@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fca81c@|fcc40e@|fcc438@|000000  |fcd262=|fcc438%|fcc42a@|fcb61c@|fcb60e@|fcb61c@|fcc438@|fcd246+|000000    |fcd254+|fcc42a@@@|fcd246*|000000    |fcd238#|fcb62a@|fcb61c@|fcc438@
+000000     |fcc42a#%|fcd238#|000000      |fcc438%|fcb61c@|e09a0e%|ee9a1c@|fcb61c@|fcc446%|000000   |fce054=|fcc42a@|fcb61c@|fca81c@|ee9a0e%|fca81c@|fcc41c@|fcd238%|000000  |fcd246%|fcc42a%|fcc41c@|fcb60e@@|fcb61c@|fcc42a@|fcd246@|000000      |fcd246+|eec446+|fcd254=
+000000               |fcd246=+|fcc438=|fcd254+|000000      |fcd254+|fcc438#%|fcd246%|000000      |eec454=|fcd254#|fcc446*|fcd246#
 `,
-    plano: `
-                                   -*+#-      +#*#  :     =
-    =*+                   -+*   -*##**##%   =##++*##**- ##*##***  #*
-   =#####+:    *####*+  *#***#**##**-:-*#%#=%#*::=*#+-=##=:+##==+#==**
- :-=#+-*#++--+%*-=*%+++%#*-:-*####**--=*#%   ##**##=    +###=    *##*-
-     **+      ##++##   -##*+*#*  ###**##%      +=-
-               ==-       ++**       *++
+        plano: `
+                                   =++#       ***# --     +    -
+    +*+                    =+   =#*#**##%=  =##++*##**==##*#****  #*
+   =#####+:    ####**+  ###*###*##**-:-*#%*+%#*::=*#+-=##=:+##+=*#==#*
+ :-=#+-*#++--=%*-=#%+++##*-:=*####**--=*#%  -##**##=    +###+    *#*#
+     *#*      ##++##   =%#*+*#*  ###**##%      ===
+               =+-=      ++##      -*+*
 `
+      },
+      {
+        color: `
+000000                                    |fcd254#|eec446#|fcd246%|000000       |fcd254*|fcc438#%|fcd246@|000000 |d2e054=|7ed246=|000000     |fcd246+|000000    |8cd246-
+000000    |70c438#|8cd246@%|000000                    |fcd246+*|000000   |9ac446*|fcd246#|fcc438%|fcc41c@|fcb60e@@@|fcc41c@|fcc438@|fce054+|000000  |fce062=|fcc42a@|fcb61c@|eea81c@|ee9a0e@|eea80e@|fcc41c@|e0d238@|8cd246@|7ec438@|70b638*|fcd254+|fcc42a@|fcb61c@|eea80e@|fcc41c@|fcc438%|9ac438%|7ed238@|7ec438@|000000 |e0d254=|d2c438@|eec438#
+000000   |70b638#|b6d238@|e0c42a@|fcc42a@|d2c438@|9ad246@|70c438@|70b638=|000000    |fcd238#|fcc42a@|e0c42a@|b6d246@|9ad246@|7ed238@|70c438%|000000  |fcc446%|fcc41c@|fcb61c@|fcb60e@|fcb61c@|fcc41c@|eed246@|9ac438@|c4d246@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fca80e@|fcc40e@|fcc438@|d2d246#|8cd246*|eed246@|fcb60e@|fca80e@|a8701c%|9a620e%|d28c1c%|fcb60e@|fcc42a@|c4c446#|70c438*|7ec438*|e0c446%|fcb60e@|e09a1c%|a8701c%|e09a1c%|fcc41c@|e0d246@|70c438#|7ec438*|c4d254#|fcb61c@|d28c0e%|c48c0e%|fcb61c@|eed246#
+000000 |7ec438==|a8d246*|fcc42a@|e09a1c%|b67e1c%|fcb61c@|e0c438@|70c438@|7ec438%++|b6d246#|fcc42a@|fca81c@|c47e0e%|c48c1c%|fcb60e@|eec438@|7ec438@|70c438@@|eed246@|fcc41c@|fca80e@|b6701c%|9a620e%|c48c1c%|fca80e@|fcc41c@|c4c446@|e0d246@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fca81c@|fcb60e@|fcc438@|000000  |fcd254=|fcc42a%@|fcb61c@|fcb60e@|fcb61c@|fcc438@|fcd246+|000000    |fcd246+|fcc42a@|fcc41c@|fcc42a@|fcd246*|000000    |fcd246#|fcb62a@|fcb61c@|fcc42a%
+000000     |fcc42a#%|fcd246#|000000      |fcc438@|fcb61c@|e09a0e%|ee9a1c@|fcb61c@|fcd246%|000000   |fcd254=|fcc42a@|fcb61c@|fca81c@|ee9a0e@|fca81c@|fcc41c@|fcd238%|000000  |fcd246@|fcc42a%|fcc41c@|fcb60e@@|fcc41c@@|fcd246@|000000      |fcd254+|eec446+|fce054=
+000000               |fcd254=|fcc438+|fcd246++|000000      |fcd246+#|fcc438%|fcd246#|000000      |fcd254+|fcc446+|fcd246#*
+`,
+        plano: `
+                                    **%       +*#% --     =    -
+    +*+                    ++   =*###*##%=  =%#++*##**==##*##+** -#*
+   =#####+:    *%###*+  ###*###*###*-:=*#%*=%#*::=*#+-=*#=:+##+=+#==#*
+ :-=#+-*#++--+%*-=##+++#%*-:=*####**--=*#%  =#%#*#%+    =%##*    *#*#
+     ***      %#++##   =##*+*##  %##*###%      +=-
+               ====      +***      =+*+
+`
+      },
+      {
+        color: `
+000000                                    |fcd246#|eec446#|fcd246%|000000 |fce062=|000000     |fcd254+|fcc438#|fcd238%%|e0d254=|000000 |7ed246=|000000     |fcd246=|000000    |8cd246-
+000000    |70c438#|8cd246@#|000000                   |eec446=|fcd246+|fcc446+|000000   |a8d246*|fcd246#|fcc438@|fcc41c@|fcb60e@@@|fcc41c@|fcc438%|fcd246*|000000  |fcd254=|fcc42a@|fcb61c@|eea81c@|ee9a0e%|eea80e@|fcc41c@|e0d238@|9ad246@|7ec438@|70b638*|fcd254=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc438%|8cc446%|7ed238@|7ec438@|000000 |d2d254=|e0d238@|eec42a#
+000000   |70b638#|b6d238@|eec42a@|fcc42a@|d2c438@|9ad246@|70c438@|70b638=|000000    |fcc438*|fcc42a@|eec42a@|b6d238@|9ad246@|7ed238@|70c438%|000000  |fcd246@|fcb61c@@|fcb60e@|fcb61c@|fcc41c@|eec446@|8cc438@|c4d246@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fcb60e@|fcc40e@|fcc438@|e0d254#|8cd246*|fcd246%|fcb60e@|fca80e@|a8701c%|9a620e%|d28c1c%|fcb60e@|fcc42a@|b6c446%|70c438+|7ec438+|e0c446%|fcb60e@|e09a1c%|a8701c%|e09a1c%|fcc41c@|e0d246@|70c438#|7ec438*|c4d246*|fcb61c@|d28c0e%|c48c0e%|fcb61c@|eed246#
+000000 |7ec438==|a8d246*|fcc42a@|e09a1c%|b6701c%|fcb60e@|eec438@|70c438@|7ec438%++|b6c446#|fcc42a@|fca80e@|c47e0e%|c48c1c%|fcb60e@|eec438@|7ec438@|70c438@|7ec438@|eed246%|fcc41c@|fca80e@|b6701c%|9a620e%|c48c1c%|fca80e@|fcc41c@|c4c446@|d2c446@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fca80e@|fcb60e@|fcc438@|fcd262=|000000 |fcd254+|fcd238%|fcc42a@|fcb61c@@@|fcc438@|fcd246+|000000    |fcd246+|fcc42a@@|fcb61c@|fcd246#|000000    |fcd238#|fcb62a@|fcb61c@|fcc42a%
+000000     |fcc42a#%|fcc438#|000000      |fcd238@|fcb61c@|e09a0e%|ee9a1c@|fcb61c@|fcd246#|000000   |fcd262+|fcc42a@|fcb61c@|fca81c@|ee9a0e%|fca81c@|fcc41c@|fcc438%|000000  |fcd254%|fcc42a@|fcb61c@|fcb60e@@|fcb61c@|fcc41c@|fcd238@|000000      |fcd246++
+000000               |fce054=|fcc438+|fcd246+|000000       |fcd246=%|fcc438%|fcd246#|fcd254=|000000     |fce054*|eec446+|fcd246%|eec446*|fce062=
+`,
+        plano: `
+                                    **# =     =+##- -     -    :
+    =*+                   -==   =*###**#*+  =#*++*##**-=#*+##+*+ -#*
+   =*###*+:    +####*+  ###*###*###+-:-*##*=##*::=*#*--**=:=##==+#=-#*
+ :-=#+-*#++--+#*-=*#+++##*-:-*####*+-:-**#- =*#***#+    =##**    ****
+     +**      %*++#*   =##*+*##  ###**###      +=
+               --+       =***=     +=#=-
+`
+      },
+      {
+        color: `
+000000                                    |fcd246#|fcc446#|fcd246*=|000000      |fcd246=|fcc438#|fcd238%|fcc438#|e0d254+|000000 |7ed246=|000000          |8cd246-
+000000    |70c438#|8cd246@%|000000                   |fcd246=+|eec446=|000000   |b6d246*|e0d246#|fcc438@|fcb61c@|fcb60e@@@|fcc41c@|fcc438%|fcd254#|000000  |fcd254=|fcc42a@|fcb61c@|eea81c@|ee9a0e@|fcb60e@|fcc41c@|eed238@|9ad246@|7ec438@|70b638*|fce054=|fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc438@|9ac446#|7ed238@|7ec438@|000000 |d2d246+|e0d238@|eec438%
+000000   |70b638#|b6d238@|eec42a@@|d2c438@|8cd238@|70c438@|70b638=|000000    |fcc438*|fcc42a@@|b6d238@|9ad246@|7ed238@|70c438%|000000  |fcd246%|fcb61c@@|fcb60e@|fcb61c@|fcc41c@|eec446@|8cc438@|c4d246@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|b68c1c%|fca80e@|fcb60e@|fcc438@|e0d254#|8cd246*|eed246@|fcb60e@|fca81c@|a8701c%|9a620e%|d29a1c%|fcb60e@|fcc42a@|b6c446%|70c438*|7ec438*|e0c446%|fcb60e@|e09a1c%|a8701c%|e09a1c%|fcc41c@|e0d246@|70c438#|7ec438*|c4d246*|fcb61c@|d28c0e%|c48c0e%|fcb61c@|eed246#
+000000 |7ec438==|a8d246*|fcc42a@|e09a1c%|b6701c%|fcb60e@|eec438@|70c438@|7ec438%++|c4d246#|fcc42a@|fca80e@|c47e0e%|d28c0e%|fcb60e@|eec438@|7ec438@|70c438@@|eed246#|fcc41c@|fca80e@|b6701c%|9a620e%|c48c1c%|fca80e@|fcc41c@|d2d246@|d2c446@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fca80e@|fcb60e@|fcc438@|fcd262+|000000 |fcd254+|fcd238%|fcb61c@@@@|fcc438%|fcd254+|000000    |fcd238+|fcc42a@|fcb61c@|fcc42a@|fcd246#|000000    |fcc438#|fcb62a@@|fcc42a%
+000000     |fcc42a#%|fcc438#|000000      |fcd238@|fcb61c@|e09a0e%|ee9a1c@|fcb61c@|fcd246#|000000   |eed254+|fcc42a@|fcb61c@|fca81c@|ee9a0e@|fca81c@|fcc41c@|fcc438@|000000  |fcd254#|fcc42a@|fcb61c@|fcb60e@@@|fcc42a@|fcd238#|000000      |fcd246+*
+000000                |fcc438+|fcd246*|000000       |fcc446=|fcd246%|fcc438%|fcc446#|fcd254=|000000     |fce054+|eec446+|fcd246%|eec446+|fce062+
+`,
+        plano: `
+                                    ***=      =*%*= -          -
+    +*+                   =+-   =*%###*##*  =%#++*#%#*=-%**##+** =#*
+   =####*+:    +%###*+  ###*###*#%#*-:=*#%*=##*::=*%*-=##+:+#%+=+#==#*
+ :-+#+-*%*+--+#*-=##+++*#*-:=*%##%**--=*#%+ +###*##+    +%##*    *#*#
+     ***      %*++#*   +##*+*#%  *%######      ++
+                =+       -##*=     +=%==
+`
+      },
+      {
+        color: `
+000000                                    |fcc446#|fcd246#|eec446+|fcd246*|000000      |eec446=|fcc438%|fcd238@|fcc438*|eed254*|000000 |7ed246=|000000    |fce054=|000000     |8cd246-
+000000    |70c438#|8cd246@%|000000                   |fcd254+|fcd246+|eec446=|fce054=|000000  |a8d246*|d2d246%|fcc42a@|fcb61c@|fcb60e@@@|fcc41c@|fcd238%|fcd254*|000000  |fcd254=|fcc42a@|fcb61c@|eea81c@|e09a0e%|fcb61c@|fcc41c@|eed238@|9ad246@|7ec438@|70b638*|000000 |fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc438@|a8c446#|7ed238@|7ec438@|000000 |d2d246+|e0d238@|eec438%
+000000   |70b638#|b6c438@|eec42a@@|d2c438@|8cd238@|70c438@|70b638=|000000    |fcc438*|fcc42a@@|b6d238@|9ad246@|7ed238@|70c438%|000000  |fcd246#|fcc41c@|fcb61c@|fcb60e@|fcb61c@|fcc42a@|eec446@|7ec438@|c4d246@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|b68c1c%|fca80e@|fcb60e@|fcc438@|d2d254%|8cc446*|eed246@|fcb60e@|fca81c@|a8700e%|9a620e%|d28c1c%|fcb60e@|fcc42a@|b6c446@|70c438*|7ec438*|eed246@|fcb60e@|e09a1c%|a8701c%|e09a1c%|fcb61c@|d2d246@|70c438#|7ec438*|d2d246#|fcc41c@|d28c0e%|c48c0e%|fcb61c@|e0d246*
+000000 |7ec438==|b6d246*|fcc42a@|e09a1c%|b6701c%|fca80e@|eed238@|70c438@|7ec438%++|c4d246*|fcc42a@|fca80e@|c47e0e%|d28c0e%|fcb60e@|eec438@|7ec438@|70c438@@|e0d246%|fcc41c@|fcb60e@|b6701c%|9a620e%|c48c1c%|fca80e@|fcc41c@|d2d246@|d2c446@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fcb60e@@|fcc438@|fcd262+|000000 |fcd254+|fcd238@|fcb61c@@|fcb60e@|fcc41c@|fcc42a%|fcd254+|000000    |fcd246*|fcc42a@|fcb61c@|fcc42a@|fcd238#|000000    |fcc438#|fcb62a@|fcb61c@|fcc42a@
+000000     |fcc42a#%|fcc438*|000000      |fcd238%|fcb61c@|e09a0e%|ee9a1c@|fcb61c@|fcd246#|000000   |fcd254*|fcc42a@|fcb61c@|fca81c@|e09a0e%|fcb61c@@|fcd246@|000000  |fcd246+|fcc42a@|fcb61c@|fcb60e@@@|fcc42a@|fcd238#|fcd254=|000000     |fcd246+*
+000000                |fcd238+|fcd246*|000000        |fcd246%|fcd238%|eec438*|fcd254=|000000     |fce054=|fcc446*|fcd246#|eec446+|fcd254=
+`,
+        plano: `
+                                    *#=+      -#%++ -    -     -
+    +*+                   =+-=  =#%###*##*  =%#++*#%#*= %***#+** =#*
+   =####*+:    +#%##*+  *##*###*#%#*-:=*#%#=##*::=*%*-=##=:+##+=+#==#+
+ :-+#+-*%++--+#*-=*#+++*#*-:=*%##%#*--=*#%+ =%##*##=    *###*    *#*#
+     **+      ##++#*   +##*+*#%  +%###*%*=     =+
+                =*        ##+=     =+*==
+`
+      },
+      {
+        color: `
+000000                                   |fce054+|eec446*|fcd246%|eeb646+|fce054#|000000      |eec446=|fcd246%|fcd238@|fcc438*|fcd254*|000000 |7ed246=|000000    |fcd254=|000000     |8cd246-
+000000    |70c438#|8cd246@%|000000                   |fcd254+|fcc446+|fcd246=|fce054=|000000  |9ac446*|d2d246@|fcc42a@|fcb61c@|fcb60e@@@|fcb61c@|fcd22a@|fcd254+|000000  |fcd254=|fcc42a@|fcb61c@|eea80e@|ee9a0e%|fcb61c@|fcc41c@|eec446@|8cd238@|7ec438@|70b638*|000000 |fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc438@|a8c446%|7ed238@|7ec438@|000000 |e0d254+|e0d238@|e0c438%
+000000   |70b638#|b6c438@|eec42a@@|d2c438@|9ad246@|70c438@|70b638=|000000    |fcc438#|fcc42a%@|c4d246@|8cd246@|7ed238@|70c438%|000000  |fcd246#|fcc42a@|fcb61c@@@|fcc42a@|fcd238%|7ec438@|c4d246@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|b68c1c%|fca80e@|fcb60e@|fcc438@|c4d254@|8cc446*|eed246@|fcc40e@|fca81c@|a8700e%|9a620e%|d28c1c%|fcb60e@|fcd22a@|c4d246%|70c438*|7ec438*|eed246@|fcb60e@|e09a1c%|a8701c%|e09a1c%|fcb61c@|d2d246%|70c438#|7ec438*|d2d246#|fcc41c@|d29a1c%|c48c0e%|fcb61c@|e0d246#
+000000 |7ec438==|a8d246*|fcc42a@|e09a1c%|b6701c%|fca80e@|eec438@|70c438@|7ec438%++|b6d246*|fcc42a@|fca80e@|c47e0e%|d28c0e%|fcb60e@|eec438@|70c438@@@|e0d246%|fcc41c@|fcb60e@|b6701c%|9a620e%|c48c1c%|fca80e@|fcc41c@|e0d246@%|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fcb60e@@|fcc438@|fcd254+|000000 |fce054=|fcc438@|fcb61c@@|fcb60e@|fcc41c@|fcc42a%|fcd254+|000000    |fcd246*|fcc42a@|fcb61c@|fcc42a@|fcd238*|000000    |fcc438#|fcb62a@|fcb61c@|fcc42a@
+000000     |fcc42a#@*|000000      |fcc438%|fcb61c@|e09a0e%|ee9a1c@|fcb61c@|fcd246%|000000   |fcd254*|fcc42a@|fcb61c@|fca81c@|e09a0e%|fcb61c@@|fcd238@|000000 |fce062=|fcd246+|fcc438@|fcb61c@|fcb60e@@@|fcc42a@|fcd238*|fce054+|000000     |eec446=|fcd246*|eec454=
+000000                |fcd246*|fcd238*|000000       |fcd254=|fcd238#@|fcc438#|000000       |fcd246#|fcc446*|fcd254*
+`,
+        plano: `
+                                   =+#=#      -#%+* -    =     -
+    +*+                   =+--  =#%#####%+  =##++*##**= ##**#+** =#*
+   =####*+:    **%#**+  *##*#%**#%#*-:-*#%#=##*::=*%*-=%#+:+##+=*#==#+
+ :-=#+-*#++--=#*-=*#+++##*-:=*###%#*--=*#%+ =%##*##=    *###+    *#*#
+     *#+      ##++##   +%#*+*## =+%###*%+=     -+-
+                ++       -*%+       *++
+`
+      },
+      {
+        color: `
+000000                                   |fcd254*|eec446+|fcd246%|eec446#|fce054#|000000      |fcc446=|fcd246%|fcc438@*|fcd246*|000000 |7ed246=|000000     |fcd246=|000000    |8cd246-
+000000    |70c438#|8cd246@%|000000                   |fcd254=|eec446+|fcd254=|000000   |7ec438+|e0d246@|fcc42a@|fcb61c@|fcb60e@@@|fcb61c@|fcd238@|fcd254+|000000  |fcd254=|fcc42a@|fcb61c@|eea81c@|e09a0e%|fcb60e@|fcc41c@|eec446@|8cd238@|7ec438@|70b638*|000000 |fcc42a@|fcb61c@|eea80e@|fcb61c@|fcc438%|a8c446%|7ed238@|7ec438@|000000 |e0d246=|e0d238@|e0c42a#
+000000   |7eb638#|b6c438@|e0c42a@|fcc42a@|d2d238@|9ad246@|70c438@|70b638=|000000    |fcd238#|fcc42a%|eec42a@|c4d246@|7ed246@|7ed238@|70c438%|000000  |fcd238#|fcc42a@|fcb61c@|fcb60e@|fcb61c@|fcc42a@|fcd246#|7ec438@|c4d246@|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fca80e@|fcb60e@|fcc438@|b6d246@|7ec446#|eed238@|fcc40e@|fca81c@|a8700e%|9a620e%|d28c1c%|fcb60e@|fcd22a@|c4d254#|70c438*|7ec438*|eed246@|fcc40e@|d29a1c%|a8701c%|e09a1c%|fcb61c@|d2d246%|70c438#|7ec438*|d2d246%|fcc41c@|d28c1c%|c48c0e%|fcb61c@|e0c446#
+000000 |7ec438==|a8c446*|fcc42a@|e09a1c%|b67e1c%|fcb61c@|e0c438@|7ec438@%++|b6d246+|fcc42a@|fca80e@|c47e0e%|d28c0e%|fcb60e@|fcc438@|70c438@@@|d2d246@|fcc41c@|fcb60e@|b6701c%|9a620e%|c48c1c%|fca80e@|fcc41c@|e0d246%|fcd246#|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fcb61c@|fcc40e@|fcc438@|fce054+|000000 |fcd254=|fcc438@|fcb61c@@|fcb60e@|fcc41c@|fcc42a@|fcd254+|000000    |fcd246*|fcb62a@|fcc42a@@|fcd246*|000000    |fcc438#|fcb62a@|fcb61c@|fcc438@
+000000     |fcc438%|fcc42a@*|000000      |fcc438%|fcb61c@|e09a0e%|eea81c@|fcb61c@|fcd246%|000000   |fcd254+|fcc42a@|fcb61c@|fca81c@|e09a0e%|fcb61c@@|fcd238%|000000 |fce062=|fcd246*|fcc438@|fcc41c@|fcb60e@@@|fcc42a@|fcc446#|fce054+|000000     |eec446=|fcd246*|fcd254+
+000000                |fcd246*|fcc438+|000000       |fcd254=|fcc438*|fcd238@|fcc446#|000000       |fcd246#|eec446*|fcd254#
+`,
+        plano: `
+                                   +=#+*      -##+* -     =    -
+    +*+                   ===   =%%#*###%=  =##++*##**= ##*##*** =#*
+   =#####+:    **##**+  *%#*#%**#%**-:-*#%#+%#*::=*%*-=%#=:+##+=*#==#*
+ :-=#+-*#*+--=#*-=*%+++##*-:=*##*##*--=*#%+ -%##*##=    +##%+    *#*%
+     ##+      *#++##   +%#*+*## =+%##*#%*+     -+=
+                +=       =+%*       #+*
+`
+      },
+      {
+        color: `
+000000                                   |fcd254+|fcc446+|fcd246#|fcc446#|fcd254+|000000      |fcd246+|fcd238#|fcc438%|fcd246#+|000000 |7ed246=|000000     |fcd246+|000000    |8cd246-
+000000    |70c438#|8cd246@%|000000                   |fcd254=|eec446+|fcd254+|000000   |7ec438+|eed246@|fcc42a%|fcc41c@|fcb60e@@@|fcb61c@|fcc438@|fcd254=|000000  |fcd254+|fcc42a@|fcb61c@|eea81c@|ee9a0e%|fca80e@|fcc41c@|e0d246@|8cd238@|7ec438@|70b638*|fcd254=|fcc42a%|fcb61c@|eea80e@|fcb61c@|fcd238%|a8c446%|7ed238@|7ec438@|000000 |e0d254=|d2d238@|e0c42a#
+000000   |7eb638#|b6c438@|e0c42a@|fcc42a@|d2d238@|9ad246@|70c438@|70b638=|000000    |fcd246#|fcc42a%|eec42a@|c4d246@|8cd246@|7ed238@|70c438%|000000  |fcd238#|fcc42a@|fcb61c@|fcb60e@|fcb61c@|fcc42a@|fcd246#|8cc438@|c4d246@|fcc42a@|fcb60e@|fca81c@|b67e1c%|a8701c%|c47e1c%|fca80e@|fcb60e@|fcc438@|b6c446%|8cd246#|eed246@|fcc40e@|fca81c@|a8701c%|9a620e%|d28c1c%|fcb60e@|fcc42a@|c4d246*|70c438*|7ec438+|eed246@|fcc40e@|e09a1c%|a8701c%|e09a1c%|fcb61c@|d2c446%|70c438#|7ec438*|c4d246%|fcc41c@|d28c0e%|c48c0e%|fcb61c@|e0d246#
+000000 |7ec438==|9ac446*|fcc42a@|e09a1c%|b67e1c%|fcb61c@|e0c438@|7ec438@%++|b6d246+|fcc42a@|fca80e@|c47e0e%|d28c0e%|fcb60e@|fcd238@|7ec438@|70c438@@|d2d246@|fcc41c@|fcb60e@|b6701c%|9a620e%|c48c1c%|fca80e@|fcc41c@|d2d246%|fcd246#|fcc42a@|fcb60e@|eea81c@|b67e1c%|a8701c%|c48c1c%|fca81c@|fcc40e@|fcc438@|fce054=|000000 |fcd262=|fcc438@|fcc41c@|fcb61c@|fcb60e@|fcb61c@|fcc42a@|fcd254+|000000    |fcd254*|fcb62a@|fcc42a@@|fcd246*|000000    |fcc438#|fcb62a@|fcb61c@|fcc438@
+000000     |fcc438%|fcc42a%|fcc438#|000000      |fcc438%|fcb61c@|e09a0e%|eea81c@|fcb61c@|fcd246%|000000   |fcd254+|fcc42a@|fcb61c@|fca81c@|ee9a0e%|fca81c@|fcc41c@|fcd238%|000000  |fcd246#|fcc438%|fcc41c@|fcb60e@@|fcb61c@|fcc42a@|fcc446%|fce054=|000000    |fce062=|fcd246=|fcc446+|fcd254+
+000000               |fcd246=*|fcc438=|fcd254=|000000      |fcd254+|fcc438*|fcd238@|fcd246%|000000       |fcd246#|eec446#|fcd254#
+`,
+        plano: `
+                                   +=**=      +*#*= -     =    -
+    +*+                   -=+   =%##**##%-  =##++*##**--##*##*** -#*
+   =*####+:    **##**+  *#***#**##**-:-*#%*+%#*::=*%+-=##=:+#*+=*#==#*
+ :-=#+-*#++--=#*-=*%+++##*-:=*##*##*--=*#%= -%#**##=    +###+    *#*%
+     *#*      ##++##   =%**+*#*  *###*##*=    -===
+               -+-=      =+##       #+*
+`
+      }
+    ]
   },
   {
     cols: 59, alto: 5,
-    color: `
-000000                             |fcd246+%|fcc438#|fcd246%|000000     |fcd246+|fcc438%|fcc42a%|fcd238#|eed254=|8cd246+|7ec438=|000000   |fcd246+|fcc446=|000000  |8cd246=
-000000   |70c438%|8cd246@|b6d246%|9ad246*|7ec438=|000000             |fcd238*|fcc438%%|fcc446+|000000 |7ec438*|c4d246@|fcc42a@|fcb61c@|fca80e@|eea80e@|fcb60e@|fcc41c@|fcd246*|000000  |fcc438@|fcb61c@|d28c1c%|d28c0e%|fca80e@|fcc42a@|c4d246@|70c438@|7ec438#|fcd238%|fcb61c@|d28c0e%|eea81c@|fcc42a@|9ac438@|7ec438@|000000 |fcd246*|e0c42a@|eeb62a@|fcd246=
-000000 |7ed246=|7ec446+|d2c438@|eea81c@|e09a1c%|fcc42a@|9ad238@|70c438@|000000   |fcc42a@|eea81c@@|eec42a@|a8d246@|7ec438@|70c438%|eed254=|fcc42a@|fca81c@|d28c0e%|e08c1c%|fcb60e@|fcc438@|a8c446@|fcd238@|fcb60e@|ee9a1c@|a8620e%%|e09a1c%|fcb60e@|fcc42a@|d2d246#|b6d246=|fcc438@|fcb61c@|e09a1c%|d28c0e%|fca80e@|fcc42a@|fcd254=|000000  |fcd246*|fcb61c@|e09a0e%|fca81c@|fcc42a@|c4d254=|000000 |b6d246=|fcc42a@|e09a1c%%|fcc438@|8cd246=
-000000   |fcd246=|fcb62a@|eeb62a@|fcc438#|000000    |fcd246*|fcb61c@|e08c1c%|d28c1c%|fcb61c@|eed246%|70c438=|7ec438=|e0d246*|fcc42a@|fca81c@|d28c0e%|e08c1c%|fcb60e@|fcc438@|000000 |fcd254*|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcc42a@|fcd246*|000000   |fcd246+|fcc438#|fcc42a#|fcc438+
-000000             |fcc438++|000000      |fcd238*|fcc438%%|fcc446=|000000    |fcd246=%|fcc438*|fcd254+
+    marcos: [
+      {
+        color: `
+000000                             |fcd246+#|fcc438%|fcd246#|000000     |fcd246+|fcc438%|fcc42a@|fcc438#|eed254+|8cd246+|7ec438=|000000   |fcd238+|000000   |8cd246+
+000000   |70c438%|9ad246@|a8d246#|9ad246*|7ec438+|000000             |fcd246*|fcc438#%|fcc446+|000000 |7ec438*|d2d246@|fcc42a@|fcb61c@|fca80e@|eea80e@|fca80e@|fcc41c@|fcd246#|000000  |fcc438@|fcb61c@|d28c1c%|c48c0e%|fca80e@|fcc41c@|b6d246@|70c438@#|fcd238@|fcb61c@|d28c0e%|eea81c@|fcc42a@|9ac438@|7ec438@|000000 |fcd238*|eec42a@|eeb62a@|fcd246=
+000000 |7ed246=|7ec446+|d2c438@|eea81c@|e09a1c%|eec42a@|9ad238@|70c438@|000000   |fcc42a@|fcb61c@|eea81c@|eec42a@|a8c438@|7ed238@|70c438%|eed254=|fcc42a@|fca81c@|d28c0e%|e08c1c%|fcb60e@|fcc438@|a8d246@|fcd238@|fcb60e@|ee9a1c@|a8620e%|9a620e%|e09a1c%|fcb60e@|fcc42a@|c4d246#|b6d246+|fcc438@|fcb61c@|e09a1c%|d28c0e%|fca81c@|fcc42a@|fcd254=|000000  |fcd246*|fcb61c@|e09a0e%|fca81c@|fcc42a@|b6c446=|000000 |9ad246=|fcc42a@|e09a1c%%|fcc438@|8cd246=
+000000   |fcc446=|fcb62a@|eea81c@|fcc438%|000000   |7ec438-|e0d246#|fcb61c@|d28c1c%%|fcb61c@|eed246%|70c438=|7ec438=|e0d246*|fcc41c@|fca81c@|d28c0e%|d28c1c%|fcb60e@|fcc438@|000000 |fcd246#|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcc42a@|fcd246*|000000   |fcd246+|fcc438#|fcc42a%|fcc446+|000000             |fcd238=
+000000             |fcc42a**|fcd246=|000000     |fcd238#|fcc438%%|fcc446=|000000    |fcd246+#|fcc438#|fcd246*
 `,
-    plano: `
-                             =#*#     +#**-=:   =-  -
-   +**=-             +##= =###*+*#*  ##==*##++##=+#** +#*=
- :-#*+#*+   #**#**+-#*==##*%#+::=*#*-%#+=*#=  +#+*#- -#=+#:
-   -#**    +#==##::+#*==## +##***#+   +**=
-             ==      +#*-    =#++
+        plano: `
+                             +**#     +*#*==:   +   -
+   +**=-             +*#= =###*+*#*  %#==*##+=##=+#** +#*-
+ :-#*+#*+   #**#**+-#*==*##%#+::=*#+-%#+=*#=  +#+*#- :#=+#-
+   -#*#   :*#==##:-+#*==#% *##***#+   =**+             -
+             =+=     *##-    =#*+
 `
+      },
+      {
+        color: `
+000000                             |fcc446=|fcd246#|fcc438%|fcd246*=|000000    |fcd246+|fcc438%|fcc42a@|fcd238%|fcd246+|8cd246+|7ec438=|000000   |fcd238*|fcd246=|000000  |8cd246+
+000000   |70c438%|9ad246@|a8d246%|8cd246*|7ec438+|000000             |fcd246*|fcc438#|fcc42a%|fcd246+|000000 |70c438*|d2d246@|fcc42a@|fcc41c@|fca80e@|eea80e@|fcb60e@|fcc41c@|fcd246#|000000  |fcc438@|fcb60e@|d28c1c%|d28c0e%|eea80e@|fcc41c@|b6c438@|70c438@#|fcd238%|fcb61c@|d28c0e%|eea81c@|fcc42a@|9ac438@|7ec438@|000000 |fcd238*|e0c42a@|eeb62a@|fcd246=
+000000 |7ed246=|7ec446+|d2c438@|eea81c@|e09a1c%|eec42a@|9ad238@|70c438@|000000  |fcd254=|fcc42a@|fcb61c@|eeb61c@|eec42a@|a8c438@|7ed238@|70c438%|eed254=|fcc42a@|fca81c@|d28c0e%|e08c1c%|fcb60e@|fcc438@|a8c446@|fcd238@|fcb60e@|ee9a1c@|a8620e%|9a620e%|e09a1c%|fcb60e@|fcc42a@|d2d246*|b6d246=|fcd238@|fcb61c@|e09a1c%|d28c0e%|fca81c@|fcc42a@|fcd254+|000000  |fcd246*|fcb61c@|e09a0e%|fca81c@|fcc42a@|b6c446=|000000 |a8d246=|fcc42a@|e08c1c%|e09a1c%|fcc438@|8cd246=
+000000   |fcd246=|fcb62a@|eea82a@|fcc42a%|000000   |7ec438-|e0d246*|fcb61c@|d28c1c%%|fcb61c@|eed246%|70c438=|7ec438=|eed246*|fcc41c@|fca81c@|d28c0e%|d28c1c%|fcb61c@|fcd238@|000000 |fcd246#|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcc42a@|fcd246*|000000   |fcd246+|fcc438#|fcc42a%|fcc446*|000000             |fcd238=
+000000             |fcc42a*|fcc438*|fcd246=|000000     |fcc438*@@|fcd246+|000000    |fcd246*#|fcc438#|fcd246#
+`,
+        plano: `
+                             =*#+=    =*##==:   +-  -
+   +#*=-             +**= =###*+*#*  ##==*##+=##=+%** +##-
+ :-#*+#*+  -%**#**+-#*==##*%#+::=*#+-%#+=*#=  +#+*#- -#=+#:
+   -#*#   :+#==##:-+#*==#% *##***#+   +**+             -
+             =+=     +##=    +***
+`
+      },
+      {
+        color: `
+000000                             |eec446=|fcd246%|fcd238%|fcc446+|fcd254+|000000    |fcd246=|fcc42a%%|fcd238%|fcd246=|8cd246+|7ec438=|000000   |fcd238*|fcd246=|000000  |8cd246+
+000000   |70c438%|9ad246@|a8d246%|8cd246*|7ec438+|000000             |fcd246*|fcc438%|fcc42a#|fcd246+|000000 |70c438*|d2d246@|fcc42a@|fcb61c@|fca80e@|eea80e@|fcb60e@|fcc41c@|fcd246#|000000  |fcc438@|fcb60e@|d28c1c%|d28c0e%|eea80e@|fcc41c@|b6c438@|70c438@#|fcc438%|fcb61c@|d28c0e%|eea81c@|fcc42a@|9ac446@|7ec438@|000000 |eec438*|e0c42a@|fcc42a@|fcd246=
+000000 |7ed246=|7ec446+|d2c438@|eea81c@|e09a1c%|eec42a@|9ac438@|70c438@|000000   |fcc42a@|fcb61c@|eeb61c@|eec42a@|9ac438@|7ed238@|70c438%|eed254=|fcc42a@|fca81c@|d28c0e%|e08c1c%|fcb60e@|eec438@|9ac438@|fcc438@|fcb60e@|eea81c@|a8620e%|9a620e%|d28c1c%|fcb60e@|fcc42a@|e0d254*|c4d246=|fcd238@|fcb61c@|e09a1c%|d28c0e%|fcb61c@|fcc42a@|fcd254+|000000  |fcd246*|fcb61c@|e09a0e%|eea81c@|fcc42a@|b6d246=|000000 |a8d246=|fcc42a@|e08c1c%|e09a0e%|fcc42a@|8cd246=
+000000   |fcd246=|fcb62a@|eea82a@|fcc42a%|000000   |7ec438-|d2c446*|fcb61c@|d28c1c%%|fcb61c@|eed246%|70c438=|7ec438=|eed254*|fcc41c@|fca81c@|d28c0e%|d28c1c%|fcb61c@|fcd238@|fce062=|fcd246*|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcc42a@|fcd246*|000000   |fcd246+|fcc438%%+|000000              |fcd246=
+000000             |fcc438**|fcd246+|000000     |fcc438*@%|fcd246+|000000    |fcd254*|fcc438*|fcd238#|fcd246#
+`,
+        plano: `
+                             -##=+    =*##-=:   +-  -
+   +**=-             +**= =###++*#*  #*==+#*+=#*=+#*+ +**-
+ :-#*=#*+   #**#**+-#*==*#*##+::=*#=-%*==*#=  +*+*#- -#=+#:
+   =***   :+#==#*::+#*==*%-+#**+*#+   =*#=              -
+             ++=     =##=    ++**
+`
+      },
+      {
+        color: `
+000000                             |eec446=|fcd246%|fcd238%|eec438+|fcd254+|000000    |fcc446=|fcc438%|fcc42a%|fcd238%|eed254=|8cd246+|7ec438=|000000   |fcd238+|fcd246=|000000  |8cd246+
+000000   |70c438%|9ad246@|a8d246%|8cd246*|7ec438+|000000             |fcd246+|fcc438%#|fcd246*|000000 |70c438*|d2d246@|fcc42a@|fcb61c@|fca80e@|eea80e@|fcb60e@|fcc41c@|fcd246%|000000  |fcc438@|fcb60e@|d28c1c%|d28c0e%|eea80e@|fcc41c@|a8c438@|70c438@|7ec438#|fcc438%|fcb61c@|d28c0e%|eea81c@|fcc42a@|9ac438@|7ec438@|000000 |e0c438*|e0c42a@|fcc42a@|fcd246-
+000000 |7ed246=|7ec446+|d2c438@|eea81c@|e09a1c%|eec42a@|9ac438@|70c438@|000000   |fcc42a@|fca81c@|eea81c@|eec42a@|a8d238@|7ed238@|70c438%|eed254=|fcc42a@|fca80e@|d28c0e%|e08c1c%|fcb60e@|eec42a@|a8c446@|eec438@|fcb60e@|eea81c@|a8620e%|9a620e%|d28c1c%|fcb60e@|fcc42a@|d2d254*|b6d254+|fcd238@|fcb61c@|e09a1c%|d28c0e%|fcb61c@|fcc42a@|fcd254+|000000  |fcd246*|fcb61c@|e09a0e%|eea81c@|fcc42a@|c4d246-|000000 |a8d246=|fcc42a@|d28c1c%|e09a0e%|fcc42a@|8cd246=
+000000   |fcd246=|fcb62a@|eea82a@|fcc42a%|000000   |7ec438-|e0c446*|fcb61c@|d28c1c%%|fcb61c@|e0d246#|70c438=|7ec438=|eed254#|fcc42a@|fca80e@|d28c0e%|d28c1c%|fcb61c@|fcc438@|eed262=|fcd246*|fcc42a@|fcb60e@|fca81c@|fca80e@|fcb61c@|fcc42a@|fcd246*|000000   |fcd246=|fcc438%%*|000000              |fcd246=
+000000             |fcc438*#|fcd246=|000000     |fcc438*|fcc42a%|fcc438%|fcd246+|000000    |fcd254+|fcc438*|fcd238%|fcd246*
+`,
+        plano: `
+                             -##=+    =*##-=:   +=  -
+   +#*=-             =**+ =###*+*##  ##==*#*++#*=+#** +##-
+ :-#*+#*+   %**#**+-#*==*#*##+::=*%+=%#==*%=  +#+*%- -#=+#-
+   =#**   :+#==#*:-*#*==#%=+#***##*   =##+              -
+             +*-     +##+    ++#+
+`
+      },
+      {
+        color: `
+000000                             |fcd246=|fcc438#|fcd238%|fcc438*|fcd254=|000000    |fcc438=%@#|e0d254=|9ad246+|7ec438=|000000   |fcc438+|fcd246=|000000  |8cd246+
+000000   |70c438%|9ad246@|a8d246%|8cd246*|7ec438+|000000             |fcc438+%#|fcd246*|000000 |70c438*|d2d246@|fcc42a@|fcb61c@|fca80e@|eea80e@|fcb60e@|fcc41c@|fcd246%|000000  |fcd238@|fcb60e@|d28c1c%|d28c0e%|eea80e@|fcc41c@|b6c438@|70c438@|7ec438%|fcc438%|fcb60e@|d28c0e%|eea81c@|fcc42a@|9ac438@|7ec438@|000000 |eec438*|e0c42a@|fcc42a@
+000000 |7ed246=|7ec446+|d2c438@|eea81c@|e09a1c%|eec42a@|9ac438@|70c438%|000000   |fcc42a@|fca81c@@|eec42a@|a8d238@|7ed238@|70c438%|fcd254=|fcc42a@|fca80e@|d28c1c%|e09a1c%|fcb60e@|eec42a@|a8d246@|eec438@|fcb60e@|eea81c@|a8620e%|9a620e%|d28c1c%|fcb60e@|fcd22a@|d2d246#|a8d246+|fcc438@|fcb60e@|e09a1c%|d28c0e%|fcb61c@|fcc42a@|eed254+|000000  |fcd246*|fcb61c@|e09a0e%|eea81c@|fcc42a@|000000  |a8c446=|fcc42a@|d28c1c%|e09a0e%|fcc42a@|8cd246=
+000000   |fcd246=|fcb62a@|eea81c@|fcc42a%|000000   |7ec438-|e0c446*|fcb61c@|d28c1c%%|fcb60e@|e0c446#|70c438=|7ec438=|e0d246%|fcc41c@|fca80e@|d28c0e%|d28c1c%|fcb61c@|fcc438@|eee062=|fcd246*|fcc42a@|fcb61c@|fca81c@|fca80e@|fcc41c@|fcc42a@|fcd246*|000000   |fcc446=|fcc438%%|fcd246*
+000000             |fcc438*#|000000      |fcc438*|fcc42a%|fcc438%|fcd246+|000000    |fcd246=|fcc438#|fcd246%|eec446+
+`,
+        plano: `
+                             -*#==    =##*-=:   =-  -
+   +**=-             =**+ =##*++*##  %*=-*#*+=**=+#*+ +**
+ :-#*=#*+   #**#**+-#*==*#*#*+::=*%*=#*==*#=  +*+*#  -#=+#:
+   =***   :=#==*+::*#*==*#-+#**+##+   -*#+
+             ++      +**=    =+#=
+`
+      },
+      {
+        color: `
+000000                             |fcd254+|fcc438#|fcd238%#|000000     |fcd238+|fcc438%@#|e0d254+|9ad246+|7ec438=|000000   |fcc438=|fcd246=|000000  |8cd246+
+000000   |70c438%|9ad246@|a8d246%|8cd246*|7ec438+|000000             |fcc438+%%|fcd246*|000000 |7ec438*|d2d246@|fcc42a@|fcb60e@|fca81c@|eea80e@|fcb60e@|fcc41c@|fcd246%|000000  |fcd238@|fcb61c@|d28c1c%|c47e0e%|eea81c@|fcc41c@|b6c446@|70c438@|7ec438#|fcd238%|fcb61c@|d28c0e%|eea81c@|fcc42a@|9ac446@|7ec438@|000000 |eed238*|e0c42a@|eec42a@
+000000 |7ed246=|7ec446+|d2c438@|eea81c@|e09a1c%|eec42a@|8cd238@|70c438@|000000   |fcc42a@|fcb61c@|eea81c@|eec42a@|a8d238@|7ed238@|70c438%|fcd254=|fcc42a@|fca81c@|d28c0e%|e09a1c%|fcb60e@|fcc42a@|b6d246@|eec438@|fcb60e@|eea81c@|a8620e%|9a620e%|d28c1c%|fcb60e@|fcc42a@|c4d246%|a8d246+|fcc438@|fcb60e@|e09a1c%|d28c0e%|fca81c@|fcc42a@|eed254+|000000  |fcd246*|fcb61c@|e09a0e%|eea81c@|fcc42a@|000000  |a8c446=|fcc42a@|d28c1c%|e09a1c@|fcc42a@|8cd246=
+000000   |fcd246=|fcb62a@|eea82a@|fcc42a%|000000   |7ec438-|e0d246*|fcb61c@|d28c1c%%|fcb60e@|e0c446#|70c438=|7ec438=|d2d246%|fcc41c@|fca80e@|d28c1c%%|fcb60e@|fcc438@|000000 |fcd246#|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcc42a@|fcd246#|000000   |fcc446=|fcc438#%|fcd246*|000000             |fcd238=
+000000             |fcc438*|fcc42a*|000000     |fcd254=|fcd238*|fcc42a%|fcc438%|fcd254+|000000    |eec446=|fcd246#%|eec446+
+`,
+        plano: `
+                             =+#*     =#%*==:   ==  =
+   +#*=-             =##* =%%#**###  %#==*%#*+#*=+#** +##
+ :-#*+#*+   #**##*+=%*=+#%###+::=#%*=%#+=*%=  +#+*%  -#=+%-
+   =#*#   :+#==#*--*#*==#% *%#**##*   =*#*             -
+             ++     -+##=    -##=
+`
+      },
+      {
+        color: `
+000000                             |fcd254*|fcc438#%|fcd246%|000000     |fcd246*|fcc438%|fcc42a@|fcc438*|e0d254+|8cd246+|7ec438=|000000   |fcc438+|fcd246=|000000  |8cd246+
+000000   |70c438%|9ad246@|a8d246%|9ad246*|7ec438+|000000             |fcc438+%%|fcd238*|000000 |7ec438*|d2d246@|fcc42a@|fcb61c@|fca80e@|eea80e@|fcb60e@|fcc41c@|fcd246#|000000  |fcd238@|fcb61c@|d28c1c%|c47e0e%|eea80e@|fcc41c@|c4d246@|70c438@|7ec438#|fcd238%|fcb61c@|e08c0e%|eea81c@|fcc42a@|9ac438@|7ec438@|000000 |fcd238*|eec42a@@
+000000 |7ed246=|7ec446+|d2c438@|eea81c@|e09a1c@|eec42a@|8cc438@|70c438@|000000   |fcc42a%|fcb61c@|eea81c@|eec42a@|a8d238@|7ed238@|70c438%|fcd254+|fcc42a@|fcb61c@|d28c0e%|e09a1c%|fcb61c@|fcc438@|b6d246@|fcc438@|fcb60e@|eea81c@|a8620e%|9a620e%|d29a1c%|fcb60e@|fcc42a@|c4d246%|a8d246*|fcc438@|fcb60e@|e09a1c%|d28c0e%|fca81c@|fcc42a@|eed254+|000000  |fcc446*|fcb61c@|e09a0e%|eea81c@|fcc42a@|000000  |9ac446=|fcc42a@|d28c1c%|e09a1c@|fcc42a@|8cd246=
+000000   |fcd246=|fcb62a@|eea81c@|fcc42a%|000000   |7ec438-|e0d246#|fcb61c@|d28c1c%%|fcb60e@|e0c446#|70c438=|7ec438=|d2d246#|fcc41c@|fca80e@|d28c0e%|d28c1c%|fcb60e@|fcc438@|000000 |fcd246#|fcc42a@|fcb61c@|fca80e@@|fcb61c@|fcc42a@|fcd246#|000000   |fcd246=|fcc438#%|fcd246*|000000             |fcd238=
+000000             |fcc438*|fcc42a*|fcd246=|000000     |fcd246*|fcc42a%%|fcd246=|000000    |eec446=|fcd246%|fcd238%|eec446+
+`,
+        plano: `
+                             ++*#     +#%+==:   =-  =
+   +#*=-             =##+ =#%#***#*  %#==*%#*+#*=+#** +##
+ :-#*+#*+   #**##*+=%*=+#%#%#+::+#%#=##+=*#=  +#+*%  -#=+%-
+   =#*#   :*#==#*--*#*==## *##**#%*   =*#+             -
+             ++-     *##=    -##=
+`
+      },
+      {
+        color: `
+000000                             |fcd246*|fcc446#|fcc438#|fcd246%|000000     |fcd246+|fcc438#|fcc42a@|fcc438#|eed254+|8cd246+|7ec438=|000000   |fcd238+|fcc446-|000000  |8cd246+
+000000   |70c438%|8cd246@|a8d246%|9ad246*|7ec438+|000000             |fcc438+%@|fcd238+|000000 |7ec438*|d2d246@|fcc42a@|fcb61c@|fca80e@|eea80e@|fcb60e@|fcc41c@|fcd246#|000000  |fcc438@|fcb61c@|d28c1c%|c48c0e%|eea80e@|fcc41c@|c4d246@|70c438@|7ec438#|fcd238@|fcb61c@|d28c0e%|eea81c@|fcc42a@|9ac438@|7ec438@|000000 |fcd238*|eec42a@|eeb62a@|fcd246=
+000000 |7ed246=|7ec446+|d2c438@|eea81c@|e09a1c%|eec42a@|9ac438@|70c438@|000000   |fcc42a%|eeb61c@|eea81c@|eec42a@|a8d238@|7ed238@|70c438%|eed254=|fcc42a@|fcb61c@|d28c0e%|e08c1c%|fcb60e@|fcc438@|b6d246@|fcd238@|fcb60e@|ee9a1c@|a8620e%|9a620e%|e09a1c%|fcb60e@|fcc42a@|c4d246%|a8d246+|fcc438@|fcb60e@|e09a1c%|d28c0e%|fca81c@|fcc42a@|eed254+|000000  |fcc446*|fcb61c@|e09a0e%|fca81c@|fcc42a@|000000  |9ac446=|fcc42a@|e08c1c%|e09a1c@|fcc438@|8cd246=
+000000   |fcc446=|fcb62a@|eea81c@|fcc438%|000000   |7ec438-|eed246#|fcb61c@|d28c1c%%|fcb61c@|eec446#|70c438=|7ec438=|d2d246#|fcc41c@|fca81c@|d28c0e%|d28c1c%|fcb60e@|fcc438@|000000 |fcd246#|fcc42a@|fcc41c@|fca80e@@|fcb61c@|fcc42a@|fcd246#|000000   |fcd254+|fcc438#%|fcd246*|000000             |fcd238=
+000000             |fcc438*|fcc42a+|fcd254=|000000     |fcd246#|fcc438%%|fcc446=|000000    |fcc446=|fcd246%|fcc438#|fcd246+
+`,
+        plano: `
+                             ***%     +*#*==:   =-  =
+   +#*=-             +##= =###***#*  %#==*##*+%#=*%** +##-
+ :-#*+#*+   #**##*+=%*==#%#%#+::+*#*=%#+=*#=  +#+*%  -#=+%-
+   -#*#   :*#==#*--+#*==#% ###**#%*   =*#+             -
+             +==     *##=    -#*+
+`
+      }
+    ]
   },
   {
     cols: 47, alto: 4,
-    color: `
-000000                       |fcd238*|fcc438%|fcc42a%|fcc446+|000000   |fcd246+|fcc42a%@|fcc438#|a8d246+|7ec438+|000000  |fcc42a+*|000000 |7ec438=|8cd246=
-000000  |7ec438#|b6c438@|e0c42a@|a8d246@|70c438*|000000   |fcc438+|fcc42a#|c4d238#|8cd246#|70c438=|000000 |fcd246*|fcc42a@|fcb61c@|fcc42a@|d2c446*|a8d246@|fcc42a@|fca81c@|d28c0e%%|fcb60e@|fcc438@|b6d246+|eed246#|fcb60e@|d28c1c%|b67e1c%|fcb60e@|fcc438@|7ec438#|9ac446+|fcc42a@|d28c1c%|e09a1c%|fcc42a@|7ec438%|7ec446*|fcc42a%|e09a1c@|fcb61c@|d2d246=
-000000  |e0d246+|fcb61c@|e09a1c@|eec42a@|70c438*|7ec446=|000000 |fcc438@|eea81c@|c48c1c%|fcb61c@|a8c438%|70c438#|d2d246#|fcb61c@|e09a1c%|b6701c%|fca80e@|fcc438@|e0d246+|fcc42a@|fcb61c@|d28c0e%|e08c0e%|fcb60e@|fcc438@|000000  |fcd238#|fcc42a@|fcb62a@|fcc42a#|000000    |fcc42a**|000000    |fcb62a#|fcc438+
-000000          |fcc438*|fcc42a*|000000    |fcd246=|fcc42a#%|fcc438*|000000   |fcd238*%|fcc438#|fcc446=
+    marcos: [
+      {
+        color: `
+000000                       |fcd246*|fcc438%|fcc42a@|fcc438+|000000   |fcd246+|fcc42a%@|fcc438#|b6d246*|7ec438+|000000  |fcc42a*+|000000 |7ec438=|8cd246=
+000000  |8cc438#|b6c438@|e0c42a@|a8d246@|70c438*|000000   |fcc438+|eec42a#|b6d246#|8cd246*|70c438=|000000 |fcd238*|fcc42a@|fcb62a@|fcc42a%|d2d246*|9ad246@|fcc42a@|fcb61c@|d28c0e%%|fcb60e@|fcc42a@|b6d246+|e0d246#|fcb60e@|d28c1c%|b67e1c%|fcb60e@|eec438@|7ec438#|8cc446*|fcc42a@|d28c1c%|e09a1c%|fcc42a@|7ec438%*|fcc438%|e09a1c%|eeb61c@|d2d246=
+000000  |d2c446+|fcb61c@|e09a1c%|eec42a@|70c438*|7ec446=|7ec438-|fcc438@|eea81c@|c48c1c%|fcb61c@|a8c438%|70c438#|d2d246#|fcb61c@|e08c1c%|b6701c%|fca80e@|fcc438@|e0d246*|fcc42a@|fca81c@|d28c0e%%|fcb61c@|fcc438@|000000  |fcc438#|fcc42a@|fcb62a@|fcc42a#|000000    |fcc42a**|000000    |fcb62a#|fcc42a*
+000000          |fcc438*|fcc42a#|fcd246+|000000   |fcd246+|fcc42a%@|fcc438*|000000   |fcd246*|fcc438%%|fcc446=
 `,
-    plano: `
-                       *##+   =##*=-  ++ --
-  +###=   =+++- +###+*#*==*%=*#=-*#+=#=+#+=*+*-
-  =*+#=: #+=#*+*#=-*%=%*==##  *##*    ++    +=
-          ++    =*#+   +#*-
+        plano: `
+                       +*#=   =*#++-  += --
+  =*#*-   =++=: +###+*#*==*#=**=-*#==#==#+=*+*-
+  =*+#=::#+-#*+*#=:*#+#*==*#  *##*    ++    ++
+          ++=   =*#+   +**-
 `
+      },
+      {
+        color: `
+000000                       |fcc438*%@+|000000   |fcd246+|fcc42a%@|fcc438#|a8d246*|7ec438*|000000  |fcc42a*+|000000 |7ec438=|8cd246=
+000000  |8cc438#|b6c438@|d2c42a@|9ad246@|70c438*|000000   |fcc438+|eec42a#|b6d246#|8cd246#|70c438=|000000 |fcc438*|fcc42a@|fcb62a@|fcc42a@|d2c446#|a8d246@|fcc42a@|fcb61c@|d28c0e%%|fcb60e@|fcc438@|c4d254+|eed246#|fcb60e@|d28c1c%|b67e1c%|fcb60e@|eec438@|7ec438#|8cc446*|fcc42a@|d28c1c%|e09a1c%|fcc42a@|7ec438%*|fcc438%|e09a1c@|eeb61c@|e0d246=
+000000  |d2d246+|fca81c@|e09a1c@|fcc438@|70c438*|7ec446=|7ec438-|fcc438@|eea81c@|c48c1c%|fcb61c@|a8c438%|70c438%|d2d246#|fcb61c@|e08c1c%|b6701c%|fca81c@|fcc42a@|d2c446*|fcc42a@|fca81c@|d28c0e%%|fcb60e@|fcc438@|000000  |fcd238#|fcc42a@|fcb62a@|fcc438#|000000    |fcc42a**|000000   |fcd246=|fcb62a#|fcc438*
+000000          |fcc438*|fcc42a#|fcd238+|000000   |fcd246=|fcc42a%@|fcc438*|000000   |fcd246*|fcc438%%|fcc446=
+`,
+        plano: `
+                       +#%=   =##*+=  += --
+  +###=   =+++- +###+#%*==#%=*#=-*%+=#=+#*=*+*-
+  =*+#=::%+=#*++#+-*%+%*==##  *##*    ++   -++
+          +*=   =*#+   +#*-
+`
+      },
+      {
+        color: `
+000000                       |fcc438+%@|fcd238*|000000   |fcd238+|fcc42a%@|fcc438#|a8d246*|7ec438*|000000  |fcc42a*|fcc438+|000000 |7ec438=|8cd246=
+000000  |7ec438#|c4d238@|d2c42a@|9ad246@|70c438*|000000   |fcc438+|fcc42a*|b6d246#|8cd246*|70c438=|000000 |fcc438*|fcc42a@|fcb62a@|fcc42a@|d2c446#|a8d246@|fcc42a@|fcb61c@|d28c0e%%|fcb60e@|fcd22a@|c4d254+|eed246#|fcb60e@|d28c1c%|b67e1c%|fcb60e@|fcc438@|7ec438#|9ac446*|fcc42a@|d28c1c%|e09a1c%|fcc42a@|8cc438@|7ec438*|fcc42a%|e09a1c@|eeb61c@|e0d246=
+000000  |d2d246+|fca81c@|e09a1c%|fcc438@|70c438*|7ec446=|7ec438-|fcc438@|ee9a0e@|c48c1c%|fcb61c@|a8c438@|70c438%|d2d246*|fcc41c@|d28c1c%|b6701c%|fca81c@|fcc42a@|c4c446#|fcc42a@|fca80e@|d28c0e%|d28c1c%|fcb60e@|fcc42a@|000000  |fcd238#|fcc42a@|fcb62a@|fcc438#|000000    |fcc42a**|000000   |fcd246=|fcb62a#|fcc42a*
+000000          |fcc42a*#|fcd238+|000000   |fcd246=|fcc42a%@|fcc438*|000000   |fcd246*|fcc438%%|fcd246=
+`,
+        plano: `
+                       =##+   =##*+=  += --
+  +###=   =+++- +###+#%*==*%=*#=-*%+=#=+#*=*+*-
+  =*+#=::%+=#*++#=-*%*#*==##  *##*    ++   -++
+          ++=   =*#+   +**=
+`
+      },
+      {
+        color: `
+000000                       |fcc438+%|fcc42a%|fcd238#|000000   |fcd238+|fcc42a%@|fcc438%|b6d246*|7ec438+|000000  |fcc42a*|fcc438+|000000 |7ec438=|8cd246=
+000000  |7ec438#|c4d238@|d2c42a@|9ad246@|70c438*|000000   |fcc438+|fcc42a*|b6d246#|7ed246*|70c438=|000000 |fcc438*|fcc42a@|fcb62a@|fcc42a@|c4c438*|a8d246@|fcc42a@|fcb61c@|d28c0e%%|fcb60e@|fcc42a@|c4d246=|e0d246#|fcb60e@|d28c1c%|b67e1c%|fcb60e@|eec438@|7ec438#|9ac446*|fcc42a@|d28c1c%|e09a1c%|fcc42a@|8cc438@|7ec438*|fcc42a%|e09a1c%|eeb61c@
+000000  |d2d246+|fca81c@|e09a1c%|fcc438@|70c438*|7ec446=|7ec438-|fcc438@|ee9a0e%|c48c1c%|fcb61c@|a8c438@|70c438#|d2c446*|fcc41c@|e08c1c%|b6701c%|fca80e@|fcc42a@|c4c446%|fcc42a@|fca80e@|d28c0e%|d28c1c%|fcb61c@|fcc438@|000000  |fcc438#|fcc42a@|fcb62a@|fcc438#|000000    |fcc42a**|000000    |fcb62a#|fcc42a*
+000000          |fcc42a*#|fcc438+|000000   |fcd246=|fcc42a%@|fcc438*|000000   |fcd246+|fcc42a#|fcc438%|fcd246=
+`,
+        plano: `
+                       =#**   =*#*=-  == --
+  =***-   =++=: +#*#+*#*==*#-+*=-*#+=#==#*-*+*
+  =*=#=::#+-#*++#=:*#*#*==*#  *##*    ++    ++
+          ++=   =*#+   =**=
+`
+      },
+      {
+        color: `
+000000                       |fcc438+|fcc42a%%|fcd246#|000000   |fcd238+|fcc42a%@|fcd238%|b6d246*|7ec438+|000000  |fcc42a*+|000000 |7ec438=|8cd246=
+000000  |7ec438#|c4d238@|d2c42a@|9ad238@|70c438*|000000   |fcc438+|fcc42a*|b6d246#|7ed246*|70c438=|000000 |fcd238*|fcc42a@|fcb62a@|fcc42a@|c4c438*|a8d246@|fcc42a@|fca80e@|d28c0e%%|fcb60e@|fcc42a@|b6d246+|e0d246#|fcb60e@|d28c1c%|b67e1c%|fcb60e@|eec438@|7ec438#|9ac446*|fcc42a@|d28c1c%|e09a1c%|fcc42a@|8cc438@|7ec438*|fcc42a%|e09a1c%|fcb61c@
+000000  |e0d246+|fca81c@|e09a1c%|fcc42a@|70c438*|7ec446=-|fcc438@|ee9a0e@|c48c1c%|fcb61c@|a8c438@|70c438#|c4d246#|fcc41c@|e08c1c%|b6701c%|fca80e@|fcc438@|d2d254%|fcc42a@|fca80e@|d28c0e%|e08c1c%|fcb61c@|fcc438@|000000  |fcc438#|fcc42a@|fcb62a@|fcc438#|000000    |fcc42a*#|000000    |fcb62a#|fcc42a*
+000000          |fcc42a*#|fcc438+|000000   |fcd246=|fcc42a%@|fcc438*|000000   |fcc438+|fcc42a#|fcc438%|fcd246+
+`,
+        plano: `
+                       =***   =*#*=-  == --
+  =#**-   ==+=: +#*#=*#*==*#-+#=-*#+=#==#*=*+*
+  =*=#=::#+-**++#=:*#*#*==*#  +##*    ++    ++
+          ++=   =**+   =**=
+`
+      },
+      {
+        color: `
+000000                       |fcc438+|fcc42a%%|fcd246*|000000   |fcd246+|fcc42a%@|fcd238%|b6d246*|7ec438+|000000  |fcc438*|fcc42a+|000000 |7ec438=|8cd246=
+000000  |7ec438#|c4c438@|d2c42a@|9ad238@|70c438*|000000   |fcc438+|fcc42a*|b6d246#|7ed246*|70c438=|000000 |fcd238*|fcc42a@|fcb62a@|fcc42a@|c4c438*|a8c446@|fcc42a@|fca80e@|d28c0e%%|fcb60e@|fcc42a@|b6d246+|d2c446#|fcb60e@|d28c1c%|b67e1c%|fcb60e@|eec438@|7ec438#|9ac446*|fcc42a@|d28c1c%|e09a1c%|fcc42a@|8cc438%|7ec438*|fcc438%|e09a1c%|fcb61c@
+000000  |e0d246+|fca81c@|e09a1c%|fcc42a@|70c438*|7ec446=|7ec438-|fcc438@|ee9a0e@|c48c1c%|fcb61c@|a8c438%|70c438#|c4d246%|fcb61c@|e09a1c%|b6701c%|fca80e@|fcc438@|e0d254#|fcc42a@|fca80e@|d28c0e%|e08c1c%|fcb61c@|fcd238@|000000  |fcc438#|fcb62a@@|fcc438#|000000    |fcc42a*#|000000    |fcb62a#|fcc42a*
+000000          |fcc42a*#|fcc438+|000000   |fcd246=|fcc42a%@|fcc438*|000000   |fcc438+%%|fcd246+
+`,
+        plano: `
+                       =**+   =*#*=-  += --
+  =#**-   =++=: +#*#=*#*==*#=+#=-*#+=#==#+=*+*
+  =*+#=::#+-**+*#=:*#*#*==*%  +##*    ++    ++
+          ++=   =*#+   =**=
+`
+      },
+      {
+        color: `
+000000                       |fcd246*|fcc42a%%|fcd246*|000000   |fcd246+|fcc42a%@#|b6d246*|7ec438+|000000  |fcc42a*|fcc438+|000000 |7ec438=|8cd246=
+000000  |7ec438#|c4c438@|d2c438@|9ad246@|70c438*|000000   |fcc438+|fcc42a*|b6d246#|7ed246*|70c438=|000000 |fcd238*|fcc42a@|fcb62a@|fcc42a%|d2c446*|9ac446@|fcc42a@|fca80e@|d28c0e%%|fcb60e@|fcc42a@|a8d246+|d2d246#|fcb60e@|d28c1c%|b67e1c%|fcb60e@|eec438@|7ec438#|9ac446*|fcc42a@|d28c1c%|e09a1c%|fcc42a@|8cc438%|7ec438*|fcc438%|e09a1c%|fcb61c@|d2d246=
+000000  |d2c446+|fca81c@|e09a1c%|fcc42a@|70c438*|7ec446=|7ec438-|fcc438@|ee9a0e@|c48c1c%|fcb61c@|a8c438%|70c438#|c4d246%|fcb61c@|e09a1c%|b6701c%|fca80e@|fcc438@|eed254*|fcc42a@|fcb61c@|d28c0e%|d28c1c%|fcb61c@|fcd238@|000000  |fcc438#|fcb62a@|fcc42a@#|000000    |fcc42a*#|000000    |fcb62a#|fcc42a*
+000000          |fcc42a*#|fcd238+|000000   |fcd246=|fcc42a%@|fcc438*|000000   |fcc438+%%|fcd246+
+`,
+        plano: `
+                       +**+   =*#*=-  == --
+  =***-   =++=: +#*#=*#*==*#=*#=-*#==#==#+-*+*-
+  =*+#=::#+-**+*#=:*#+#*==*%  +##*    ++    ++
+          ++=   =*#+   =#*=
+`
+      },
+      {
+        color: `
+000000                       |fcd246*|fcc438%|fcc42a%|fcc438*|000000   |fcd246+|fcc42a%@#|b6d254*|7ec438+|000000  |fcc42a*+|000000 |7ec438=|8cd246=
+000000  |7ec438#|b6c438@|e0c438@|a8d246@|70c438*|000000   |fcc438+|eec42a*|b6d246#|7ed246*|70c438=|000000 |fcd238*|fcc42a@|fcb62a@|fcc42a%|d2c446*|9ac446@|fcc42a@|fca81c@|d28c0e%%|fcb60e@|fcc42a@|a8d246+|e0d246%|fcb60e@|d28c1c%|b67e1c%|fcb60e@|eec438@|7ec438#|8cc446*|fcc42a@|d28c1c%|e09a1c%|fcc42a@|7ec438%*|fcc438%|e09a1c%|fcb61c@|d2d246=
+000000  |d2c446+|fcb61c@|e09a1c%|eec42a@|70c438*|7ec446=|7ec438-|fcc438@|eea81c@|c48c1c%|fcb61c@|a8c438%|70c438%|d2d246%|fcb61c@|e09a1c%|b6701c%|fca80e@|fcc438@|eed254*|fcc42a@|fcb61c@|d28c0e%|d28c1c%|fcb61c@|fcc438@|000000  |fcc438#|fcc42a@|fcb62a@|fcc42a#|000000    |fcc42a**|000000    |fcb62a#|fcc42a*
+000000          |fcc42a*#|fcd246+|000000   |fcd246=|fcc42a%@|fcc438*|000000   |fcc438+%%|fcc446=
+`,
+        plano: `
+                       +**+   =*#++=  += --
+  =*#*=   =++=: +###+*#*==*#=*#=-*#+=#==#+=*+*-
+  =*+#=::#+=#*+*#=-*#+#*==#%  *##*    ++    ++
+          ++=   =*#+   +##-
+`
+      }
+    ]
   }
 ]);
 export const GUIRNALDA_BRILLO = 1.15;

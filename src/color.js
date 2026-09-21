@@ -13,6 +13,8 @@ export const ESC = {
   limpiaLinea: '\x1b[K',
   limpiaAbajo: '\x1b[J',
   arriba: (n) => (n > 0 ? `\x1b[${n}F` : ''),   // n líneas arriba, a la columna 1
+  abajo:  (n) => (n > 0 ? `\x1b[${n}E` : ''),   // n líneas abajo, a la columna 1
+  columna: (n) => `\x1b[${n + 1}G`,              // a la columna n (desde 0) de esta línea
   bold: '\x1b[1m',
   dim: '\x1b[2m'
 };

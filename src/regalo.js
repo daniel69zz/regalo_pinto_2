@@ -8,17 +8,10 @@
 import { componer, MENSAJE, ALTO_A_CIEGAS } from './layout.js';
 import { pinta } from './lienzo.js';
 import {
-  PALETA, tinta, revelaArte, revelaRotulo,
-  arcoiris, bucleRotulo, bucleCinta
+  revelaArte, revelaRotulo, arcoiris, sangriaRotulo, bucleRotulo, bucleCinta
 } from './escena.js';
 
 export { MENSAJE };
-
-/** Lo único que se escribe además del arte y el rótulo: la firma del mensaje. */
-const CIERRE = ['con retraso, pero con todo el cariño'];
-/** La misma firma para consolas estrechas: si se parte en dos, el bucle final
- *  sube menos líneas de las que ha escrito y el rótulo se descuadra. */
-const CIERRE_CORTO = ['con todo el cariño'];
 
 /**
  * @param {object} s        salida (src/salida.js)
@@ -39,7 +32,7 @@ export async function regalo(s, opciones = {}) {
   } = opciones;
 
   const escena = componer(s.ancho, { flores, mensaje, mono: s.nivel === 'ninguno', filas });
-  const { arte, rotulo, desfase } = escena;
+  const { arte, rotulo, desfase, giro, flor } = escena;
 
   if (modo === 'estatico') {
     estatico(s, escena);
@@ -52,16 +45,11 @@ export async function regalo(s, opciones = {}) {
 
   const cual = bucle === 'auto' ? eligeBucle(filas, rotulo) : bucle;
   if (cual === 'rotulo') {
-    // aquí el cierre lo escribe el propio bucle: cada vuelta sube hasta el
-    // rótulo y lo repinta todo, y si ya estuviera escrito lo machacaría
-    await bucleRotulo(s, rotulo, { cola: despedida(s), desfase });
+    await bucleRotulo(s, rotulo, { desfase, ...queGira(filas, rotulo, giro, flor) });
     return escena;
   }
 
-  cierra(s, escena);
-  if (cual === 'cinta') {
-    await bucleCinta(s, { texto: `¡FELIZ CUMPLEAÑOS!  ·  ${CIERRE[0]}` });
-  }
+  if (cual === 'cinta') await bucleCinta(s, { texto: '¡FELIZ 21 DE SEPTIEMBRE!' });
   return escena;
 }
 
@@ -76,16 +64,23 @@ function eligeBucle(filas, rotulo) {
   return (filas ?? ALTO_A_CIEGAS) > rotulo.length + 4 ? 'rotulo' : 'cinta';
 }
 
-/** Las líneas de despedida, centradas y ya pintadas. */
-function despedida(s, textos = CIERRE) {
-  if (textos === CIERRE && textos.some((t) => t.length > s.ancho)) textos = CIERRE_CORTO;
-  return textos.map((t) =>
-    ' '.repeat(Math.max(0, Math.floor((s.ancho - t.length) / 2))) + tinta(t, PALETA.gris, s.nivel));
-}
-
-function cierra(s, escena, textos = CIERRE) {
-  for (const l of despedida(s, textos)) s.linea(l);
-  s.linea();
+/**
+ * ¿Giran los girasoles o se quedan quietos?
+ *
+ * Para animarlos hay que subir el cursor por encima de ellos, así que tiene que
+ * constar que siguen en pantalla: guirnalda + rótulo y sus dos líneas en
+ * blanco, más la fila donde se queda el cursor, todo dentro de las filas de la
+ * consola. El girasol grande está encima de la guirnalda, así que sólo gira si
+ * gira ella y además cabe él. Lo que no cabe llega vacío y el bucle lo deja
+ * quieto donde lo dejó el revelado.
+ */
+function queGira(filas, rotulo, giro, flor) {
+  const alto = filas ?? ALTO_A_CIEGAS;
+  const debajo = rotulo.length + 2;
+  const altoGiro = giro?.[0]?.length ?? 0;
+  if (!altoGiro || alto <= altoGiro + debajo) return { giro: [], flor: null };
+  const altoFlor = flor?.marcos[0]?.length ?? 0;
+  return { giro, flor: altoFlor && alto > altoFlor + altoGiro + debajo ? flor : null };
 }
 
 /**
@@ -98,13 +93,11 @@ function estatico(s, escena) {
   for (const linea of escena.arte) s.linea(linea.length ? pinta(linea, s.nivel, {}) : '');
   s.linea();
   if (escena.rotulo.length) {
-    const ancho = Math.max(...escena.rotulo.map((l) => l.length));
-    const margen = ' '.repeat(Math.max(0, Math.floor((s.ancho - ancho) / 2)));
+    const margen = sangriaRotulo(s, escena.rotulo);
     // el arcoíris queda congelado, con el desfase por renglón de la web
     escena.rotulo.forEach((l, i) => {
       s.linea(l.trim() ? margen + arcoiris(l, s.nivel, -i * escena.desfase) : '');
     });
     s.linea();
   }
-  cierra(s, escena);
 }

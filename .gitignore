@@ -30,8 +30,8 @@ yarn-error.log*
 #   src/arte.js    lo genera `npm run arte`, pero es lo que se ejecuta: el
 #                  contenedor copia src/ y nunca corre el generador, así que
 #                  si no está en el repo no hay regalo que servir.
-#   pinto.png      el original del retrato.
-#   girasol.png    las flores las dibuja `npm run flores`, y son la fuente
-#   guirnalda.png  de la que `npm run arte` saca el ASCII. Sin ellas no se
-#                  puede regenerar el arte (ni retocar las flores).
+#   pinto.png      el original del retrato: sin él no hay nada que convertir.
+#   girasol.png    las flores no salen de aquí —`npm run arte` las dibuja en
+#   guirnalda.png  memoria—, pero son la única forma de mirarlas con ojos en
+#                  vez de con caracteres, así que se guardan igual.
 # --------------------------------------------------------------------------

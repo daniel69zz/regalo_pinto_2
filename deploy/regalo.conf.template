@@ -1,5 +1,9 @@
 # ============================================================
-# El regalo detrás de un dominio: flores.duckdns.org
+# El regalo detrás de un dominio: pinto-tqm.duckdns.org
+#
+# OJO con el TLD: DuckDNS reparte subdominios de duckdns.ORG. duckdns.com existe
+# y resuelve (a un aparcamiento que no es tuyo), así que un server_name con .com
+# no da error en ningún sitio: simplemente nunca le llega una petición.
 # ============================================================
 #
 # El contenedor escucha en el 2999 y se publica en el 2999 del VPS
@@ -33,7 +37,7 @@
 
 server {
   listen 80;
-  server_name flores.duckdns.org;          # <-- tu dominio aquí
+  server_name pinto-tqm.duckdns.org;          # .org, que es lo que da DuckDNS
 
   # nada de `return 301 https://...` aquí: curl no sigue redirecciones si no le
   # pasan -L, así que redirigir es servir una línea de texto en vez del regalo.
@@ -102,7 +106,7 @@ server {
 }
 
 # ------------------------------------------------------------------
-# Para que baste con `curl flores.duckdns.org` hacen falta dos cosas más:
+# Para que baste con `curl pinto-tqm.duckdns.org` hacen falta dos cosas más:
 #
 #   1. un registro A del dominio apuntando a la IP del VPS (con DuckDNS, poner
 #      la IP una vez y listo: no cambia);
@@ -114,15 +118,15 @@ server {
 # ¿HTTPS también? En este orden, y sin saltarse el primer paso:
 #
 #   1. con nginx en contenedor, añade  ensure_cert "${REGALO_DOMAIN}"  a
-#      nginx/init-certs.sh y  REGALO_DOMAIN: flores.duckdns.org  al environment
+#      nginx/init-certs.sh y  REGALO_DOMAIN: pinto-tqm.duckdns.org  al environment
 #      del servicio nginx, para que el self-signed temporal exista antes de que
 #      nginx lo busque;
 #   2. reinicia nginx y emite el certificado de verdad:
 #      docker compose run --rm certbot certonly --webroot -w /var/www/certbot \
-#        -d flores.duckdns.org
+#        -d pinto-tqm.duckdns.org
 #   3. y entonces sí, copia aquí un bloque 443 con este mismo server_name y el
 #      mismo `location /` de arriba.
 #
 # El bloque 80 se queda como está: sin redirección, que es lo que hace que
-# `curl flores.duckdns.org` siga funcionando.
+# `curl pinto-tqm.duckdns.org` siga funcionando.
 # ------------------------------------------------------------------

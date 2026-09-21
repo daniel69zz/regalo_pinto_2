@@ -129,7 +129,7 @@ class Lienzo {
  * tiradas —pedirle 120 y que devuelva 104—. Y de paso deja que la proporción
  * del dibujo sea la que se ve, no la del lienzo en el que se pintó.
  */
-function recortaAlContenido(px, w, h, margen = 2) {
+function cajaDelContenido(px, w, h, margen = 2) {
   let x0 = w, y0 = h, x1 = 0, y1 = 0;
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -143,8 +143,12 @@ function recortaAlContenido(px, w, h, margen = 2) {
       if (y > y1) y1 = y;
     }
   }
-  x0 = Math.max(0, x0 - margen); y0 = Math.max(0, y0 - margen);
-  x1 = Math.min(w - 1, x1 + margen); y1 = Math.min(h - 1, y1 + margen);
+  return [Math.max(0, x0 - margen), Math.max(0, y0 - margen),
+          Math.min(w - 1, x1 + margen), Math.min(h - 1, y1 + margen)];
+}
+
+/** Recorta a una caja dada [x0,y0,x1,y1]. */
+function recortaA(px, w, [x0, y0, x1, y1]) {
   const nw = x1 - x0 + 1, nh = y1 - y0 + 1;
   const out = new Uint8Array(nw * nh * 3);
   for (let y = 0; y < nh; y++) {
@@ -154,6 +158,11 @@ function recortaAlContenido(px, w, h, margen = 2) {
     }
   }
   return { px: out, w: nw, h: nh };
+}
+
+/** Lo de siempre: caja del contenido y recorte, de una vez. */
+function recortaAlContenido(px, w, h, margen = 2) {
+  return recortaA(px, w, cajaDelContenido(px, w, h, margen));
 }
 
 /* --------------------------------------------------------------- color -- */
@@ -201,8 +210,14 @@ function corona(dx, dy, { n, fase, r0, r1, ancho }) {
   const th = Math.atan2(dy, dx);
   const k = Math.round((th - fase) / sector);
   const a = th - fase - k * sector;
-  // cada pétalo, un poco distinto: ni la naturaleza los hace iguales
-  const largo = 0.86 + 0.14 * azar(k * 7.3 + n);
+  // cada pétalo, un poco distinto: ni la naturaleza los hace iguales. El largo
+  // va por la dirección en la que apunta el pétalo y no por su número, porque
+  // la flor gira: así, al avanzar un sector, cada pétalo ocupa el sitio del de
+  // al lado con su mismo largo y el bucle cierra sin que los pétalos peguen un
+  // estirón. Lo que se ve es una silueta un poco irregular, quieta, por la que
+  // van pasando los pétalos.
+  const eje = fase + k * sector;
+  const largo = 0.92 + 0.05 * Math.sin(2 * eje + n) + 0.03 * Math.sin(5 * eje + 1.3 * n);
   const t = (r - r0) / ((r1 - r0) * largo);
   if (t > 1) return null;
   const medio = (sector / 2) * ancho * Math.pow(Math.sin(Math.PI * (0.06 + t * 0.94)), 0.7);
@@ -224,15 +239,29 @@ function tintaPetalo(p, atenua = 1) {
 /**
  * La cabeza de la flor: dos coronas de pétalos (la de detrás más apagada, que
  * es lo que da el volumen) y el disco de semillas en espiral de Fibonacci.
+ *
+ * `vuelta` (de 0 a 1) la gira sobre su centro, y `sentido` (1 o -1) dice hacia
+ * dónde. Cada capa avanza su propio periodo —la corona de delante un sector,
+ * la de detrás el suyo, el festón una onda—, así que en `vuelta = 1` todo está
+ * donde estaba en `vuelta = 0` y unos cuantos fotogramas repartidos por el
+ * medio dan un bucle sin costura: es con lo que los girasoles giran de verdad
+ * en la terminal.
+ *
+ * Las semillas no giran. La espiral de Fibonacci no se repite al girar un
+ * sector, así que al cerrar el bucle el disco entero pegaría un salto hacia
+ * atrás; quieto no se nota, porque lo que dice "esto gira" son los pétalos.
  */
-function cabeza(l, cx, cy, radio, { n = 21, disco = 0.38 } = {}) {
+function cabeza(l, cx, cy, radio, { n = 21, disco = 0.38, vuelta = 0, sentido = 1 } = {}) {
   const rDisco = radio * disco;
   const x0 = cx - radio, x1 = cx + radio, y0 = cy - radio, y1 = cy + radio;
+  const giro = (periodo) => sentido * vuelta * periodo;
+  const atras = n - 4;
 
   // corona de detrás: pétalos más cortos, girados medio sector y a la sombra
   l.zona(x0, y0, x1, y1, (x, y) => {
     const p = corona(x - cx, y - cy, {
-      n: n - 4, fase: Math.PI / (n - 4), r0: rDisco * 0.86, r1: radio * 0.9, ancho: 0.94
+      n: atras, fase: Math.PI / atras + giro(2 * Math.PI / atras),
+      r0: rDisco * 0.86, r1: radio * 0.9, ancho: 0.94
     });
     return p ? tintaPetalo(p, 0.78) : null;
   });
@@ -240,7 +269,7 @@ function cabeza(l, cx, cy, radio, { n = 21, disco = 0.38 } = {}) {
   // corona de delante
   l.zona(x0, y0, x1, y1, (x, y) => {
     const p = corona(x - cx, y - cy, {
-      n, fase: 0, r0: rDisco * 0.82, r1: radio, ancho: 0.9
+      n, fase: giro(2 * Math.PI / n), r0: rDisco * 0.82, r1: radio, ancho: 0.9
     });
     return p ? tintaPetalo(p) : null;
   });
@@ -252,7 +281,8 @@ function cabeza(l, cx, cy, radio, { n = 21, disco = 0.38 } = {}) {
     if (d > 0.88) {
       // el anillo de flósculos abiertos, con su festón
       const th = Math.atan2(y - cy, x - cx);
-      const festón = 0.5 + 0.5 * Math.sin(th * n * 1.6);
+      const ondas = Math.round(n * 1.6);
+      const festón = 0.5 + 0.5 * Math.sin(ondas * th - giro(2 * Math.PI));
       return mezcla(DISCO.flósculo, DISCO.claro, 0.35 * festón);
     }
     return mezcla(DISCO.semilla, DISCO.fondo, Math.pow(d, 0.7));
@@ -326,18 +356,18 @@ function hoja(l, x, y, largo, ancho, giro) {
 /* ------------------------------------------------------------- cuadros -- */
 
 /**
- * La protagonista: un girasol de frente, con el tallo y dos hojas.
+ * La flor grande: un girasol de frente, con el tallo y dos hojas.
  *
- * Va sola y bien grande porque es la que manda en la escena: en una consola
- * ancha se dibuja a 120 columnas, y a ese tamaño el disco de semillas se ve
- * semilla a semilla.
+ * Va sola y bien grande porque es la que acompaña a Pinto: a ese tamaño el
+ * disco de semillas se ve semilla a semilla. Con `vuelta` gira la cabeza; el
+ * tallo y las hojas se quedan donde están, que la flor gira, no la planta.
  */
-function dibujaGirasol() {
+export function dibujaGirasol(vuelta = 0) {
   const l = new Lienzo(510, 580);
   tallo(l, [262, 400], [272, 500], [252, 590], { grosor: 13 });
   hoja(l, 268, 496, 132, 40, -0.24 + Math.PI);        // hoja izquierda
   hoja(l, 266, 538, 112, 34, -0.34);                  // hoja derecha
-  cabeza(l, 255, 246, 238, { n: 22, disco: 0.4 });
+  cabeza(l, 255, 246, 238, { n: 22, disco: 0.4, vuelta });
   return l;
 }
 
@@ -352,7 +382,7 @@ function dibujaGirasol() {
  * tallo hace una onda muy suave: en ASCII una línea recta se lee como un
  * subrayado, y la onda es lo que la convierte en rama.
  */
-function dibujaGuirnalda() {
+export function dibujaGuirnalda(vuelta = 0) {
   const l = new Lienzo(1200, 210);
   const onda = (x) => 112 + 24 * Math.sin((x - 40) / 1120 * Math.PI * 2);
 
@@ -370,16 +400,62 @@ function dibujaGuirnalda() {
   });
 
   // y las flores encima, la mayor en el centro
+  // `vuelta` va de 0 a 1 y es una vuelta de sector: cada flor gira su propio
+  // sector (2π/n), así que todas vuelven a su sitio a la vez y el bucle cierra.
+  // Las de índice par giran al derecho y las impares al revés, que un carrusel
+  // entero girando para el mismo lado parece una cinta transportadora.
   const flores = [[135, 46], [300, 58], [465, 74], [620, 92], [790, 74], [950, 58], [1085, 46]];
-  for (const [x, r] of flores) {
-    cabeza(l, x, onda(x), r, { n: r > 70 ? 15 : 12, disco: 0.34 });
-  }
+  flores.forEach(([x, r], i) => {
+    const n = r > 70 ? 15 : 12;
+    cabeza(l, x, onda(x), r, { n, disco: 0.34, vuelta, sentido: i % 2 ? -1 : 1 });
+  });
   return l;
 }
 
-for (const [nombre, dibujo] of [['girasol.png', dibujaGirasol()],
-                                ['guirnalda.png', dibujaGuirnalda()]]) {
-  const r = recortaAlContenido(dibujo.reduce(), dibujo.w, dibujo.h);
-  escribePNG(join(RAIZ, nombre), r.w, r.h, r.px);
-  console.error(`→ ${nombre}  (${r.w}x${r.h}, proporción ${(r.h / r.w).toFixed(2)})`);
+/**
+ * El dibujo tal y como lo quiere `foto.mjs`: ya reducido, recortado al
+ * contenido y con la luminancia calculada. Así `generar-arte.mjs` puede pedir
+ * los fotogramas del giro sin pasar por veinte PNG en el disco.
+ */
+export function comoImagen(lienzo, caja = null) {
+  const bruto = lienzo.reduce();
+  const { px, w, h } = caja
+    ? recortaA(bruto, lienzo.w, caja)
+    : recortaAlContenido(bruto, lienzo.w, lienzo.h);
+  const lum = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    lum[i] = 0.2126 * px[i * 3] + 0.7152 * px[i * 3 + 1] + 0.0722 * px[i * 3 + 2];
+  }
+  return { w, h, lum, rgb: px };
+}
+
+/**
+ * Los fotogramas de un giro, todos exactamente del mismo tamaño.
+ *
+ * Lo del mismo tamaño no es un detalle: en la terminal los fotogramas se pintan
+ * uno encima de otro sobre las mismas filas, y si uno midiera una fila más, el
+ * bucle se descuadraría. Por eso se dibujan todos, se mira dónde tiene
+ * contenido cada uno y se recortan todos a la caja que los cubre a todos: los
+ * pétalos que asoman al girar entran dentro, no se van por el recorte.
+ */
+function marcos(dibuja, n) {
+  const lienzos = Array.from({ length: n }, (_, k) => dibuja(k / n));
+  const cajas = lienzos.map((l) => cajaDelContenido(l.reduce(), l.w, l.h));
+  const union = [Math.min(...cajas.map((c) => c[0])), Math.min(...cajas.map((c) => c[1])),
+                 Math.max(...cajas.map((c) => c[2])), Math.max(...cajas.map((c) => c[3]))];
+  return lienzos.map((l) => comoImagen(l, union));
+}
+
+export const marcosGuirnalda = (n = 8) => marcos(dibujaGuirnalda, n);
+export const marcosGirasol = (n = 8) => marcos(dibujaGirasol, n);
+
+// Ejecutado a mano (`npm run flores`) escribe además los PNG, que son la única
+// forma cómoda de mirar las flores con ojos en vez de con caracteres.
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  for (const [nombre, dibujo] of [['girasol.png', dibujaGirasol()],
+                                  ['guirnalda.png', dibujaGuirnalda()]]) {
+    const r = recortaAlContenido(dibujo.reduce(), dibujo.w, dibujo.h);
+    escribePNG(join(RAIZ, nombre), r.w, r.h, r.px);
+    console.error(`→ ${nombre}  (${r.w}x${r.h}, proporción ${(r.h / r.w).toFixed(2)})`);
+  }
 }

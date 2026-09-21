@@ -45,13 +45,15 @@ export function deArte(filas, brillo = 1) {
 
 /**
  * Dos bloques uno al lado del otro, centrados verticalmente entre sí
- * (el `align-items: center` de `.arte` en la web).
+ * (el `align-items: center` de `.arte` en la web). Con `abajo`, los dos se
+ * apoyan en el mismo suelo en vez de centrarse.
  */
-export function juntar(a, b, hueco = 3) {
+export function juntar(a, b, hueco = 3, { abajo = false } = {}) {
   const w = anchoBloque(a);
   const alto = Math.max(a.length, b.length);
-  const desfaseA = Math.floor((alto - a.length) / 2);
-  const desfaseB = Math.floor((alto - b.length) / 2);
+  const desfase = (n) => (abajo ? alto - n : Math.floor((alto - n) / 2));
+  const desfaseA = desfase(a.length);
+  const desfaseB = desfase(b.length);
   const out = [];
   for (let i = 0; i < alto; i++) {
     const izq = a[i - desfaseA] ?? [];

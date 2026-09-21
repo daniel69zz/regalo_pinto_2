@@ -12,18 +12,10 @@ import { pinta } from './lienzo.js';
 
 /** Paleta de la terminal del regalo (misma que src/styles/global.css). */
 export const PALETA = {
-  verdeTen: '#8dffc9',      // el fósforo del escaneo
-  gris:     '#6f8a80'       // la línea de despedida bajo el rótulo
+  verdeTen: '#8dffc9'       // el fósforo del escaneo
 };
 
 const rgbDe = (hex) => aRGB(hex.replace('#', ''));
-const col = (hex, nivel) => (nivel === 'ninguno' ? '' : fg(rgbDe(hex), nivel));
-
-/** Texto suelto ya pintado. */
-export function tinta(texto, hex, nivel) {
-  if (nivel === 'ninguno') return texto;
-  return col(hex, nivel) + texto + ESC.reset;
-}
 
 /* -------------------------------------------------------------- arte ---- */
 
@@ -103,8 +95,7 @@ export function arcoiris(texto, nivel, fase, { paso = 0.003, pasos = 32 } = {}) 
  */
 export async function revelaRotulo(s, rotulo, { fase = 0, desfase = 0.06 } = {}) {
   if (!rotulo.length) return;
-  const margen = Math.max(0, Math.floor((s.ancho - Math.max(...rotulo.map((l) => l.length))) / 2));
-  const sangria = ' '.repeat(margen);
+  const sangria = sangriaRotulo(s, rotulo);
 
   s.linea();
   for (let i = 0; i < rotulo.length; i++) {
@@ -123,25 +114,82 @@ export async function revelaRotulo(s, rotulo, { fase = 0, desfase = 0.06 } = {})
   s.linea();
 }
 
+/** Los espacios que centran el rótulo en la consola. */
+export function sangriaRotulo(s, rotulo) {
+  return ' '.repeat(Math.max(0, Math.floor((s.ancho - Math.max(...rotulo.map((l) => l.length))) / 2)));
+}
+
 /**
- * Repinta el rótulo entero una y otra vez, con el arcoíris rodando.
+ * Repinta el final de la escena una y otra vez: el arcoíris rodando por el
+ * rótulo y, encima, los girasoles girando: los de la guirnalda y el grande, el
+ * que está junto a Pinto.
  *
- * Es el único sitio donde se sube el cursor, y por eso `cola` (las líneas de
- * despedida) se repinta aquí dentro: si se hubiera escrito antes, cada vuelta
- * la machacaría. En la primera vuelta el rótulo ya está en pantalla y la cola
- * no, así que se sube menos.
+ * Es el único sitio donde se sube el cursor.
+ *
+ * `giro` son los fotogramas de la guirnalda y `flor` los del girasol grande,
+ * que va apoyado sobre ella, junto al retrato: son lo único del arte que puede
+ * animarse, porque están al final de todo y siguen en pantalla. De Pinto se
+ * suele ver sólo la parte de abajo; subir hasta su cara sería pintar a ciegas.
+ * Quien decide si caben es `regalo.js`, que sabe cuántas filas tiene la
+ * consola: si no, llegan vacíos y se quedan quietos donde los dejó el revelado.
+ *
+ * Del girasol se repinta sólo su trozo de cada fila: el cursor salta a la
+ * columna donde empieza (`flor.columna`) y borra de ahí al final, así que el
+ * retrato de la izquierda no se toca.
+ *
+ * Los girasoles van a `giroFps`, mucho más despacio que el arcoíris, y entre
+ * cambio y cambio no se reescriben: se salta por encima con un movimiento de
+ * cursor. No es sólo estética —un girasol da la vuelta al sol, no a la
+ * lavadora—: un fotograma de guirnalda son unos 9 kB de escapes ANSI, y a la
+ * velocidad del arcoíris serían 110 kB/s por curl. A tres por segundo son 30, y
+ * el giro se ve igual de bien.
  */
-export async function bucleRotulo(s, rotulo, { cola = [], fps = 12, desfase = 0.06 } = {}) {
+export async function bucleRotulo(s, rotulo,
+                                  { fps = 12, desfase = 0.06,
+                                    giro = [], flor = null, giroFps = 3 } = {}) {
   if (!rotulo.length) return;
-  const margen = Math.max(0, Math.floor((s.ancho - Math.max(...rotulo.map((l) => l.length))) / 2));
-  const sangria = ' '.repeat(margen);
-  const primera = rotulo.length + 1;              // rótulo + su línea en blanco
-  const total = primera + cola.length;
-  let subir = primera;
+  const sangria = sangriaRotulo(s, rotulo);
+  const altoGiro = giro[0]?.length ?? 0;          // filas de la guirnalda
+  const altoFlor = altoGiro ? (flor?.marcos[0]?.length ?? 0) : 0;
+  // flor + guirnalda + su blanco + rótulo + el blanco de después
+  const subir = altoFlor + altoGiro + (altoGiro ? 1 : 0) + rotulo.length + 1;
   let fase = 0;
+  let tic = 0;
+  let pintado = -1;                               // qué fotograma está en pantalla
+  let florPintada = 0;                            // el revelado dejó puesto el primero
 
   while (s.vivo) {
     s.escribe(ESC.arriba(subir));
+    const marco = Math.floor(tic * giroFps / fps);
+
+    if (altoFlor) {
+      const m = marco % flor.marcos.length;
+      if (m !== florPintada) {
+        for (const linea of flor.marcos[m]) {
+          s.escribe(ESC.columna(flor.columna) + ESC.limpiaLinea);
+          s.linea(linea.length ? pinta(linea, s.nivel, {}) : '');
+        }
+        florPintada = m;
+      } else {
+        s.escribe(ESC.abajo(altoFlor));
+      }
+    }
+
+    if (altoGiro) {
+      const m = marco % giro.length;
+      if (m !== pintado) {
+        for (const linea of giro[m]) {
+          s.escribe(ESC.limpiaLinea);
+          s.linea(linea.length ? pinta(linea, s.nivel, {}) : '');
+        }
+        pintado = m;
+      } else {
+        s.escribe(ESC.abajo(altoGiro));           // no ha cambiado: ni se toca
+      }
+      s.escribe(ESC.limpiaLinea);
+      s.linea();
+    }
+
     for (let i = 0; i < rotulo.length; i++) {
       const linea = rotulo[i];
       s.escribe(ESC.limpiaLinea);
@@ -149,9 +197,9 @@ export async function bucleRotulo(s, rotulo, { cola = [], fps = 12, desfase = 0.
     }
     s.escribe(ESC.limpiaLinea);
     s.linea();
-    for (const linea of cola) { s.escribe(ESC.limpiaLinea); s.linea(linea); }
-    subir = total;
+
     fase += 0.012;
+    tic++;
     await s.espera(1000 / fps);
   }
 }

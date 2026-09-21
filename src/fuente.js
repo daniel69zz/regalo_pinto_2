@@ -103,17 +103,33 @@ export function rotulo(texto) {
 /**
  * Parte un renglón en los que hagan falta para no pasar de `max` columnas.
  * Si una palabra suelta ya no cabe, se devuelve igual: el que la eligió sabrá.
+ *
+ * Con los menos renglones posibles y, entre las formas de partir con esos
+ * renglones, la más pareja (la que menos hueco cuadrado deja). Llenar cada
+ * renglón hasta donde quepa deja palabras huérfanas: "¡FELIZ 21 DE SEPTIEMBRE!"
+ * en 54 columnas salía "¡FELIZ 21" / "DE" / "SEPTIEMBRE!", y parejo sale
+ * "¡FELIZ" / "21 DE" / "SEPTIEMBRE!". Como los renglones van centrados, se
+ * nota. Son cuatro palabras por renglón, así que la tabla es de juguete.
  */
 function parte(texto, max) {
   const palabras = texto.split(/\s+/).filter(Boolean);
-  const salida = [];
-  let actual = '';
-  for (const p of palabras) {
-    const prueba = actual ? `${actual} ${p}` : p;
-    if (ancho(prueba) <= max || !actual) actual = prueba;
-    else { salida.push(actual); actual = p; }
+  const n = palabras.length;
+  // mejor[i]: la mejor forma de partir las i primeras palabras
+  const mejor = [{ renglones: 0, coste: 0, desde: -1 }];
+  for (let i = 1; i <= n; i++) {
+    mejor[i] = null;
+    for (let j = i - 1; j >= 0; j--) {
+      const w = ancho(palabras.slice(j, i).join(' '));
+      if (w > max && i - j > 1) break;           // más atrás sólo es más ancho
+      const prueba = { renglones: mejor[j].renglones + 1,
+                       coste: mejor[j].coste + Math.max(0, max - w) ** 2, desde: j };
+      const m = mejor[i];
+      if (!m || prueba.renglones < m.renglones ||
+          (prueba.renglones === m.renglones && prueba.coste < m.coste)) mejor[i] = prueba;
+    }
   }
-  if (actual) salida.push(actual);
+  const salida = [];
+  for (let i = n; i > 0; i = mejor[i].desde) salida.unshift(palabras.slice(mejor[i].desde, i).join(' '));
   return salida;
 }
 
@@ -168,7 +184,7 @@ export function render(lineas, max = Infinity, { compacta = false } = {}) {
 
 /**
  * Plan B para consolas muy estrechas: por debajo de ~54 columnas ni
- * "CUMPLEAÑOS!" cabe en bloques (11 letras x 5 = 54), así que el rótulo pasa a
+ * "SEPTIEMBRE!" cabe en bloques (11 letras x 5 = 54), así que el rótulo pasa a
  * texto espaciado. Menos vistoso, pero legible, que es de lo que se trata.
  */
 export function rotuloPlano(lineas, max) {

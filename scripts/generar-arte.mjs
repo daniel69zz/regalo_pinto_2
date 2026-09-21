@@ -24,6 +24,7 @@ import { writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cargarImagen, aAscii } from './foto.mjs';
+import { marcosGirasol, marcosGuirnalda } from './dibujar-flores.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -59,9 +60,17 @@ const RETRATO = {
  */
 const FLOR = { key: [225, 12], vig: 0, crop: [0, 0, 1, 1], minden: 0.78, piso: 0.14, sat: 1.15 };
 
-/** El girasol que acompaña al retrato, a su derecha. */
+/**
+ * Fotogramas del giro. Ocho por vuelta de sector: con menos, los girasoles dan
+ * tirones; con más, `src/arte.js` engorda sin que se note en pantalla, porque
+ * cada flor de la guirnalda mide diez caracteres de ancho y al girasol grande
+ * ocho le bastan para que la punta de un pétalo avance menos de una columna.
+ */
+const MARCOS = 8;
+
+/** El girasol grande, que va de pie junto al retrato. */
 const GIRASOL = {
-  fichero: 'girasol.png',
+  imagenes: () => marcosGirasol(MARCOS),
   anchos: [56, 48, 42, 36, 30, 26, 22, 18],
   opciones: FLOR,
   mono: MONO_FLOR
@@ -75,26 +84,68 @@ const GIRASOL = {
  * que quepa y se centra debajo. De ahí que lleguen hasta 176.
  */
 const GUIRNALDA = {
-  fichero: 'guirnalda.png',
+  imagenes: () => marcosGuirnalda(MARCOS),
   anchos: [176, 160, 144, 128, 112, 96, 84, 72, 60, 48],
   opciones: { ...FLOR, piso: 0.18 },
   mono: MONO_FLOR
 };
+
+/** Ancho real en columnas de una versión en color (los tramos ya montados). */
+const anchoDe = (color) => Math.max(...color.map((f) =>
+  f.split('|').map((t) => t.slice(6)).join('').length));
 
 function genera({ fichero, anchos, opciones, mono }) {
   const img = cargarImagen(join(RAIZ, fichero));
   return anchos.map((cols) => {
     const { color, filas } = aAscii(img, { ...opciones, cols });
     const plano = aAscii(img, { ...opciones, ...mono, cols }).texto;
-    const ancho = Math.max(...color.map((f) =>
-      f.split('|').map((t) => t.slice(6)).join('').length));
-    return { pedido: cols, cols: ancho, filas, color, plano };
+    return { pedido: cols, cols: anchoDe(color), filas, color, plano };
+  });
+}
+
+/**
+ * Lo mismo, pero con los fotogramas del giro.
+ *
+ * Se comprueba que todos tengan las mismas FILAS: se pintan unos encima de
+ * otros sobre las mismas líneas de la terminal, y uno con una fila de más
+ * descuadraría el bucle. El ancho sí puede bailar una columna —el conversor
+ * quita los espacios del final de cada fila, y al girar los pétalos el último
+ * carácter cae en un sitio u otro—; de igualarlo se encarga `layout.js`, que
+ * los centra a todos contra el mismo ancho para que no tiriten.
+ */
+function generaMarcos(nombre, { imagenes, anchos, opciones, mono }) {
+  const imgs = imagenes();
+  return anchos.map((cols) => {
+    const marcos = imgs.map((img) => ({
+      color: aAscii(img, { ...opciones, cols }).color,
+      plano: aAscii(img, { ...opciones, ...mono, cols }).texto,
+      filas: aAscii(img, { ...opciones, cols }).filas
+    }));
+    const altos = new Set(marcos.map((m) => m.filas));
+    if (altos.size !== 1) {
+      throw new Error(`Los fotogramas ${nombre} a ${cols} columnas no tienen las mismas ` +
+                      `filas: ${[...altos].join(', ')}`);
+    }
+    return {
+      pedido: cols,
+      cols: Math.max(...marcos.map((m) => anchoDe(m.color))),
+      filas: marcos[0].filas,
+      marcos
+    };
   });
 }
 
 const retrato = genera(RETRATO);
-const girasol = genera(GIRASOL);
-const guirnalda = genera(GUIRNALDA);
+const girasol = generaMarcos('del girasol', GIRASOL);
+const guirnalda = generaMarcos('de la guirnalda', GUIRNALDA);
+
+const bloqueMarcos = (v) => v.map((t) =>
+  `  {\n    cols: ${t.cols}, alto: ${t.filas},\n    marcos: [\n` +
+  t.marcos.map((m) =>
+    `      {\n        color: \`\n${m.color.join('\n')}\n\`,\n` +
+    `        plano: \`\n${m.plano.join('\n')}\n\`\n      }`).join(',\n') +
+  `\n    ]\n  }`
+).join(',\n');
 
 const bloque = (v) => v.map((t) =>
   `  {\n    cols: ${t.cols}, alto: ${t.filas},\n` +
@@ -127,6 +178,15 @@ const parte = (s) => s.replace(/^\\n/, '').replace(/\\n$/, '').split('\\n');
 const filas = (a) => a.map((v) => ({ ...v, filas: parte(v.color), mono: parte(v.plano) }));
 
 /**
+ * Igual, pero para lo que gira: cada tamaño trae sus fotogramas, y las claves
+ * filas y mono apuntan al primero, que es el que se pinta si no hay animación.
+ */
+const conMarcos = (a) => a.map((v) => {
+  const marcos = v.marcos.map((m) => ({ filas: parte(m.color), mono: parte(m.plano) }));
+  return { ...v, marcos, filas: marcos[0].filas, mono: marcos[0].mono };
+});
+
+/**
  * Retrato de Pinto, de mayor a menor.
  *
  * El brillo se sube un poco al pintar, no en los datos: un carácter ASCII sólo
@@ -141,14 +201,17 @@ ${bloque(retrato)}
 export const RETRATO_BRILLO = 1.2;
 
 /**
- * El girasol que acompaña al retrato, de mayor a menor.
+ * El girasol grande, de mayor a menor. Va de pie junto al retrato, girando si
+ * cabe en pantalla.
  *
  * Un poco de brillo porque un carácter ASCII sólo entinta parte de su celda y
  * el amarillo se apaga; poco, que los pétalos ya rozan el 255 en la punta y lo
  * siguiente es que se vayan a blanco y se pierda el filo.
+ *
+ * Como la guirnalda, cada tamaño trae ${MARCOS} fotogramas del giro de la cabeza.
  */
-export const GIRASOL = filas([
-${bloque(girasol)}
+export const GIRASOL = conMarcos([
+${bloqueMarcos(girasol)}
 ]);
 export const GIRASOL_BRILLO = 1.15;
 
@@ -157,9 +220,13 @@ export const GIRASOL_BRILLO = 1.15;
  *
  * Se elige por el ancho del conjunto ya montado, no por el de la consola, y se
  * centra debajo: es la peana de la escena, no un tercer protagonista.
+ *
+ * Cada tamaño trae ${MARCOS} fotogramas: son girasoles, así que giran. Es una vuelta
+ * de sector de pétalos, que al acabar deja cada flor como estaba y el bucle
+ * cierra sin costura.
  */
-export const GUIRNALDA = filas([
-${bloque(guirnalda)}
+export const GUIRNALDA = conMarcos([
+${bloqueMarcos(guirnalda)}
 ]);
 export const GUIRNALDA_BRILLO = 1.15;
 `;
@@ -169,6 +236,10 @@ writeFileSync(destino, salida);
 
 const kb = (Buffer.byteLength(salida) / 1024).toFixed(1);
 console.error(`→ src/arte.js  (${kb} kB)`);
-for (const t of [...retrato, ...girasol, ...guirnalda]) {
+for (const t of retrato) {
   console.error(`   ${String(t.cols).padStart(3)} x ${String(t.filas).padStart(2)} caracteres`);
+}
+for (const t of [...girasol, ...guirnalda]) {
+  console.error(`   ${String(t.cols).padStart(3)} x ${String(t.filas).padStart(2)} caracteres` +
+                ` x ${t.marcos.length} fotogramas`);
 }
